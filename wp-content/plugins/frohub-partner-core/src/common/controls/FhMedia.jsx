@@ -1,9 +1,9 @@
-import FhButton from "./FhButton.jsx";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { InboxOutlined, DeleteOutlined } from "@ant-design/icons";
 import { message, Upload, Button } from "antd";
-import { uploadMedia } from "../../services/upload-media.js";
-import { deleteMedia } from "../../services/upload-media.js";
+import FhButton from "./FhButton";
+import useMediaStore from "./mediaStore.js";
+import {uploadMedia, deleteMedia} from "../../services/upload-media.js";
 
 const { Dragger } = Upload;
 
@@ -11,6 +11,8 @@ const FhMedia = () => {
     const [fileList, setFileList] = useState([]);
     const [featuredImage, setFeaturedImage] = useState(null);
     const [uploading, setUploading] = useState(false);
+
+    const { addUrl, removeUrl, setFeaturedUrl } = useMediaStore();
 
     const customRequest = async ({ file, onSuccess, onError, onProgress }) => {
         try {
@@ -25,6 +27,7 @@ const FhMedia = () => {
 
             if (result.success) {
                 onSuccess(result);
+                addUrl(result.url);
                 setFileList((prev) => [
                     ...prev,
                     {
@@ -33,10 +36,11 @@ const FhMedia = () => {
                         status: 'done',
                         url: result.url,
                         thumbUrl: URL.createObjectURL(file),
-                        id: result.id // Store the WordPress attachment ID
+                        id: result.id
                     }
                 ]);
                 message.success(`${file.name} uploaded successfully`);
+                console.log(result.url);
             } else {
                 throw new Error(result.error || 'Upload failed');
             }
@@ -49,28 +53,17 @@ const FhMedia = () => {
         }
     };
 
-    // const handleRemove = (file) => {
-    //     const updatedList = fileList.filter((item) => item.uid !== file.uid);
-    //     setFileList(updatedList);
-    //     if (file.uid === featuredImage) {
-    //         setFeaturedImage(null);
-    //     }
-    //     message.success(`${file.name} removed`);
-    // };
-
-    const handleRemove = async (file) => {
+    const handleRemove = useCallback(async (file) => {
         try {
-            // Only attempt to delete from server if we have an ID
             if (file.id) {
                 const result = await deleteMedia(file.id);
                 if (!result.success) {
                     message.error(`Failed to delete ${file.name}: ${result.error}`);
-                    return false; // Prevent removal from fileList if server deletion failed
+                    return false;
                 }
             }
-
-            const updatedList = fileList.filter((item) => item.uid !== file.uid);
-            setFileList(updatedList);
+            removeUrl(file.url);
+            setFileList((prev) => prev.filter((item) => item.uid !== file.uid));
 
             if (file.uid === featuredImage) {
                 setFeaturedImage(null);
@@ -83,28 +76,25 @@ const FhMedia = () => {
             message.error(`Failed to delete ${file.name}`);
             return false;
         }
-    };
+    }, [featuredImage]);
 
-    const setAsFeatured = (file) => {
+    const setAsFeatured = useCallback((file) => {
         setFeaturedImage(file.uid);
         message.success(`Set ${file.name} as featured image`);
-    };
+    }, []);
 
-    const beforeUpload = (file) => {
-        // Check if maximum files reached
+    const beforeUpload = useCallback((file) => {
         if (fileList.length >= 4) {
             message.error('Maximum 4 images allowed');
             return Upload.LIST_IGNORE;
         }
 
-        // Check file type
         const isImage = file.type.startsWith('image/');
         if (!isImage) {
             message.error('You can only upload image files!');
             return Upload.LIST_IGNORE;
         }
 
-        // Check file size (10MB)
         const isLt10M = file.size / 1024 / 1024 < 10;
         if (!isLt10M) {
             message.error('Image must be smaller than 10MB!');
@@ -112,10 +102,9 @@ const FhMedia = () => {
         }
 
         return true;
-    };
+    }, [fileList.length]);
 
-    // Function to get the value for form submission
-    const getValue = () => {
+    const getValue = useCallback(() => {
         return {
             images: fileList.map(file => ({
                 id: file.id,
@@ -124,7 +113,7 @@ const FhMedia = () => {
             })),
             featuredImage: fileList.find(file => file.uid === featuredImage)?.id || null
         };
-    };
+    }, [fileList, featuredImage]);
 
     return (
         <div className="space-y-4">
@@ -137,7 +126,7 @@ const FhMedia = () => {
                 showUploadList={false}
                 accept="image/*"
                 disabled={uploading || fileList.length >= 4}
-                className="bg-white border-2 rounded-lg p-8"
+                className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-blue-500 transition-colors"
             >
                 <div className="flex flex-col items-center justify-center space-y-4">
                     <p className="text-4xl text-gray-400">
@@ -209,7 +198,7 @@ const FhMedia = () => {
                             </div>
                         </div>
 
-                        {/* File name tooltip */}
+                        {/* Filename tooltip */}
                         <div className="absolute top-2 left-2 right-2">
                             <div className="px-2 py-1 bg-black/50 rounded text-white text-xs truncate">
                                 {file.name}
@@ -220,11 +209,11 @@ const FhMedia = () => {
             </div>
 
             {/* Empty state */}
-            {fileList.length === 0 && (
-                <div className="text-center text-gray-500 py-8">
-                    No images uploaded yet
-                </div>
-            )}
+            {/*{fileList.length === 0 && (*/}
+            {/*    <div className="text-center text-gray-500 py-8">*/}
+            {/*        No images uploaded yet*/}
+            {/*    </div>*/}
+            {/*)}*/}
         </div>
     );
 };

@@ -1,15 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { House, Store, Car, CircleCheckBig } from 'lucide-react';
+import useMediaStore from "./mediaStore.js";
 
-const FhIconButton = ({ options }) => {
+const FhIconButton = ({ options, name, form }) => {
     const [selectedOptions, setSelectedOptions] = useState([]);
+    const { setServiceTypes, serviceTypes } = useMediaStore();
+
+    // Initialize from store or form values
+    useEffect(() => {
+        if (serviceTypes.length > 0) {
+            setSelectedOptions(serviceTypes);
+            form?.setFieldValue(name, serviceTypes);
+        } else {
+            const formValues = form?.getFieldValue(name);
+            if (formValues) {
+                setSelectedOptions(formValues);
+                setServiceTypes(formValues);
+            }
+        }
+    }, [form, name]);
 
     const toggleSelect = (type) => {
-        setSelectedOptions((prevSelected) =>
-            prevSelected.includes(type)
-                ? prevSelected.filter((item) => item !== type)
-                : [...prevSelected, type]
-        );
+        const newSelected = selectedOptions.includes(type)
+            ? selectedOptions.filter((item) => item !== type)
+            : [...selectedOptions, type];
+
+        setSelectedOptions(newSelected);
+
+        // Update form field
+        if (form && name) {
+            form.setFieldValue(name, newSelected);
+        }
+
+        // Save to mediaStore
+        setServiceTypes(newSelected);
     };
 
     // Function to get the appropriate icon based on type
@@ -56,12 +80,13 @@ const FhIconButton = ({ options }) => {
                         </div>
                     </div>
 
-                    {/* Hidden Checkbox (for accessibility, can be styled with opacity-0) */}
+                    {/* Hidden Checkbox (for accessibility) */}
                     <input
                         type="checkbox"
                         checked={selectedOptions.includes(option.type)}
                         onChange={() => toggleSelect(option.type)}
                         className="absolute top-4 right-4 opacity-0"
+                        aria-label={`Select ${option.title}`}
                     />
                 </div>
             ))}

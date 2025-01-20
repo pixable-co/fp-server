@@ -3,14 +3,14 @@
 	/**
 	 *
 	 * @link              https://pixable.co/
-	 * @since             0.0.1
+	 * @since             0.0.4
 	 * @package           Frohub Partners Server Plugin
 	 *
 	 * @wordpress-plugin
 	 * Plugin Name:       Frohub Partners Server Plugin
 	 * Plugin URI:        https://pixable.co/
 	 * Description:       Core Plugin & Functions Fro Frohub Pratners
-	 * Version:           0.0.1
+	 * Version:           0.0.4
 	 * Author:            Pixable
 	 * Author URI:        https://pixable.co/
 	 * License:           GPL-2.0+
@@ -44,7 +44,7 @@ final class FrohubServer {
 	}
 
 	public function define_constants() {
-		define( 'FPSERVER_VERSION', '0.0.1' );
+		define( 'FPSERVER_VERSION', '0.0.4' );
 		define( 'FPSERVER_PLUGIN_FILE', __FILE__ );
 		define( 'FPSERVER_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 		define( 'FPSERVER_ROOT_DIR_PATH', plugin_dir_path( __FILE__ ) );
@@ -67,7 +67,7 @@ final class FrohubServer {
 		FPServer\Enqueue::init();
 		FPServer\Shortcodes::init();
 		FPServer\Ajax::init();
-		FPServer\Actions::init();
+// 		FPServer\Actions::init();
 	}
 
 	public function load_textdomain() {

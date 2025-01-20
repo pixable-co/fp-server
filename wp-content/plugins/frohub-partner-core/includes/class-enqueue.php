@@ -14,14 +14,17 @@ class Enqueue {
 	}
 
 	public function fpserver_scripts() {
+	        $current_user_id = get_current_user_id();
+
 			wp_enqueue_style( 'fpserver-style', FPSERVER_ROOT_DIR_URL . 'includes/assets/frontend.css' );
-			wp_enqueue_script( 'fpserver-script', FPSERVER_ROOT_DIR_URL . 'includes/assets/frontend.js', 'jquery', '0.0.1', true );
+			wp_enqueue_script( 'fpserver-script', FPSERVER_ROOT_DIR_URL . 'includes/assets/frontend.js', 'jquery', '0.0.4', true );
 			wp_localize_script(
 				'fpserver-script',
 				'fpserver_settings',
 				array(
-					'ajax_url' => admin_url( 'admin-ajax.php' ),
-					'nonce'    => wp_create_nonce( 'fpserver_nonce' ),
+					'ajax_url'        => admin_url( 'admin-ajax.php' ),
+					'nonce'           => wp_create_nonce( 'fpserver_nonce' ),
+                    'partner_post_id' => get_field('partner_post_id', 'user_' . $current_user_id)
 				)
 			);
 

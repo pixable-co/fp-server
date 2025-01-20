@@ -19,7 +19,7 @@ export default function BookingCalender() {
                 // Transform the API data into the format expected by FhCalender
                 const transformedEvents = response.data.map(order => ({
                     id: order.id.toString(),
-                    title: order.line_items[0].product_name,
+                    title: order.line_items[0]?.product_name ?? 'No Title',
                     start: `${order.acf_fields.booking_day}T${order.acf_fields.booking_start_time_slot}`,
                     end: `${order.acf_fields.booking_day}T${order.acf_fields.booking_end_time_slot}`,
                     customer: `${order.billing.first_name} ${order.billing.last_name}`,

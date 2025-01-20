@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*Main Styles For Frohub */
+
+/* Typography */
+body {
+    font-family: "Lexend Deca", sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #3D3D3D;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 1.5rem;
+}
+
+h2 {
+    font-size: 1rem;
+}
+
+h3 {
+    font-size: 0.8rem;
+}
+
+/* Paragraphs */
+p {
+    color: #3D3D3D;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.13rem;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+label {
+    color: #3D3D3D;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.13rem;
+    text-align: left;
+}
+
+/* Links */
+a {
+    font-size: 0.88rem;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #3D3D3D;
+}
+
+.active-link{
+    color: #3D3D3D !important;
+}
+
+.inactive-link{
+    color: #b0b0b0;
+}
+
+
+/* Colors */
+
+.fh__background {
+    background-color: #D9D9D9;
+}
+
+.fh__background_lite {
+    background-color: #F8F8F8;
+}
+
+.fh__background_container {
+    background-color: #F5F5F5;
+}
+
+.fh__border {
+    border-color: #D9D9D9;
+}

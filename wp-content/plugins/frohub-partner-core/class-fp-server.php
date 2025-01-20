@@ -3,14 +3,14 @@
 	/**
 	 *
 	 * @link              https://pixable.co/
-	 * @since             0.0.4
+	 * @since             0.0.5
 	 * @package           Frohub Partners Server Plugin
 	 *
 	 * @wordpress-plugin
 	 * Plugin Name:       Frohub Partners Server Plugin
 	 * Plugin URI:        https://pixable.co/
 	 * Description:       Core Plugin & Functions Fro Frohub Pratners
-	 * Version:           0.0.4
+	 * Version:           0.0.5
 	 * Author:            Pixable
 	 * Author URI:        https://pixable.co/
 	 * License:           GPL-2.0+

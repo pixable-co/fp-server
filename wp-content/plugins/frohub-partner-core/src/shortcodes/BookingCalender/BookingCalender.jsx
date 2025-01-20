@@ -1,28 +1,41 @@
+import React, { useEffect, useState } from 'react';
 import FhCalender from "../../common/controls/FhCalender.jsx";
+import axios from 'axios'; // or use fetch
 
 export default function BookingCalender() {
-    const events = [
-        {
-            id: '1',
-            title: 'Car Booking',
-            start: '2025-01-10T10:00:00',
-            end: '2025-01-10T11:30:00',
-            customer: 'John Doe',
-            email: 'hello@example.com',
-            phone: '123-456-7890',
-            service: 'Haircut',
-        },
-        {
-            id: '2',
-            title: 'Booking 2',
-            start: '2025-01-15T14:00:00',
-            end: '2025-01-15T15:00:00',
-            customer: 'Jane Smith',
-            email: 'hello@example.com',
-            phone: '098-765-4321',
-            service: 'Facial',
-        }
-    ];
+    const partner_id =  fpserver_settings.partner_post_id;
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.post(
+                    'https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/orders',
+                    {
+                        partner_id: "465"
+                    }
+                );
+
+                // Transform the API data into the format expected by FhCalender
+                const transformedEvents = response.data.map(order => ({
+                    id: order.id.toString(),
+                    title: order.line_items[0].product_name,
+                    start: `${order.acf_fields.booking_day}T${order.acf_fields.booking_start_time_slot}`,
+                    end: `${order.acf_fields.booking_day}T${order.acf_fields.booking_end_time_slot}`,
+                    customer: `${order.billing.first_name} ${order.billing.last_name}`,
+                    email: order.billing.email,
+                    phone: order.billing.phone,
+                    service: order.acf_fields.service_type,
+                }));
+
+                setEvents(transformedEvents);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <div>

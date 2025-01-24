@@ -4,61 +4,11 @@ import "./style.css";
 
 const { RangePicker } = DatePicker;
 
-const FhTable = () => {
+const FhTable = ({data}) => {
     const [filteredData, setFilteredData] = useState(null); // Initially null to show all data
     const [statusFilter, setStatusFilter] = useState([]);
     const [dateFilter, setDateFilter] = useState([]);
 
-    const data = [
-        {
-            key: "1",
-            date: "2025-01-19",
-            ref: "#12345",
-            time: "15:00",
-            duration: "1 hr 30 mins",
-            service: "Service Name",
-            deposit: "£30.00",
-            depositNote: "Due on the day: £100.00",
-            client: "Roger Bennett",
-            status: "Pending",
-        },
-        {
-            key: "2",
-            date: "2025-01-10",
-            ref: "#12346",
-            time: "16:00",
-            duration: "1 hr 30 mins",
-            service: "Service Name",
-            deposit: "£30.00",
-            depositNote: "Due on the day: £100.00",
-            client: "Roger Bennett",
-            status: "Confirmed",
-        },
-        {
-            key: "3",
-            date: "2025-01-24",
-            ref: "#12347",
-            time: "17:00",
-            duration: "1 hr 30 mins",
-            service: "Service Name",
-            deposit: "£30.00",
-            depositNote: "Due on the day: £100.00",
-            client: "Roger Bennett",
-            status: "Early Cancel by Client",
-        },
-        {
-            key: "4",
-            date: "2024-07-20",
-            ref: "#12348",
-            time: "15:00",
-            duration: "1 hr 30 mins",
-            service: "Service Name",
-            deposit: "£30.00",
-            depositNote: "Due on the day: £100.00",
-            client: "Roger Bennett",
-            status: "Awaiting Deposit Payout",
-        },
-    ];
 
     const columns = [
         {
@@ -88,9 +38,9 @@ const FhTable = () => {
             key: "status",
             render: (status) => {
                 let color = "#000";
-                if (status === "Pending") color = "#FA8C16";
-                if (status === "Confirmed") color = "#52C41A";
-                if (status === "Early Cancel by Client") color = "#F5222D";
+                if (status === "Processing") color = "#FA8C16";
+                if (status === "Completed") color = "#52C41A";
+                if (status === "Cancelled") color = "#F5222D";
 
                 return (
                     <Tag color={color} style={{ fontWeight: "bold" }}>
@@ -187,9 +137,9 @@ const FhTable = () => {
                     onChange={handleStatusChange}
                     allowClear
                 >
-                    <Select.Option value="Pending">Pending</Select.Option>
-                    <Select.Option value="Confirmed">Confirmed</Select.Option>
-                    <Select.Option value="Early Cancel by Client">Early Cancel by Client</Select.Option>
+                    <Select.Option value="Processing">Processing</Select.Option>
+                    <Select.Option value="Completed">Confirmed</Select.Option>
+                    <Select.Option value="Cancelled">Cancelled by Client</Select.Option>
                     <Select.Option value="Awaiting Deposit Payout">Awaiting Deposit Payout</Select.Option>
                 </Select>
             </div>

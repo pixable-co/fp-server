@@ -1,3 +1,4 @@
+import FpBookingTable from './shortcodes/BookingTable/fp_booking_table';
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider } from 'antd'
@@ -72,6 +73,17 @@ bookingCalender.forEach(element => {
     createRoot(element).render(
         <WithConfigProvider>
             <BookingCalender dataKey={key} />
+        </WithConfigProvider>
+    );
+});
+
+
+const fpBookingTableElements = document.querySelectorAll('.fp_booking_table');
+fpBookingTableElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <WithConfigProvider>
+        <FpBookingTable dataKey={key} />
         </WithConfigProvider>
     );
 });

@@ -18,5 +18,6 @@ class Shortcodes {
 		ServiceForm::init();
 		BookingCalender::init();
 		PartnerBookings::init();
+		FpBookingTable::init();
 	}
 }

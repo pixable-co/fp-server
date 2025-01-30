@@ -1,27 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Dropdown, Space } from 'antd';
+import { Dropdown } from 'antd';
 import './style.css';
 
 const FhCalender = ({ type, events }) => {
+    console.log("Received Events:", events);
+
     const isDayView = type === 'day';
+
+    // Convert API response to FullCalendar format
+    const transformedEvents = events.map(event => ({
+        id: event.id,
+        title: event.title,
+        date: new Date(event.date),
+        backgroundColor: '#4285f4',
+        borderColor: '#4285f4',
+        textColor: '#fff',
+        extendedProps: {
+            booking_time: event.time, // Store booking time separately
+            customer: event.customer,
+            email: event.email,
+            phone: event.phone,
+            service: event.service
+        }
+    }));
 
     const handleEventClick = (clickInfo) => {
         clickInfo.jsEvent.preventDefault();
     };
 
     const getEventContent = (event) => {
-        const formatTime = (date) => {
-            return date.toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-        };
-
+        const eventDate = event.start ? event.start.toISOString().split('T')[0] : event.date || 'N/A';
         return {
             items: [
                 {
@@ -29,11 +41,12 @@ const FhCalender = ({ type, events }) => {
                     label: (
                         <div className="event-details-dropdown">
                             <h6>{event.title}</h6>
-                            <p>Time: {formatTime(event.start)} - {formatTime(event.end)}</p>
-                            <p>Customer: {event._def.extendedProps.customer}</p>
-                            <p>Email: {event._def.extendedProps.email}</p>
-                            <p>Phone: {event._def.extendedProps.phone}</p>
-                            <p>Service: {event._def.extendedProps.service}</p>
+                            <p><strong>Date:</strong> {eventDate}</p>
+                            <p><strong>Time:</strong> {event.extendedProps.booking_time}</p>
+                            <p><strong>Customer:</strong> {event.extendedProps.customer}</p>
+                            <p><strong>Email:</strong> {event.extendedProps.email}</p>
+                            <p><strong>Phone:</strong> {event.extendedProps.phone || 'N/A'}</p>
+                            <p><strong>Service:</strong> {event.extendedProps.service || 'N/A'}</p>
                         </div>
                     ),
                 }
@@ -56,7 +69,7 @@ const FhCalender = ({ type, events }) => {
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 }}
                 weekends={false}
-                events={events}
+                events={transformedEvents} // Use transformed events
                 eventContent={(arg) => {
                     return (
                         <Dropdown
@@ -69,10 +82,11 @@ const FhCalender = ({ type, events }) => {
                                 style={{
                                     backgroundColor: arg.event.backgroundColor || '#4285f4',
                                     color: '#fff',
-                                    padding: '2px 4px',
-                                    borderRadius: '2px',
+                                    padding: '4px 6px',
+                                    borderRadius: '4px',
                                     width: '100%',
-                                    height: '100%'
+                                    height: '100%',
+                                    cursor: 'pointer'
                                 }}
                             >
                                 {arg.event.title}
@@ -86,8 +100,6 @@ const FhCalender = ({ type, events }) => {
                     minute: '2-digit',
                     meridiem: false
                 }}
-                slotMinTime="09:00:00"
-                slotMaxTime="18:00:00"
                 height="auto"
             />
         </div>

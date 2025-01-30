@@ -12,7 +12,7 @@ export default function BookingCalender() {
                 const response = await axios.post(
                     'https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/orders',
                     {
-                        partner_id: "465"
+                        partner_id: partner_id
                     }
                 );
 

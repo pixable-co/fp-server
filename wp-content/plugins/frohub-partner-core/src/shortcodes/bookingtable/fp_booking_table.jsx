@@ -3,6 +3,7 @@ import axios from "axios";
 import FhTable from "../../common/controls/FhTable.jsx";
 
 const FpBookingTable = () => {
+    const partner_id =  fpserver_settings.partner_post_id;
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -13,14 +14,14 @@ const FpBookingTable = () => {
                 const response = await axios.post(
                     "https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/orders",
                     {
-                        partner_id: "465", // Replace with dynamic partner_id if needed
+                        partner_id: partner_id
                     }
                 );
 
                 // Transform the API data into the format expected by FhTable
                 const transformedData = response.data.map((order) => ({
                     key: order.id.toString(),
-                    date: formatDate(order.acf_fields.booking_day), // Convert YYYYMMDD to YYYY-MM-DD
+                    date: order.acf_fields.booking_day, // Convert YYYYMMDD to YYYY-MM-DD
                     ref: `#${order.id}`,
                     time: order.acf_fields.booking_start_time_slot,
                     duration: calculateDuration(

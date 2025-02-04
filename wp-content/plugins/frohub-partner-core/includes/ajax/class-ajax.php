@@ -1,6 +1,9 @@
 <?php
 namespace FPServer;
 
+use FPServer\ConnectCalender;
+
+
 use FPServer\Twillo;
 use FPServer\GoCardless;
 use FPServer\Xero;
@@ -19,5 +22,6 @@ class Ajax {
 // 		Twillo::init();
 // 		GoCardless::init();
 // 		Xero::init();
+		ConnectCalender::init();
 	}
 }

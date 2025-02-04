@@ -67,6 +67,7 @@ final class FrohubServer {
 		FPServer\Enqueue::init();
 		FPServer\Shortcodes::init();
 		FPServer\Ajax::init();
+		FPServer\API::init();
 // 		FPServer\Actions::init();
 	}
 

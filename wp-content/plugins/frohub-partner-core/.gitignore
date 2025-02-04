@@ -22,13 +22,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-!library/vendor/
-!library/composer.json
-library/vendor/google/apiclient-services/src
-library/vendor/paragonie/random_compat/build-phar.sh
-library/vendor/paragonie/random_compat/dist/random_compat.phar.pubkey.asc
-library/vendor/google/auth/COPYING
-library/vendor/phpseclib/phpseclib/phpseclib/openssl.cnf
-library/vendor/paragonie/random_compat/dist/random_compat.phar.pubkey
-!library/vendor/google/apiclient-services/src/Calendar
-!library/vendor/google/apiclient-services/src/Calendar.php
+

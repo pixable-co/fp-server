@@ -80,7 +80,7 @@ class ConnectCalender {
         }
 
         update_user_meta($user_id, 'google_calendar_access_token', json_encode($token)); // Store per user
-        wp_redirect(admin_url('admin.php?page=google-calendar-settings&success=1'));
+        wp_redirect(site_url('/google-calender'));
         exit;
     }
 

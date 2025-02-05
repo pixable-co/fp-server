@@ -1,0 +1,17 @@
+{
+    "name": "fpserver/library",
+    "autoload": {
+        "psr-4": {
+            "Fpserver\\Library\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pixable"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "google/apiclient": "^2.18"
+    }
+}

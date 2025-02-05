@@ -1,3 +1,4 @@
+import GoogleCalender from './shortcodes/bookings/google_calender';
 import FpBookingTable from './shortcodes/BookingTable/fp_booking_table';
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -85,5 +86,13 @@ fpBookingTableElements.forEach(element => {
         <WithConfigProvider>
         <FpBookingTable dataKey={key} />
         </WithConfigProvider>
+    );
+});
+
+const googleCalenderElements = document.querySelectorAll('.google_calender');
+googleCalenderElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <GoogleCalender dataKey={key} />
     );
 });

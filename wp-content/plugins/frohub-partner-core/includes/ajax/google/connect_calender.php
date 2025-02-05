@@ -5,7 +5,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
 class ConnectCalender {
 
     public static function init() {
@@ -40,7 +39,12 @@ class ConnectCalender {
     }
 
     public static function check_google_auth_status() {
-        $token = get_option('google_calendar_access_token');
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'User not logged in.']);
+        }
+
+        $token = get_user_meta($user_id, 'google_calendar_access_token', true);
 
         if (!$token) {
             wp_send_json_success(['authenticated' => false, 'expired' => false]);
@@ -51,7 +55,7 @@ class ConnectCalender {
         $client->setAccessToken($token);
 
         if ($client->isAccessTokenExpired()) {
-            delete_option('google_calendar_access_token'); // Remove expired token
+            delete_user_meta($user_id, 'google_calendar_access_token'); // Remove expired token
             wp_send_json_success(['authenticated' => false, 'expired' => true]);
         }
 
@@ -70,19 +74,30 @@ class ConnectCalender {
             wp_send_json_error(['message' => 'Error retrieving access token: ' . $token['error']]);
         }
 
-        update_option('google_calendar_access_token', json_encode($token)); // Store in DB
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'User not logged in.']);
+        }
+
+        update_user_meta($user_id, 'google_calendar_access_token', json_encode($token)); // Store per user
         wp_redirect(admin_url('admin.php?page=google-calendar-settings&success=1'));
         exit;
     }
 
     public static function getAccessToken() {
-        return json_decode(get_option('google_calendar_access_token'), true) ?: null;
+        $user_id = get_current_user_id();
+        return json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true) ?: null;
     }
 
     public function get_google_calendars() {
         check_ajax_referer('fpserver_nonce');
 
-        $token = get_option('google_calendar_access_token');
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'User not logged in.']);
+        }
+
+        $token = get_user_meta($user_id, 'google_calendar_access_token', true);
         if (!$token) {
             wp_send_json_error(['message' => 'User is not authenticated.']);
         }
@@ -120,7 +135,7 @@ class ConnectCalender {
         $user_id = get_current_user_id();
 
         if (!$user_id) {
-            wp_send_json_error(['message' => 'User not found.']);
+            wp_send_json_error(['message' => 'User not logged in.']);
         }
 
         update_user_meta($user_id, 'google_calendar_id', $calendar_id);
@@ -144,14 +159,13 @@ class ConnectCalender {
         }
 
         $user_id = $users[0]->ID;
-
         $calendar_id = get_user_meta($user_id, 'google_calendar_id', true);
 
         if (!$calendar_id) {
             wp_send_json_error(['message' => 'No calendar found for this user.']);
         }
 
-        $token = get_option('google_calendar_access_token');
+        $token = get_user_meta($user_id, 'google_calendar_access_token', true);
         if (!$token) {
             wp_send_json_error(['message' => 'User is not authenticated.']);
         }
@@ -166,7 +180,6 @@ class ConnectCalender {
 
         $timeMin = $date . 'T00:00:00Z';
         $timeMax = $date . 'T23:59:59Z';
-
 
         $service = new \Google_Service_Calendar($client);
         $events = $service->events->listEvents($calendar_id, [
@@ -191,4 +204,3 @@ class ConnectCalender {
     }
 
 }
-

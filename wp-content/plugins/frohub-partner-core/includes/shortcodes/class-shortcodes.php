@@ -3,6 +3,7 @@ namespace FPServer;
 
 use FPServer\UserLogin;
 use FPServer\ServiceForm;
+use FPServer\MobileService;
 use FPServer\BookingCalender;
 use FPServer\PartnerBookings;
 use FPServer\GoogleCalender;
@@ -17,6 +18,7 @@ class Shortcodes {
 		$self = new self();
 		UserLogin::init();
 		ServiceForm::init();
+		MobileService::init();
 		BookingCalender::init();
 		PartnerBookings::init();
 		FpBookingTable::init();

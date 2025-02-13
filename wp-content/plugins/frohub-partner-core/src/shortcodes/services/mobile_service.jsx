@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleMap, Marker, Circle, useJsApiLoader, Autocomplete } from '@react-google-maps/api';
+import { Spin } from 'antd';
 
 const containerStyle = {
     width: '100%',
@@ -7,31 +8,29 @@ const containerStyle = {
 };
 
 const defaultCenter = {
-    lat: 51.5074, // Default to London
+    lat: 51.5074,
     lng: -0.1278,
 };
 
 const MobileService = () => {
-    const partnerId =  Number(fpserver_settings.partner_post_id);
+    const partnerId = fpserver_settings.partner_post_id ? Number(fpserver_settings.partner_post_id) : null;
     const [position, setPosition] = useState(defaultCenter);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [travelFees, setTravelFees] = useState([
-        { miles: 3, fee: 0.00 },
-        { miles: 5, fee: 5.00 },
-        { miles: 10, fee: 7.00 }
-    ]);
+    const [travelFees, setTravelFees] = useState([]);
+    const [address, setAddress] = useState(""); // Address for search box
+    const [loading, setLoading] = useState(true); // Spinner while fetching data
+    const [saving, setSaving] = useState(false); // Spinner while saving data
     const autocompleteRef = useRef(null);
 
-    // Load the Google Maps JavaScript API and Places Library
+    // Load Google Maps API
     const { isLoaded: isMapLoaded } = useJsApiLoader({
         googleMapsApiKey: 'AIzaSyDfCq6qG1IOH2aJtp44RPif8QeO6Samnzc',
         libraries: ['places'],
     });
 
-    // Fetch existing location data on mount
+    // Fetch location data on mount
     useEffect(() => {
         if (partnerId) {
-            fetch(`http://localhost:10013/wp-json/frohub/v1/get-location-data/${partnerId}`)
+            fetch(`https://frohubpartners.mystagingwebsite.com/wp-json/frohub/v1/get-location-data/${partnerId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -39,24 +38,47 @@ const MobileService = () => {
                             lat: parseFloat(data.data.latitude) || defaultCenter.lat,
                             lng: parseFloat(data.data.longitude) || defaultCenter.lng
                         });
-                        setTravelFees(data.data.radius_fees.map(fee => ({
-                            miles: parseFloat(fee.radius),
-                            fee: parseFloat(fee.price)
-                        })));
+
+                        if (data.data.address) {
+                            setAddress(data.data.address);
+                        }
+
+                        if (Array.isArray(data.data.radius_fees) && data.data.radius_fees.length > 0) {
+                            setTravelFees(data.data.radius_fees.map(fee => ({
+                                miles: parseFloat(fee.radius) || 0,
+                                fee: parseFloat(fee.price) || 0
+                            })));
+                        } else {
+                            setTravelFees([
+                                { miles: 2, fee: 0.00 },
+                                { miles: 5, fee: 5.00 },
+                                { miles: 7, fee: 7.00 }
+                            ]);
+                        }
+                    } else {
+                        console.warn("No data found for this partner.");
                     }
+                    setLoading(false); // Hide loader after data fetch
                 })
-                .catch(error => console.error('Error fetching data:', error));
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    setLoading(false);
+                });
         }
     }, [partnerId]);
 
-    // Handle Place Selection from Autocomplete
+    // Handle Place Selection
     const handlePlaceChanged = () => {
         const place = autocompleteRef.current.getPlace();
         if (place.geometry && place.geometry.location) {
-            const lat = place.geometry.location.lat();
-            const lng = place.geometry.location.lng();
-            setPosition({ lat, lng });
-            setIsLoaded(true);
+            setPosition({
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            });
+
+            if (place.formatted_address) {
+                setAddress(place.formatted_address);
+            }
         } else {
             alert('Please select a valid location from suggestions.');
         }
@@ -73,7 +95,7 @@ const MobileService = () => {
         setTravelFees(updatedFees);
     };
 
-    // Update miles or fee for a specific entry and sync radius
+    // Update miles or fee for a specific entry
     const handleInputChange = (index, field, value) => {
         const updatedFees = [...travelFees];
         updatedFees[index][field] = field === 'fee' ? parseFloat(value) : parseInt(value, 10);
@@ -82,10 +104,18 @@ const MobileService = () => {
 
     // Save the data to the API
     const saveLocationData = async () => {
+        if (!partnerId) {
+            alert("Invalid partner ID. Data cannot be saved.");
+            return;
+        }
+
+        setSaving(true); // Show loader while saving
+
         const payload = {
             partner_id: partnerId,
             latitude: position.lat.toString(),
             longitude: position.lng.toString(),
+            address: address, // Include address in payload
             radius_fees: travelFees.map(fee => ({
                 radius: fee.miles.toString(),
                 price: fee.fee.toString()
@@ -93,7 +123,7 @@ const MobileService = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:10013/wp-json/frohub/v1/update-location-data', {
+            const response = await fetch('https://frohubpartners.mystagingwebsite.com/wp-json/frohub/v1/update-location-data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,10 +140,12 @@ const MobileService = () => {
         } catch (error) {
             console.error('Error saving data:', error);
             alert('An error occurred while saving.');
+        } finally {
+            setSaving(false); // Hide loader after save completes
         }
     };
 
-    if (!isMapLoaded) return <div>Loading Map...</div>;
+    if (!isMapLoaded || loading) return <Spin size="large" style={{ display: 'block', margin: '50px auto' }} />;
 
     return (
         <div>
@@ -121,12 +153,12 @@ const MobileService = () => {
             <Autocomplete
                 onLoad={(ref) => (autocompleteRef.current = ref)}
                 onPlaceChanged={handlePlaceChanged}
-                options={{
-                    componentRestrictions: { country: 'uk' }, // Restrict to UK
-                }}
+                options={{ componentRestrictions: { country: 'uk' } }}
             >
                 <input
                     type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                     placeholder="30 Churchill Place, London, E14 5RE"
                     style={{
                         padding: '10px',
@@ -140,102 +172,53 @@ const MobileService = () => {
 
             <div style={{ marginTop: '20px' }}>
                 <GoogleMap mapContainerStyle={containerStyle} center={position} zoom={13}>
-                    {isLoaded && (
-                        <>
-                            <Marker position={position} />
-                            {travelFees.map((item, index) => (
-                                <Circle
-                                    key={index}
-                                    center={position}
-                                    radius={item.miles * 1609.34} // Convert miles to meters
-                                    options={{
-                                        fillColor: 'red',
-                                        fillOpacity: 0.2 + (index * 0.1), // Varying opacity for visibility
-                                        strokeColor: 'red',
-                                    }}
-                                />
-                            ))}
-                        </>
-                    )}
+                    <Marker position={position} />
+                    {travelFees.length > 0 &&
+                        travelFees.map((item, index) => (
+                            <Circle
+                                key={index}
+                                center={position}
+                                radius={item.miles * 1609.34}
+                                options={{
+                                    fillColor: 'red',
+                                    fillOpacity: 0.2 + (index * 0.1),
+                                    strokeColor: 'red',
+                                }}
+                            />
+                        ))}
                 </GoogleMap>
             </div>
 
-            {/* Travel Radius and Fees Repeater */}
+            {/* Travel Radius and Fees */}
             <div style={{ marginTop: '30px' }}>
                 <h3>Travel Radius and Fees</h3>
-                <p style={{ color: '#666' }}>
-                    Add the distances you are willing to travel and the corresponding fees.
-                </p>
+                <p style={{ color: '#666' }}>Add the distances you are willing to travel and the corresponding fees.</p>
 
                 {travelFees.map((item, index) => (
                     <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                        {/* Miles Input */}
                         <input
                             type="number"
-                            value={item.miles}
+                            value={item.miles || ''}
                             onChange={(e) => handleInputChange(index, 'miles', e.target.value)}
                             placeholder="Miles"
-                            style={{
-                                width: '100px',
-                                padding: '10px',
-                                marginRight: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ccc',
-                            }}
                         />
-                        <span style={{ marginRight: '10px' }}>miles</span>
-
-                        {/* Fee Input */}
+                        <span> miles </span>
                         <input
                             type="number"
-                            value={item.fee}
+                            value={item.fee || ''}
                             onChange={(e) => handleInputChange(index, 'fee', e.target.value)}
                             placeholder="Fee"
-                            style={{
-                                width: '100px',
-                                padding: '10px',
-                                marginRight: '10px',
-                                borderRadius: '5px',
-                                border: '1px solid #ccc',
-                            }}
                         />
-                        <span style={{ marginRight: '10px' }}>£</span>
-
-                        {/* Add New Entry Button */}
-                        <button onClick={addTravelFee} style={{
-                            padding: '10px',
-                            backgroundColor: '#4CAF50',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            marginRight: '5px'
-                        }}>
-                            +
-                        </button>
-
-                        {/* Remove Entry Button */}
-                        <button
-                            onClick={() => removeTravelFee(index)}
-                            disabled={travelFees.length === 1} // Disable if only one entry remains
-                            style={{
-                                padding: '10px',
-                                backgroundColor: travelFees.length === 1 ? '#ccc' : '#F44336',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '5px',
-                                cursor: travelFees.length === 1 ? 'not-allowed' : 'pointer'
-                            }}
-                        >
-                            -
-                        </button>
+                        <span> £ </span>
+                        <button onClick={addTravelFee}>+</button>
+                        <button onClick={() => removeTravelFee(index)} disabled={travelFees.length === 1}>-</button>
                     </div>
                 ))}
             </div>
 
-            {/* Save Button */}
-            <button onClick={saveLocationData} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#007bff', color: '#fff', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>
-                Save
+            {/* Save Button with Loading */}
+            <button onClick={saveLocationData} disabled={saving} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#007bff', color: '#fff', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>
+                {saving ? <Spin size="small" /> : "Save"}
             </button>
         </div>
     );

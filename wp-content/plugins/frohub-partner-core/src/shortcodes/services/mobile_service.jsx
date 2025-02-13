@@ -15,10 +15,14 @@ const defaultCenter = {
 const MobileService = () => {
     const partnerId = fpserver_settings.partner_post_id ? Number(fpserver_settings.partner_post_id) : null;
     const [position, setPosition] = useState(defaultCenter);
-    const [travelFees, setTravelFees] = useState([]);
+    const [travelFees, setTravelFees] = useState([
+        { miles: 3, fee: 0.00 },
+        { miles: 5, fee: 5.00 },
+        { miles: 10, fee: 7.00 }
+    ]);
     const [address, setAddress] = useState(""); // Address for search box
-    const [loading, setLoading] = useState(true); // Spinner while fetching data
-    const [saving, setSaving] = useState(false); // Spinner while saving data
+    const [loading, setLoading] = useState(true); // Show while fetching data
+    const [saving, setSaving] = useState(false); // Show while saving data
     const autocompleteRef = useRef(null);
 
     // Load Google Maps API
@@ -30,7 +34,7 @@ const MobileService = () => {
     // Fetch location data on mount
     useEffect(() => {
         if (partnerId) {
-            fetch(`https://frohubpartners.mystagingwebsite.com/wp-json/frohub/v1/get-location-data/${partnerId}`)
+            fetch(`https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-location-data/${partnerId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data) {
@@ -40,7 +44,7 @@ const MobileService = () => {
                         });
 
                         if (data.data.address) {
-                            setAddress(data.data.address);
+                            setAddress(data.data.address); // Set address
                         }
 
                         if (Array.isArray(data.data.radius_fees) && data.data.radius_fees.length > 0) {
@@ -48,15 +52,7 @@ const MobileService = () => {
                                 miles: parseFloat(fee.radius) || 0,
                                 fee: parseFloat(fee.price) || 0
                             })));
-                        } else {
-                            setTravelFees([
-                                { miles: 2, fee: 0.00 },
-                                { miles: 5, fee: 5.00 },
-                                { miles: 7, fee: 7.00 }
-                            ]);
                         }
-                    } else {
-                        console.warn("No data found for this partner.");
                     }
                     setLoading(false); // Hide loader after data fetch
                 })
@@ -123,7 +119,7 @@ const MobileService = () => {
         };
 
         try {
-            const response = await fetch('https://frohubpartners.mystagingwebsite.com/wp-json/frohub/v1/update-location-data', {
+            const response = await fetch('https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-location-data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -159,7 +155,7 @@ const MobileService = () => {
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="30 Churchill Place, London, E14 5RE"
+                    placeholder="Enter address..."
                     style={{
                         padding: '10px',
                         width: '300px',
@@ -217,7 +213,7 @@ const MobileService = () => {
             </div>
 
             {/* Save Button with Loading */}
-            <button onClick={saveLocationData} disabled={saving} style={{ marginTop: '20px', padding: '10px', backgroundColor: '#007bff', color: '#fff', borderRadius: '5px', border: 'none', cursor: 'pointer' }}>
+            <button onClick={saveLocationData} disabled={saving} style={{ marginTop: '20px' }}>
                 {saving ? <Spin size="small" /> : "Save"}
             </button>
         </div>

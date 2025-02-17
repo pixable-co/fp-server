@@ -203,4 +203,56 @@ class ConnectCalender {
         return $event_list;
     }
 
+    public static function get_user_all_calendar_events($partner_id) {
+        $user_query = new \WP_User_Query([
+            'meta_key'   => 'partner_post_id',
+            'meta_value' => $partner_id,
+            'number'     => 1,
+        ]);
+
+        $users = $user_query->get_results();
+        if (empty($users)) {
+            wp_send_json_error(['message' => 'No user found for this partner ID.']);
+        }
+
+        $user_id = $users[0]->ID;
+        $calendar_id = get_user_meta($user_id, 'google_calendar_id', true);
+
+        if (!$calendar_id) {
+            wp_send_json_error(['message' => 'No calendar found for this user.']);
+        }
+
+        $token = get_user_meta($user_id, 'google_calendar_access_token', true);
+        if (!$token) {
+            wp_send_json_error(['message' => 'User is not authenticated.']);
+        }
+
+        $token = json_decode($token, true);
+        $client = self::getClient();
+        $client->setAccessToken($token);
+
+        if ($client->isAccessTokenExpired()) {
+            wp_send_json_error(['message' => 'Access token expired. Please reconnect.']);
+        }
+
+        $service = new \Google_Service_Calendar($client);
+        $events = $service->events->listEvents($calendar_id, [
+            'singleEvents' => true,
+            'orderBy'      => 'startTime'
+        ]);
+
+        $event_list = [];
+
+        foreach ($events->getItems() as $event) {
+            $event_list[] = [
+                'id'    => $event->getId(),
+                'title' => $event->getSummary(),
+                'start' => $event->getStart()->getDateTime() ?: $event->getStart()->getDate(),
+                'end'   => $event->getEnd()->getDateTime() ?: $event->getEnd()->getDate(),
+            ];
+        }
+
+        return $event_list;
+    }
+
 }

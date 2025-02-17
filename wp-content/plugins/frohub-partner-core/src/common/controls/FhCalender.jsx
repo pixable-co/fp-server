@@ -7,7 +7,6 @@ import { Dropdown } from 'antd';
 import './style.css';
 
 const FhCalender = ({ type, events }) => {
-    console.log("Received Events:", events);
 
     const isDayView = type === 'day';
 

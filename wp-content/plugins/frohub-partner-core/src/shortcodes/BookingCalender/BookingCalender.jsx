@@ -13,22 +13,22 @@ export default function BookingCalender() {
                     'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/return-order-details',
                     { partner_id }
                 );
-
+        
                 return response.data.map(order => ({
                     id: `order-${order.id}`,
                     title: order.line_items[0]?.product_name ?? 'No Title',
-                    date: order.acf_fields.booking_day,
-                    time: order.acf_fields.booking_start_time_slot,
+                    date: order.line_items[0]?.meta.booking_date, // Updated field
+                    time: order.line_items[0]?.meta.booking_time, // Updated field
                     customer: `${order.billing.first_name} ${order.billing.last_name}`,
                     email: order.billing.email,
                     phone: order.billing.phone,
-                    service: order.acf_fields.service_type,
+                    service: order.line_items[0]?.meta.service_type ?? 'Unknown Service',
                 }));
             } catch (error) {
                 console.error("Error fetching order details:", error);
                 return [];
             }
-        };
+        };        
 
         const fetchAllCalendarEvents = async () => {
             try {

@@ -242,13 +242,30 @@ class ConnectCalender {
         ]);
 
         $event_list = [];
+        $uk_timezone = new \DateTimeZone('Europe/London');
 
         foreach ($events->getItems() as $event) {
+            $start_time = $event->getStart()->getDateTime() ?: $event->getStart()->getDate();
+            $end_time = $event->getEnd()->getDateTime() ?: $event->getEnd()->getDate();
+
+            // Convert to UK timezone if datetime is provided (not just date)
+            if ($event->getStart()->getDateTime()) {
+                $start_datetime = new \DateTime($start_time);
+                $start_datetime->setTimezone($uk_timezone);
+                $start_time = $start_datetime->format('Y-m-d\TH:i:sP');
+            }
+
+            if ($event->getEnd()->getDateTime()) {
+                $end_datetime = new \DateTime($end_time);
+                $end_datetime->setTimezone($uk_timezone);
+                $end_time = $end_datetime->format('Y-m-d\TH:i:sP');
+            }
+
             $event_list[] = [
                 'id'    => $event->getId(),
                 'title' => $event->getSummary(),
-                'start' => $event->getStart()->getDateTime() ?: $event->getStart()->getDate(),
-                'end'   => $event->getEnd()->getDateTime() ?: $event->getEnd()->getDate(),
+                'start' => $start_time,
+                'end'   => $end_time,
             ];
         }
 

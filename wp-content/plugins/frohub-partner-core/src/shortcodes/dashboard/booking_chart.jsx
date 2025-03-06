@@ -2,7 +2,7 @@ import React from 'react';
 import FhChart from "../../common/controls/FhChart.jsx";
 
 const BookingChart = ({ dataKey }) => {
-
+    console.log('Booking Chart Loaded')
     const chartData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
         datasets: [

@@ -1,3 +1,4 @@
+import BookingChart from './shortcodes/Dashboard/booking_chart';
 import MobileService from './shortcodes/Services/mobile_service';
 import GoogleCalender from './shortcodes/bookings/google_calender';
 import FpBookingTable from './shortcodes/BookingTable/fp_booking_table';
@@ -103,5 +104,13 @@ mobileServiceElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <MobileService dataKey={key} />
+    );
+});
+
+const bookingChartElements = document.querySelectorAll('.booking_chart');
+bookingChartElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <BookingChart dataKey={key} />
     );
 });

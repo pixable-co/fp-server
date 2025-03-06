@@ -20,6 +20,7 @@
     "@react-google-maps/api": "^2.20.6",
     "antd": "^5.22.6",
     "axios": "^1.7.9",
+    "chart.js": "^4.4.8",
     "dayjs": "^1.11.13",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.469.0",

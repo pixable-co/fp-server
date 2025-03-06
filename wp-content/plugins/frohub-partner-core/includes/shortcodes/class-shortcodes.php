@@ -7,6 +7,7 @@ use FPServer\MobileService;
 use FPServer\BookingCalender;
 use FPServer\PartnerBookings;
 use FPServer\GoogleCalender;
+use FPServer\BookingChart;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,5 +24,6 @@ class Shortcodes {
 		PartnerBookings::init();
 		FpBookingTable::init();
 		GoogleCalender::init();
+        BookingChart::init();
 	}
 }

@@ -1,30 +1,77 @@
 /*Booking State Style*/
 
+/* Booking Stats Style */
+
 .booking-stats-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: var(--spacing-lg, 16px); /* Uses Impreza spacing variable */
 }
 
 .booking-stats {
     flex: 1;
     min-width: 220px;
     max-width: 300px;
-    padding: 1.5rem;
-    background-color: white;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
+    padding: var(--spacing-md, 1.5rem);
+    background-color: var(--color-content-bg-alt, white);
+    border-radius: var(--border-radius-md, 8px);
 }
 
+/* Headings */
 .booking-stats__heading {
     font-weight: 600;
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: var(--spacing-sm, 0.5rem);
+    color: var(--color-heading, #1E293B); /* Uses Impreza heading color */
 }
 
+/* Prices */
 .booking-stats__price {
-    margin-top: 1.5rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #6b7280;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #1e3050;
 }
+
+/* Ensure consistent box height */
+.booking-stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+/* Responsive Fix */
+@media (max-width: 768px) {
+    .booking-stats {
+        min-width: 100%;
+    }
+}
+
+/*.booking-stats-container {*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    gap: 16px;*/
+/*}*/
+
+/*.booking-stats {*/
+/*    flex: 1;*/
+/*    min-width: 220px;*/
+/*    max-width: 300px;*/
+/*    padding: 1.5rem;*/
+/*    background-color: white;*/
+/*    border-radius: 8px;*/
+/*    border: 1px solid #d1d5db;*/
+/*}*/
+
+/*.booking-stats__heading {*/
+/*    font-weight: 600;*/
+/*    font-size: 1.25rem;*/
+/*    margin-bottom: 0.5rem;*/
+/*}*/
+
+/*.booking-stats__price {*/
+/*    margin-top: 1.5rem;*/
+/*    font-size: 1.5rem;*/
+/*    font-weight: bold;*/
+/*    color: #6b7280;*/
+/*}*/

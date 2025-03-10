@@ -131,33 +131,33 @@ class BookingStats {
         ?>
         <div class="booking-stats-container">
             <div class="booking-stats">
-                <h2 class="booking-stats__heading">Total Value of Bookings</h2>
+                <h2 class="w-text-h">Total Value of Bookings</h2>
                 <p class="booking-stats__price">£<?php echo number_format($total_value, 2); ?></p>
             </div>
 
             <div class="booking-stats">
-                <h2 class="booking-stats__heading">Total Value of Deposits</h2>
+                <h2 class="w-text-h">Total Value of Deposits</h2>
                 <p class="booking-stats__price">£<?php echo number_format($total_deposits, 2); ?></p>
             </div>
 
             <div class="booking-stats">
-                <h2 class="booking-stats__heading">Total Number of Bookings</h2>
+                <h2 class="w-text-h">Total Number of Bookings</h2>
                 <p class="booking-stats__price"><?php echo $total_bookings; ?></p>
             </div>
 
             <div class="booking-stats">
-                <h2 class="booking-stats__heading">Average Booking Value</h2>
+                <h2 class="w-text-h">Average Booking Value</h2>
                 <p class="booking-stats__price">£<?php echo number_format($average_booking_value, 2); ?></p>
             </div>
 
             <div class="booking-stats">
-                <h2 class="booking-stats__heading">New vs Repeating Clients</h2>
+                <h2 class="w-text-h">New vs Repeating Clients</h2>
                 <p class="booking-stats__price">New: £<?php echo number_format($new_clients_value, 2); ?></p>
                 <p class="booking-stats__price">Returning: £<?php echo number_format($returning_clients_value, 2); ?></p>
             </div>
 
             <div class="booking-stats">
-                <h2 class="booking-stats__heading">Top Booked Services</h2>
+                <h2 class="w-text-h">Top Booked Services</h2>
                 <ul class="booking-stats__list">
                     <?php foreach ($top_services as $service) : ?>
                         <li><?php echo esc_html($service); ?></li>

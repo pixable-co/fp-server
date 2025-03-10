@@ -152,11 +152,11 @@ class BookingStats {
 
             <div class="booking-stats">
                 <h2 class="w-text-h">New vs Repeating Clients</h2>
-                <p class="booking-stats__price">New: £<?php echo number_format($new_clients_value, 2); ?></p>
-                <p class="booking-stats__price">Returning: £<?php echo number_format($returning_clients_value, 2); ?></p>
+                    <p class="booking-stats__price">New: £<?php echo number_format($new_clients_value, 2); ?></p>
+                    <p class="booking-stats__price">Returning: £<?php echo number_format($returning_clients_value, 2); ?></p>
             </div>
 
-            <div class="booking-stats">
+            <div class="booking-stats top-booked-service">
                 <h2 class="w-text-h">Top Booked Services</h2>
                 <ul class="booking-stats__list">
                     <?php foreach ($top_services as $service) : ?>

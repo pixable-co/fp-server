@@ -9,6 +9,7 @@ use FPServer\PartnerBookings;
 use FPServer\GoogleCalender;
 use FPServer\BookingChart;
 use FPServer\BookingStats;
+use FPServer\ReviewCount;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -27,5 +28,6 @@ class Shortcodes {
 		GoogleCalender::init();
         BookingChart::init();
 		BookingStats::init();
+		ReviewCount::init();
 	}
 }

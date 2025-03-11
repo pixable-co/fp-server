@@ -3,12 +3,18 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { Dropdown } from 'antd';
+import { Dropdown, Skeleton } from 'antd';
 import './style.css';
 
 const FhCalender = ({ type, events }) => {
-
     const isDayView = type === 'day';
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (events.length > 0) {
+            setLoading(false); // Stop loading when events are fetched
+        }
+    }, [events]);
 
     // Convert API response to FullCalendar format
     const transformedEvents = events.map(event => ({
@@ -19,7 +25,7 @@ const FhCalender = ({ type, events }) => {
         borderColor: '#4285f4',
         textColor: '#fff',
         extendedProps: {
-            booking_time: event.time, // Store booking time separately
+            booking_time: event.time,
             customer: event.customer,
             email: event.email,
             phone: event.phone,
@@ -55,52 +61,65 @@ const FhCalender = ({ type, events }) => {
 
     return (
         <div className="calendar-container">
-            <FullCalendar
-                plugins={[
-                    dayGridPlugin,
-                    timeGridPlugin,
-                    interactionPlugin
-                ]}
-                initialView={isDayView ? 'dayGridMonth' : 'timeGridWeek'}
-                headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }}
-                weekends={false}
-                events={transformedEvents} // Use transformed events
-                eventContent={(arg) => {
-                    return (
-                        <Dropdown
-                            menu={getEventContent(arg.event)}
-                            trigger={['click']}
-                            placement="bottomLeft"
-                        >
-                            <div
-                                onClick={(e) => e.stopPropagation()}
-                                style={{
-                                    backgroundColor: arg.event.backgroundColor || '#4285f4',
-                                    color: '#fff',
-                                    padding: '4px 6px',
-                                    borderRadius: '4px',
-                                    width: '100%',
-                                    height: '100%',
-                                    cursor: 'pointer'
-                                }}
+            {loading ? (
+                <>
+                    <div className="w-full">
+                        <div className="flex justify-between mb-4 gap-2">
+                            <Skeleton.Button active size="small" style={{ width: 100 }} />
+                            <Skeleton.Button active size="small" style={{ width: 100 }} />
+                            <Skeleton.Button active size="small" style={{ width: 100 }} />
+                        </div>
+                        <Skeleton.Button active size="small" style={{ width: '1150px', height: '500px' }} />
+                    </div>
+                </>
+            ) : (
+                <FullCalendar
+                    plugins={[
+                        dayGridPlugin,
+                        timeGridPlugin,
+                        interactionPlugin
+                    ]}
+                    initialView={isDayView ? 'dayGridMonth' : 'timeGridWeek'}
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    }}
+                    weekends={false}
+                    events={transformedEvents}
+                    eventContent={(arg) => {
+                        return (
+                            <Dropdown
+                                menu={getEventContent(arg.event)}
+                                trigger={['click']}
+                                placement="bottomLeft"
                             >
-                                {arg.event.title}
-                            </div>
-                        </Dropdown>
-                    );
-                }}
-                eventClick={handleEventClick}
-                eventTimeFormat={{
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: false
-                }}
-                height="auto"
-            />
+                                <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{
+                                        backgroundColor: arg.event.backgroundColor || '#4285f4',
+                                        color: '#fff',
+                                        padding: '4px 6px',
+                                        borderRadius: '4px',
+                                        width: '100%',
+                                        height: '100%',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    {arg.event.title}
+                                </div>
+                            </Dropdown>
+                        );
+                    }}
+                    eventClick={handleEventClick}
+                    eventTimeFormat={{
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        meridiem: false
+                    }}
+                    height="auto"
+                />
+            )}
         </div>
     );
 };

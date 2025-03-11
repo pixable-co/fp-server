@@ -28,7 +28,7 @@ export default function BookingCalender() {
                     return {
                         id: `order-${order.id}`,
                         title: lineItem.product_name ?? 'No Title',
-                        date: meta.booking_date ?? 'Unknown Date',
+                        date: meta.booking_date ? meta.booking_date.split(", ")[1] : 'Unknown Date',
                         time: meta.booking_time ?? 'Unknown Time',
                         customer: `${order.billing.first_name} ${order.billing.last_name}`,
                         email: order.billing.email ?? 'No Email',

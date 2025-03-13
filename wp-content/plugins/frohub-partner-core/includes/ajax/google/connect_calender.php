@@ -79,14 +79,61 @@ class ConnectCalender {
             wp_send_json_error(['message' => 'User not logged in.']);
         }
 
+        // Ensure refresh token is stored
+        if (!empty($token['refresh_token'])) {
+           update_user_meta($user_id, 'google_calendar_refresh_token', $token['refresh_token']);
+        }
+
         update_user_meta($user_id, 'google_calendar_access_token', json_encode($token)); // Store per user
         wp_redirect(site_url('/google-calender'));
         exit;
     }
 
+//     public static function getAccessToken() {
+//         $user_id = get_current_user_id();
+//         return json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true) ?: null;
+//     }
+
     public static function getAccessToken() {
         $user_id = get_current_user_id();
-        return json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true) ?: null;
+        $token = json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true);
+
+        if (!$token) {
+            return null;
+        }
+
+        $client = self::getClient();
+        $client->setAccessToken($token);
+
+        // Refresh token if expired
+        if ($client->isAccessTokenExpired()) {
+            $new_token = self::refreshAccessToken($user_id);
+            if (!$new_token) {
+                return null; // Re-authentication needed
+            }
+            return $new_token;
+        }
+
+        return $token;
+    }
+
+    public static function refreshAccessToken($user_id) {
+        $refresh_token = get_user_meta($user_id, 'google_calendar_refresh_token', true);
+
+        if (!$refresh_token) {
+            return false; // No refresh token found, user must reauthenticate
+        }
+
+        $client = self::getClient();
+        $client->fetchAccessTokenWithRefreshToken($refresh_token);
+        $new_token = $client->getAccessToken();
+
+        if (isset($new_token['error'])) {
+            return false; // Token refresh failed
+        }
+
+        update_user_meta($user_id, 'google_calendar_access_token', json_encode($new_token));
+        return $new_token;
     }
 
     public function get_google_calendars() {
@@ -102,7 +149,15 @@ class ConnectCalender {
             wp_send_json_error(['message' => 'User is not authenticated.']);
         }
 
-        $token = json_decode($token, true);
+//         $token = json_decode($token, true);
+//         $client = self::getClient();
+//         $client->setAccessToken($token);
+
+        $token = self::getAccessToken();
+        if (!$token) {
+            wp_send_json_error(['message' => 'Access token expired. Please reconnect.']);
+        }
+
         $client = self::getClient();
         $client->setAccessToken($token);
 

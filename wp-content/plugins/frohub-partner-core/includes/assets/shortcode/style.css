@@ -48,13 +48,13 @@
 /*Upcoming Order Styles*/
 
 .upcoming-order-container {
-    border: 1px solid #d1e3f8;
+    /* border: 1px solid #d1e3f8;
     border-radius: 8px;
-    padding: 20px;
+    padding: 20px; */
     max-width: 400px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    /* box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     background-color: #f9fbff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; */
 }
 
 .upcoming-order-container h3 {
@@ -66,8 +66,8 @@
 }
 
 .booking-date-time {
-    font-size: 22px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 500;
     color: #333;
     margin-bottom: 5px;
 }

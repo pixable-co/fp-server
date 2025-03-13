@@ -7,13 +7,13 @@
     gap: var(--spacing-lg, 16px); /* Uses Impreza spacing variable */
 }
 
-.booking-stats {
+/* .booking-stats {
     flex: 1;
     min-width: 220px;
     padding: var(--spacing-md, 1.0rem);
     background-color: var(--color-content-bg-alt, white);
     border-radius: var(--border-radius-md, 8px);
-}
+} */
 
 /* Headings */
 .booking-stats__heading {

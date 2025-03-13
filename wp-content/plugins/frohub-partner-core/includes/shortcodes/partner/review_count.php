@@ -36,7 +36,7 @@ class ReviewCount {
 
         // Display rating in the existing format
         return '<div class="booking-stats">
-                    <p class="booking-stats__price">' . esc_html($average_rating) . ' / 5</p>
+                    <p class="booking-stats__price">' . esc_html($average_rating) . '</p>
                 </div>';
     }
 

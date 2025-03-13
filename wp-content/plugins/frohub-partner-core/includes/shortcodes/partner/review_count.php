@@ -36,8 +36,7 @@ class ReviewCount {
 
         // Display rating in the existing format
         return '<div class="booking-stats">
-                    <h2 class="w-text-h">Average Rating</h2>
-                    <p class="booking-stats__price">' . esc_html($average_rating) . ' / 5</p>
+                    <p class="booking-stats__price">' . esc_html($average_rating) . '</p>
                 </div>';
     }
 
@@ -78,17 +77,18 @@ class ReviewCount {
         if (!$api_response || !isset($api_response['reviews'])) {
             return "No Reviews";
         }
-
+    
         $total_rating = 0;
         $review_count = 0;
-
+    
         foreach ($api_response['reviews'] as $review) {
             if (!empty($review['rating'])) {
                 $total_rating += floatval($review['rating']);
                 $review_count++;
             }
         }
-
-        return ($review_count > 0) ? number_format($total_rating / $review_count, 1) : "No Reviews";
+    
+        return ($review_count > 0) ? number_format($total_rating / $review_count, 1) . ' / 5' : "No Reviews";
     }
+    
 }

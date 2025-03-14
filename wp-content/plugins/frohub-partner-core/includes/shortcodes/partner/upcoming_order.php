@@ -40,7 +40,7 @@ class UpcomingOrder {
 
         // Check if the API request was successful and contains data
         if (!$response || !isset($response['success']) || $response['success'] !== true || empty($response['data'])) {
-            return '<div class="upcoming-order-container">
+            return '<div class="upcoming-order-container dashboard-stats">
                         <p>No upcoming bookings found.</p>
                     </div>';
         }
@@ -52,7 +52,7 @@ class UpcomingOrder {
         $date_time = $booking_data['start_date'] . ' at ' . $booking_data['start_time'];
 
         // Display the upcoming booking in the format shown in the screenshot
-        return '<div class="upcoming-order-container">
+        return '<div class="upcoming-order-container dashboard-stats">
                     <div class="booking-date-time">' . esc_html($date_time) . '</div>
                     <div class="booking-service">' . esc_html($booking_data['service_name']) . '</div>
                     <div class="booking-client-info">

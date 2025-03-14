@@ -68,6 +68,7 @@ const FhChart = ({ data }) => {
                             usePointStyle: false,
                             padding: 20,
                         },
+                        onClick: () => null, // ✅ Disable clicking on legend
                     },
                 },
             },

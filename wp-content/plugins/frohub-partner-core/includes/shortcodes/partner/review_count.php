@@ -35,7 +35,8 @@ class ReviewCount {
         $average_rating = $this->calculate_average_rating($api_response);
 
         // Display rating in the existing format
-        return '<div class="booking-stats dashboard-stats">
+        return '<div class="review-stats dashboard-stats">
+                    <h2> Your Reviews </h2>
                     <p class="booking-stats__price">' . esc_html($average_rating) . '</p>
                 </div>';
     }

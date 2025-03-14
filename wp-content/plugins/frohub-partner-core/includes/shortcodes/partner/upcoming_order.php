@@ -57,6 +57,7 @@ class UpcomingOrder {
 
         // Display the upcoming booking in the format shown in the screenshot
         return '<div class="upcoming-order-container dashboard-stats">
+                    <h2> Next Upcoming Booking </h2>
                     <div class="booking-date-time">' . esc_html($date_time) . '</div>
                     <div class="booking-service">' . esc_html($booking_data['service_name']) . '</div>
                     <div class="booking-client-info">

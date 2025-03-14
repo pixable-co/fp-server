@@ -76,6 +76,20 @@ const GoogleCalendar = () => {
         });
     };
 
+    // ✅ Handle Google Calendar Disconnection
+    const handleDisconnect = () => {
+        fetchData("fpserver/disconnect_google_calendar", (response) => {
+            if (response.success) {
+                setIsConnected(false);
+                setCalendars([]);
+                setSavedCalendar("");
+                alert("Disconnected from Google Calendar.");
+            } else {
+                console.error("Failed to disconnect:", response.message);
+            }
+        });
+    };
+
     return (
         <div>
             <h1>Google Calendar Integration</h1>
@@ -92,6 +106,9 @@ const GoogleCalendar = () => {
                     </select>
                     <button onClick={handleSaveCalendar} className="btn btn-primary" style={{ marginLeft: "10px" }}>
                         Save Calendar
+                    </button>
+                    <button onClick={handleDisconnect} className="btn btn-danger" style={{ marginLeft: "10px" }}>
+                        Disconnect Calender
                     </button>
 
                     {/* Show saved calendar info */}

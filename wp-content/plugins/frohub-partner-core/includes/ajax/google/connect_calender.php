@@ -12,6 +12,7 @@ class ConnectCalender {
         $self = new self();
 
         add_action('wp_ajax_fpserver/connect_calender', array($self, 'connect_calender'));
+        add_action('wp_ajax_fpserver/disconnect_google_calendar', array($self, 'disconnect_google_calendar'));
         add_action('wp_ajax_fpserver/get_google_auth_url', array($self, 'get_google_auth_url'));
         add_action('wp_ajax_fpserver/check_google_auth_status', array($self, 'check_google_auth_status'));
         add_action('wp_ajax_fpserver/google_oauth_callback', array($self, 'handle_oauth_callback'));
@@ -28,6 +29,21 @@ class ConnectCalender {
         $client->setAccessType('offline');
         $client->setPrompt('consent');
         return $client;
+    }
+
+    public function disconnect_google_calendar() {
+        check_ajax_referer('fpserver_nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'User not logged in.']);
+        }
+
+        delete_user_meta($user_id, 'google_calendar_access_token');
+        delete_user_meta($user_id, 'google_calendar_refresh_token');
+        delete_user_meta($user_id, 'google_calendar_id');
+
+        wp_send_json_success(['message' => 'Disconnected from Google Calendar.']);
     }
 
     public function get_google_auth_url() {

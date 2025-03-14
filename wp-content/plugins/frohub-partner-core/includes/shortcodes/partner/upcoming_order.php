@@ -62,7 +62,7 @@ class UpcomingOrder {
                     <div class="booking-client-info">
                         <div class="client-name-email">
                             <span class="client-name">' . esc_html($booking_data['client_name']) . '</span>
-                            <a href="' . esc_url($client_profile_url) . '" class="client-email-icon" title="View profile of ' . esc_attr($booking_data['client_name']) . '">👤</a>
+                            <a href="' . esc_url($client_profile_url) . '" class="client-email-icon" title="Conversation of ' . esc_attr($booking_data['client_name']) . '"><i class="fas fa-comment-alt"></i></a>
                         </div>
                         <div class="client-phone">
                             <a href="tel:' . esc_attr($booking_data['client_phone']) . '" class="client-phone-link">' . esc_html($booking_data['client_phone']) . '</a>

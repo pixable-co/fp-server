@@ -1,10 +1,18 @@
-/*Booking State Style*/
+/*Booking Stat Style*/
 
 .booking-stats-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: var(--spacing-lg, 16px); /* Uses Impreza spacing variable */
+}
+
+.dashboard-stats
+{
+        padding: 1rem;
+    background: var(--color-content-bg-alt);
+    border-radius: 0.3rem;
+    border: 1px solid var(--color-content-border);
 }
 
 /* .booking-stats {
@@ -16,18 +24,12 @@
 } */
 
 /* Headings */
-.booking-stats__heading {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: var(--spacing-sm, 0.5rem);
-    color: var(--color-heading, #1E293B); /* Uses Impreza heading color */
-}
+
 
 /* Prices */
-.booking-stats__price {
+.booking-stats-value {
     font-size: 1.2rem;
     font-weight: 500;
-    color: #1e3050;
 }
 
 /* Ensure consistent box height */

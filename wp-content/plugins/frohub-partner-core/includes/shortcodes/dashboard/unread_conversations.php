@@ -35,9 +35,9 @@ class UnreadConversations {
         wp_reset_postdata();
 
         // Return the count within a div element
-        return '<div class="unread_conversations dashboard-stats"> 
+        return '<div class="unread-conversations dashboard-stats"> 
          <h2>  Unread Conversations </h2>
-         <p>' . esc_html($count) . '</p>
+         <p class="booking-stats-value">' . esc_html($count) . '</p>
          </div>';
     }
 }

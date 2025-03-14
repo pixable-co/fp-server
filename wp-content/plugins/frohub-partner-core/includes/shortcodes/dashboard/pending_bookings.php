@@ -63,7 +63,7 @@ class PendingBookings {
         // Return the pending bookings count inside a div
         return '<div class="pending-bookings dashboard-stats">
          <h2>Pending Bookings </h2>
-         <p>' . esc_html($order_count) . '</p>
+         <p class="booking-stats-value">' . esc_html($order_count) . '</p>
          </div>';
     }
 }

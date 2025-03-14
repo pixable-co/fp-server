@@ -13,23 +13,29 @@ export default function BookingCalender() {
                     'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/return-order-details',
                     { partner_id }
                 );
-        
+
                 console.log("Order API Response:", response.data);
 
                 if (!response.data || !Array.isArray(response.data)) {
                     console.error("Order API returned unexpected response:", response.data);
                     return [];
                 }
-        
+
                 return response.data.map(order => {
                     const lineItem = order.line_items?.[0] ?? {};
                     const meta = lineItem.meta ?? {};
-        
+
+                    const bookingDateTime = meta.booking_date ? meta.booking_date.split(", ") : [];
+                    const extractedTime = bookingDateTime.length > 0 ? bookingDateTime[0] : 'Unknown Time';
+                    const extractedDate = bookingDateTime.length > 1 ? bookingDateTime[1] : 'Unknown Date';
+
                     return {
                         id: `order-${order.id}`,
                         title: lineItem.product_name ?? 'No Title',
-                        date: meta.booking_date ? meta.booking_date.split(", ")[1] : 'Unknown Date',
-                        time: meta.booking_time ?? 'Unknown Time',
+                        // date: meta.booking_date ? meta.booking_date.split(", ")[1] : 'Unknown Date',
+                        // time: meta.booking_time ?? 'Unknown Time',
+                        date: extractedDate,
+                        time: extractedTime,
                         customer: `${order.billing.first_name} ${order.billing.last_name}`,
                         email: order.billing.email ?? 'No Email',
                         phone: order.billing.phone ?? 'No Phone',
@@ -41,7 +47,7 @@ export default function BookingCalender() {
                 return [];
             }
         };
-          
+
 
         const fetchAllCalendarEvents = async () => {
             try {
@@ -51,12 +57,12 @@ export default function BookingCalender() {
                 );
                 console.log("Google Calendar API Response:", response.data);
 
-        
+
                 if (!response.data || !response.data.events) {
                     console.error("Google Calendar API returned unexpected response:", response.data);
                     return [];
                 }
-        
+
                 return response.data.events.map(event => ({
                     id: `calendar-${event.id}`,
                     title: event.title ?? 'Google Calendar Event',
@@ -69,7 +75,7 @@ export default function BookingCalender() {
                 return [];
             }
         };
-        
+
 
         const fetchData = async () => {
             const [orderEvents, allCalendarEvents] = await Promise.all([

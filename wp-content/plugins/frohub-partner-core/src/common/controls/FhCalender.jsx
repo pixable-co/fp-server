@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Dropdown, Skeleton } from 'antd';
-import './style.css';
 
 const FhCalender = ({ type, events }) => {
     const isDayView = type === 'day';
@@ -12,26 +11,37 @@ const FhCalender = ({ type, events }) => {
 
     useEffect(() => {
         if (events.length > 0) {
-            setLoading(false); // Stop loading when events are fetched
+            setLoading(false);
         }
     }, [events]);
 
-    // Convert API response to FullCalendar format
-    const transformedEvents = events.map(event => ({
-        id: event.id,
-        title: event.title,
-        date: new Date(event.date),
-        backgroundColor: '#4285f4',
-        borderColor: '#4285f4',
-        textColor: '#fff',
-        extendedProps: {
-            booking_time: event.time,
-            customer: event.customer,
-            email: event.email,
-            phone: event.phone,
-            service: event.service
+    const transformedEvents = events.map(event => {
+        const eventDate = event.date ? new Date(event.date) : null;
+        const eventTime = event.time || '00:00';
+
+        let eventStart = null;
+        if (eventDate) {
+            const [hours, minutes] = eventTime.split(':');
+            eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
+            eventStart = eventDate.toISOString();
         }
-    }));
+
+        return {
+            id: event.id,
+            title: event.title,
+            start: eventStart,
+            backgroundColor: '#4285f4',
+            borderColor: '#4285f4',
+            textColor: '#fff',
+            extendedProps: {
+                booking_time: event.time,
+                customer: event.customer,
+                email: event.email,
+                phone: event.phone,
+                service: event.service
+            }
+        };
+    });
 
     const handleEventClick = (clickInfo) => {
         clickInfo.jsEvent.preventDefault();
@@ -44,7 +54,7 @@ const FhCalender = ({ type, events }) => {
                 {
                     key: '1',
                     label: (
-                        <div className="event-details-dropdown">
+                        <div>
                             <h6>{event.title}</h6>
                             <p><strong>Date:</strong> {eventDate}</p>
                             <p><strong>Time:</strong> {event.extendedProps.booking_time}</p>
@@ -60,7 +70,7 @@ const FhCalender = ({ type, events }) => {
     };
 
     return (
-        <div className="calendar-container">
+        <div>
             {loading ? (
                 <>
                     <div className="w-full">
@@ -87,30 +97,28 @@ const FhCalender = ({ type, events }) => {
                     }}
                     weekends={false}
                     events={transformedEvents}
-                    eventContent={(arg) => {
-                        return (
-                            <Dropdown
-                                menu={getEventContent(arg.event)}
-                                trigger={['click']}
-                                placement="bottomLeft"
+                    eventContent={(arg) => (
+                        <Dropdown
+                            menu={getEventContent(arg.event)}
+                            trigger={['click']}
+                            placement="bottomLeft"
+                        >
+                            <div
+                                onClick={(e) => e.stopPropagation()}
+                                style={{
+                                    backgroundColor: arg.event.backgroundColor || '#4285f4',
+                                    color: '#fff',
+                                    padding: '4px 6px',
+                                    borderRadius: '4px',
+                                    width: '100%',
+                                    height: '100%',
+                                    cursor: 'pointer'
+                                }}
                             >
-                                <div
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{
-                                        backgroundColor: arg.event.backgroundColor || '#4285f4',
-                                        color: '#fff',
-                                        padding: '4px 6px',
-                                        borderRadius: '4px',
-                                        width: '100%',
-                                        height: '100%',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    {arg.event.title}
-                                </div>
-                            </Dropdown>
-                        );
-                    }}
+                                {arg.event.title}
+                            </div>
+                        </Dropdown>
+                    )}
                     eventClick={handleEventClick}
                     eventTimeFormat={{
                         hour: '2-digit',

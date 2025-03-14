@@ -11,6 +11,8 @@ use FPServer\BookingChart;
 use FPServer\BookingStats;
 use FPServer\ReviewCount;
 use FPServer\UpcomingOrder;
+use FPServer\PendingBookings;
+use FPServer\UnreadConversations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,5 +33,7 @@ class Shortcodes {
 		BookingStats::init();
 		ReviewCount::init();
 		UpcomingOrder::init();
+		PendingBookings::init();
+		UnreadConversations::init();
 	}
 }

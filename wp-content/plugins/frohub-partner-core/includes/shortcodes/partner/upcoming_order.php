@@ -60,9 +60,12 @@ class UpcomingOrder {
                             <span class="client-name">' . esc_html($booking_data['client_name']) . '</span>
                             <a href="mailto:' . esc_attr($booking_data['client_email']) . '" class="client-email-icon" title="Email ' . esc_attr($booking_data['client_name']) . '">✉</a>
                         </div>
-                        <div class="client-phone">' . esc_html($booking_data['client_phone']) . '</div>
+                        <div class="client-phone">
+                            <a href="tel:' . esc_attr($booking_data['client_phone']) . '" class="client-phone-link">' . esc_html($booking_data['client_phone']) . '</a>
+                        </div>
                     </div>
                 </div>';
+
     }
 
     /**

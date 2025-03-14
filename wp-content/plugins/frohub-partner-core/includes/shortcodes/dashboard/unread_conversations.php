@@ -13,7 +13,28 @@ class UnreadConversations {
     }
 
     public function unread_conversations_shortcode() {
-        $unique_key = 'unread_conversations' . uniqid();
-        return '<div class="unread_conversations" data-key="' . esc_attr($unique_key) . '"></div>';
+        // Query client posts with ACF field 'read_by_partner' as false
+        $args = array(
+            'post_type'      => 'client', // Change to your actual post type
+            'posts_per_page' => -1, // Retrieve all posts
+            'meta_query'     => array(
+                array(
+                    'key'   => 'read_by_partner',
+                    'value' => '0', // ACF stores boolean values as '0' and '1' (string format)
+                    'compare' => '='
+                ),
+            ),
+        );
+
+        $query = new \WP_Query($args);
+
+        // Get the count of unread conversations
+        $count = $query->found_posts;
+
+        // Reset post data
+        wp_reset_postdata();
+
+        // Return the count within a div element
+        return '<div class="unread_conversations dashboard-stats">' . esc_html($count) . '</div>';
     }
 }

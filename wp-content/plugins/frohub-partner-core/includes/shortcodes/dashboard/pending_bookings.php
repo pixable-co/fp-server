@@ -61,6 +61,9 @@ class PendingBookings {
         $order_count = (!empty($data) && isset($data['order_count'])) ? intval($data['order_count']) : 0;
 
         // Return the pending bookings count inside a div
-        return '<div class="pending_bookings dashboard-stats">' . esc_html($order_count) . '</div>';
+        return '<div class="pending-bookings dashboard-stats">
+         <h2>Pending Bookings </h2>
+         <p class="booking-stats-value">' . esc_html($order_count) . '</p>
+         </div>';
     }
 }

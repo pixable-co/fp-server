@@ -22,9 +22,10 @@ class UpcomingOrder {
         );
 
         $current_user_id = get_current_user_id();
-                // Check if user is logged in
+
+        // Check if user is logged in
         if (!$current_user_id) {
-             return '<p>You need to be logged in to view upcoming bookings.</p>';
+            return '<p>You need to be logged in to view upcoming bookings.</p>';
         }
 
         // Get partner ID from ACF field
@@ -51,6 +52,9 @@ class UpcomingOrder {
         // Format the date and time
         $date_time = $booking_data['start_date'] . ' at ' . $booking_data['start_time'];
 
+        // Build the client profile URL using partner_platform_client_id
+        $client_profile_url = get_permalink($booking_data['partner_platform_client_id']);
+
         // Display the upcoming booking in the format shown in the screenshot
         return '<div class="upcoming-order-container dashboard-stats">
                     <div class="booking-date-time">' . esc_html($date_time) . '</div>
@@ -58,14 +62,13 @@ class UpcomingOrder {
                     <div class="booking-client-info">
                         <div class="client-name-email">
                             <span class="client-name">' . esc_html($booking_data['client_name']) . '</span>
-                            <a href="mailto:' . esc_attr($booking_data['client_email']) . '" class="client-email-icon" title="Email ' . esc_attr($booking_data['client_name']) . '">✉</a>
+                            <a href="' . esc_url($client_profile_url) . '" class="client-email-icon" title="View profile of ' . esc_attr($booking_data['client_name']) . '">👤</a>
                         </div>
                         <div class="client-phone">
                             <a href="tel:' . esc_attr($booking_data['client_phone']) . '" class="client-phone-link">' . esc_html($booking_data['client_phone']) . '</a>
                         </div>
                     </div>
                 </div>';
-
     }
 
     /**

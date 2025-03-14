@@ -34,6 +34,7 @@ const FhCalender = ({ type, events }) => {
             borderColor: '#4285f4',
             textColor: '#fff',
             extendedProps: {
+                eventType: event.eventType,
                 booking_time: event.time,
                 customer: event.customer,
                 email: event.email,
@@ -44,10 +45,17 @@ const FhCalender = ({ type, events }) => {
     });
 
     const handleEventClick = (clickInfo) => {
+        if (clickInfo.event.extendedProps.eventType === 'google-calendar') {
+            return; // Skip clicks for Google Calendar events
+        }
         clickInfo.jsEvent.preventDefault();
     };
 
     const getEventContent = (event) => {
+        if (event.extendedProps.eventType === 'google-calendar') {
+            return null; // No dropdown for Google Calendar events
+        }
+
         const eventDate = event.start ? event.start.toISOString().split('T')[0] : event.date || 'N/A';
         return {
             items: [
@@ -97,14 +105,12 @@ const FhCalender = ({ type, events }) => {
                     }}
                     weekends={false}
                     events={transformedEvents}
-                    eventContent={(arg) => (
-                        <Dropdown
-                            menu={getEventContent(arg.event)}
-                            trigger={['click']}
-                            placement="bottomLeft"
-                        >
+                    eventContent={(arg) => {
+                        const isGoogleEvent = arg.event.extendedProps.eventType === 'google-calendar';
+
+                        return isGoogleEvent ? (
                             <div
-                                onClick={(e) => e.stopPropagation()}
+                                className="google-calendar-event"
                                 style={{
                                     backgroundColor: arg.event.backgroundColor || '#4285f4',
                                     color: '#fff',
@@ -112,13 +118,34 @@ const FhCalender = ({ type, events }) => {
                                     borderRadius: '4px',
                                     width: '100%',
                                     height: '100%',
-                                    cursor: 'pointer'
+                                    cursor: 'default' // Prevents cursor change on hover
                                 }}
                             >
                                 {arg.event.title}
                             </div>
-                        </Dropdown>
-                    )}
+                        ) : (
+                            <Dropdown
+                                menu={getEventContent(arg.event)}
+                                trigger={['click']}
+                                placement="bottomLeft"
+                            >
+                                <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{
+                                        backgroundColor: arg.event.backgroundColor || '#4285f4',
+                                        color: '#fff',
+                                        padding: '4px 6px',
+                                        borderRadius: '4px',
+                                        width: '100%',
+                                        height: '100%',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    {arg.event.title}
+                                </div>
+                            </Dropdown>
+                        );
+                    }}
                     eventClick={handleEventClick}
                     eventTimeFormat={{
                         hour: '2-digit',

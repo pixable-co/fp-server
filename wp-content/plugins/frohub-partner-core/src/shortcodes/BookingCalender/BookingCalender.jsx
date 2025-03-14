@@ -40,6 +40,7 @@ export default function BookingCalender() {
                         email: order.billing.email ?? 'No Email',
                         phone: order.billing.phone ?? 'No Phone',
                         service: meta.service_type ?? 'Unknown Service',
+                        eventType: 'order',
                     };
                 });
             } catch (error) {
@@ -117,6 +118,7 @@ export default function BookingCalender() {
                         date: formattedDate,
                         time: formattedTime,
                         end: formattedEnd,
+                        eventType: 'google-calendar',
                     };
                 });
             } catch (error) {

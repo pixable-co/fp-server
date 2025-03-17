@@ -11,17 +11,68 @@ const GoogleCalendar = () => {
     // ✅ Check if user is authenticated with Google Calendar & token status
     useEffect(() => {
         fetchData("fpserver/check_google_auth_status", (response) => {
+            console.log("Auth Status Response:", response);
+            if (response.data.authenticated === false) {
+                console.log("Token expired, attempting refresh...");
+                refreshGoogleToken();
+            }
             if (response.success) {
                 setIsConnected(response.data.authenticated);
                 setIsExpired(response.data.expired);
 
-                if (response.data.authenticated && !response.data.expired) {
-                    fetchAvailableCalendars();
-                    fetchSavedCalendar();
+                if (response.data.authenticated) {
+                    if (response.data.expired) {
+                        console.log("Token expired, attempting refresh...");
+                        refreshGoogleToken();
+                    } else {
+                        fetchAvailableCalendars();
+                        fetchSavedCalendar();
+                    }
                 }
             }
         });
     }, []);
+
+    // useEffect(() => {
+    //     fetchData("fpserver/check_google_auth_status", (response) => {
+    //         console.log(response);
+    //         if (response.data.expired) {
+    //             console.log("Token expired, attempting refresh...");
+    //             refreshGoogleToken();
+    //         }
+    //         if (response.success) {
+    //             setIsConnected(response.data.authenticated);
+    //             setIsExpired(response.data.expired);
+    //
+    //             if (response.data.authenticated) {
+    //                 fetchAvailableCalendars();
+    //                 fetchSavedCalendar();
+    //                 // if (response.data.expired) {
+    //                 //     console.log("Token expired, attempting refresh...");
+    //                 //     refreshGoogleToken();
+    //                 // } else {
+    //                 //     fetchAvailableCalendars();
+    //                 //     fetchSavedCalendar();
+    //                 // }
+    //             }
+    //         }
+    //     });
+    // }, []);
+
+    // ✅ Function to refresh token if expired
+    const refreshGoogleToken = () => {
+        fetchData("fpserver/refresh_google_token", (response) => {
+            if (response.success) {
+                console.log("Token refreshed successfully.");
+                setIsExpired(false); // Mark token as valid
+                fetchAvailableCalendars();
+                fetchSavedCalendar();
+            } else {
+                console.error("Failed to refresh token:", response.message);
+                alert("Google Calendar session expired. Please reconnect.");
+            }
+        });
+    };
 
     // ✅ Fetch user's available Google Calendars
     const fetchAvailableCalendars = () => {
@@ -108,7 +159,7 @@ const GoogleCalendar = () => {
                         Save Calendar
                     </button>
                     <button onClick={handleDisconnect} className="btn btn-danger" style={{ marginLeft: "10px" }}>
-                        Disconnect Calender
+                        Disconnect Calendar
                     </button>
 
                     {/* Show saved calendar info */}
@@ -121,11 +172,13 @@ const GoogleCalendar = () => {
             ) : (
                 <div>
                     {isExpired && (
-                        <p style={{ color: "red" }}>⚠️ Your Google Calendar access has expired. Please reconnect.</p>
+                        <p style={{ color: "red" }}>⚠️ Your Google Calendar access has expired. Attempting to refresh...</p>
                     )}
-                    <button onClick={handleConnect} className="btn btn-primary">
-                        Connect Google Calendar
-                    </button>
+                    {!isConnected && (
+                        <button onClick={handleConnect} className="btn btn-primary">
+                            Connect Google Calendar
+                        </button>
+                    )}
                 </div>
             )}
         </div>

@@ -112,7 +112,8 @@
 }
 
 .client-phone:before {
-    content: "☎";
+    content: "\f879";
+    font-family: "fontawesome";
     margin-right: 5px;
     color: #888;
 }

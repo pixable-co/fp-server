@@ -22,16 +22,6 @@ class ConnectCalender {
         add_action('wp_ajax_fpserver/save_user_calendar', array($self, 'save_user_calendar'));
     }
 
-//     public static function getClient() {
-//         $client = new \Google_Client();
-//         $client->setAuthConfig(__DIR__ . '/credentials.json'); // Google OAuth Credentials
-//         $client->setRedirectUri(admin_url('admin-ajax.php?action=fpserver/google_oauth_callback'));
-//         $client->addScope(\Google_Service_Calendar::CALENDAR_READONLY);
-//         $client->setAccessType('offline');
-//         $client->setPrompt('consent');
-//         return $client;
-//     }
-
     public static function ajax_refresh_google_token() {
         check_ajax_referer('fpserver_nonce');
 
@@ -77,14 +67,6 @@ class ConnectCalender {
         wp_send_json_success(['message' => 'Disconnected from Google Calendar.']);
     }
 
-//     public function get_google_auth_url() {
-//         check_ajax_referer('fpserver_nonce');
-//
-//         $client = self::getClient();
-//         $auth_url = $client->createAuthUrl();
-//         wp_send_json_success(['auth_url' => $auth_url]);
-//     }
-
     public function get_google_auth_url() {
         check_ajax_referer('fpserver_nonce');
 
@@ -127,39 +109,6 @@ class ConnectCalender {
 
         wp_send_json_success(['authenticated' => true, 'expired' => false]);
     }
-
-//     public function handle_oauth_callback() {
-//         if (!isset($_GET['code'])) {
-//             wp_send_json_error(['message' => 'Authorization code missing']);
-//         }
-//
-// //         error_log('Refresh token received: ' . (!empty($token['refresh_token']) ? 'Yes' : 'No'));
-//         error_log(print_r($token, true));
-//
-//         $client = self::getClient();
-//         $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-//
-//         if (isset($token['error'])) {
-//             wp_send_json_error(['message' => 'Error retrieving access token: ' . $token['error']]);
-//         }
-//
-//         $user_id = get_current_user_id();
-//         if (!$user_id) {
-//             wp_send_json_error(['message' => 'User not logged in.']);
-//         }
-//
-//         // Ensure refresh token is stored
-//         if (!empty($token['refresh_token'])) {
-//            update_user_meta($user_id, 'google_calendar_refresh_token', $token['refresh_token']);
-//         }
-//
-// //         error_log('Stored refresh token: ' . get_user_meta($user_id, 'google_calendar_refresh_token', true));
-//         error_log(print_r(get_user_meta($user_id, 'google_calendar_refresh_token', true), true));
-//
-//         update_user_meta($user_id, 'google_calendar_access_token', json_encode($token)); // Store per user
-//         wp_redirect(site_url('/google-calendar'));
-//         exit;
-//     }
 
     public function handle_oauth_callback() {
         if (!isset($_GET['code'])) {
@@ -208,11 +157,6 @@ class ConnectCalender {
             wp_send_json_error(['message' => 'Authentication error: ' . $e->getMessage()]);
         }
     }
-
-//     public static function getAccessToken() {
-//         $user_id = get_current_user_id();
-//         return json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true) ?: null;
-//     }
 
     public static function getAccessToken() {
         $user_id = get_current_user_id();
@@ -268,10 +212,6 @@ class ConnectCalender {
         if (!$token) {
             wp_send_json_error(['message' => 'User is not authenticated.']);
         }
-
-//         $token = json_decode($token, true);
-//         $client = self::getClient();
-//         $client->setAccessToken($token);
 
         $token = self::getAccessToken();
         if (!$token) {
@@ -419,11 +359,16 @@ class ConnectCalender {
             error_log("Token refreshed successfully for user " . $user_id);
         }
 
-        // 🔹 Step 4: Fetch calendar events using the valid token
+        // 🔹 Step 4: Fetch upcoming events using the valid token
         $service = new \Google_Service_Calendar($client);
+
+        // Get current date and time in RFC3339 format
+        $now = (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC3339);
+
         $events = $service->events->listEvents($calendar_id, [
             'singleEvents' => true,
-            'orderBy'      => 'startTime'
+            'orderBy'      => 'startTime',
+            'timeMin'      => $now, // Get only future events
         ]);
 
         $event_list = [];
@@ -455,74 +400,5 @@ class ConnectCalender {
 
         return $event_list;
     }
-
-//     public static function get_user_all_calendar_events($partner_id) {
-//         $user_query = new \WP_User_Query([
-//             'meta_key'   => 'partner_post_id',
-//             'meta_value' => $partner_id,
-//             'number'     => 1,
-//         ]);
-//
-//         $users = $user_query->get_results();
-//         if (empty($users)) {
-//             wp_send_json_error(['message' => 'No user found for this partner ID.']);
-//         }
-//
-//         $user_id = $users[0]->ID;
-//         $calendar_id = get_user_meta($user_id, 'google_calendar_id', true);
-//
-//         if (!$calendar_id) {
-//             wp_send_json_error(['message' => 'No calendar found for this user.']);
-//         }
-//
-//         $token = get_user_meta($user_id, 'google_calendar_access_token', true);
-//         if (!$token) {
-//             wp_send_json_error(['message' => 'User is not authenticated.']);
-//         }
-//
-//         $token = json_decode($token, true);
-//         $client = self::getClient();
-//         $client->setAccessToken($token);
-//
-//         if ($client->isAccessTokenExpired()) {
-//             wp_send_json_error(['message' => 'Access token expired. Please reconnect.']);
-//         }
-//
-//         $service = new \Google_Service_Calendar($client);
-//         $events = $service->events->listEvents($calendar_id, [
-//             'singleEvents' => true,
-//             'orderBy'      => 'startTime'
-//         ]);
-//
-//         $event_list = [];
-//         $uk_timezone = new \DateTimeZone('Europe/London');
-//
-//         foreach ($events->getItems() as $event) {
-//             $start_time = $event->getStart()->getDateTime() ?: $event->getStart()->getDate();
-//             $end_time = $event->getEnd()->getDateTime() ?: $event->getEnd()->getDate();
-//
-//             // Convert to UK timezone if datetime is provided (not just date)
-//             if ($event->getStart()->getDateTime()) {
-//                 $start_datetime = new \DateTime($start_time);
-//                 $start_datetime->setTimezone($uk_timezone);
-//                 $start_time = $start_datetime->format('Y-m-d\TH:i:sP');
-//             }
-//
-//             if ($event->getEnd()->getDateTime()) {
-//                 $end_datetime = new \DateTime($end_time);
-//                 $end_datetime->setTimezone($uk_timezone);
-//                 $end_time = $end_datetime->format('Y-m-d\TH:i:sP');
-//             }
-//
-//             $event_list[] = [
-//                 'id'    => $event->getId(),
-//                 'title' => $event->getSummary(),
-//                 'start' => $start_time,
-//                 'end'   => $end_time,
-//             ];
-//         }
-//
-//         return $event_list;
-//     }
 
 }

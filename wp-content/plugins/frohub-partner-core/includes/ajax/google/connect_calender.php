@@ -12,6 +12,7 @@ class ConnectCalender {
         $self = new self();
 
         add_action('wp_ajax_fpserver/connect_calender', array($self, 'connect_calender'));
+        add_action('wp_ajax_fpserver/refresh_google_token', array($self, 'ajax_refresh_google_token'));
         add_action('wp_ajax_fpserver/disconnect_google_calendar', array($self, 'disconnect_google_calendar'));
         add_action('wp_ajax_fpserver/get_google_auth_url', array($self, 'get_google_auth_url'));
         add_action('wp_ajax_fpserver/check_google_auth_status', array($self, 'check_google_auth_status'));
@@ -21,13 +22,33 @@ class ConnectCalender {
         add_action('wp_ajax_fpserver/save_user_calendar', array($self, 'save_user_calendar'));
     }
 
+    public static function ajax_refresh_google_token() {
+        check_ajax_referer('fpserver_nonce');
+
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            wp_send_json_error(['message' => 'User not logged in.']);
+        }
+
+        $new_token = self::refreshAccessToken($user_id);
+        if (!$new_token) {
+            wp_send_json_error(['message' => 'Failed to refresh token. Please reconnect your Google account.']);
+        }
+
+        wp_send_json_success(['message' => 'Token refreshed successfully.']);
+    }
+
     public static function getClient() {
         $client = new \Google_Client();
         $client->setAuthConfig(__DIR__ . '/credentials.json'); // Google OAuth Credentials
         $client->setRedirectUri(admin_url('admin-ajax.php?action=fpserver/google_oauth_callback'));
         $client->addScope(\Google_Service_Calendar::CALENDAR_READONLY);
+
+        // Make sure these are set properly
         $client->setAccessType('offline');
         $client->setPrompt('consent');
+        $client->setApprovalPrompt('force'); // Add this for older API versions
+
         return $client;
     }
 
@@ -50,7 +71,18 @@ class ConnectCalender {
         check_ajax_referer('fpserver_nonce');
 
         $client = self::getClient();
+
+        // Double-check these settings are applied
+        $client->setAccessType('offline');
+        $client->setPrompt('consent');
+        $client->setApprovalPrompt('force');
+
+        // Add a state parameter to help with debugging
+        $client->setState('new_auth_' . time());
+
         $auth_url = $client->createAuthUrl();
+        error_log('Generated auth URL: ' . $auth_url);
+
         wp_send_json_success(['auth_url' => $auth_url]);
     }
 
@@ -84,31 +116,47 @@ class ConnectCalender {
         }
 
         $client = self::getClient();
-        $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
-        if (isset($token['error'])) {
-            wp_send_json_error(['message' => 'Error retrieving access token: ' . $token['error']]);
+        try {
+            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+            error_log('Received token response: ' . json_encode($token));
+
+            if (isset($token['error'])) {
+                error_log('Error retrieving access token: ' . $token['error']);
+                wp_send_json_error(['message' => 'Error retrieving access token: ' . $token['error']]);
+            }
+
+            $user_id = get_current_user_id();
+            if (!$user_id) {
+                wp_send_json_error(['message' => 'User not logged in.']);
+            }
+
+            // Store the access token
+            update_user_meta($user_id, 'google_calendar_access_token', json_encode($token));
+
+            // Check for and store refresh token
+            if (!empty($token['refresh_token'])) {
+                error_log('Received refresh token: ' . substr($token['refresh_token'], 0, 5) . '...');
+                update_user_meta($user_id, 'google_calendar_refresh_token', $token['refresh_token']);
+            } else {
+                error_log('No refresh token received in this authentication flow');
+
+                // Check if we already have a refresh token stored
+                $existing_refresh = get_user_meta($user_id, 'google_calendar_refresh_token', true);
+                if (!$existing_refresh) {
+                    error_log('No existing refresh token found. User will need to reconnect soon.');
+                } else {
+                    error_log('Using existing refresh token from database.');
+                }
+            }
+
+            wp_redirect(site_url('/google-calender'));
+            exit;
+        } catch (\Exception $e) {
+            error_log('Exception during OAuth callback: ' . $e->getMessage());
+            wp_send_json_error(['message' => 'Authentication error: ' . $e->getMessage()]);
         }
-
-        $user_id = get_current_user_id();
-        if (!$user_id) {
-            wp_send_json_error(['message' => 'User not logged in.']);
-        }
-
-        // Ensure refresh token is stored
-        if (!empty($token['refresh_token'])) {
-           update_user_meta($user_id, 'google_calendar_refresh_token', $token['refresh_token']);
-        }
-
-        update_user_meta($user_id, 'google_calendar_access_token', json_encode($token)); // Store per user
-        wp_redirect(site_url('/google-calender'));
-        exit;
     }
-
-//     public static function getAccessToken() {
-//         $user_id = get_current_user_id();
-//         return json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true) ?: null;
-//     }
 
     public static function getAccessToken() {
         $user_id = get_current_user_id();
@@ -164,10 +212,6 @@ class ConnectCalender {
         if (!$token) {
             wp_send_json_error(['message' => 'User is not authenticated.']);
         }
-
-//         $token = json_decode($token, true);
-//         $client = self::getClient();
-//         $client->setAccessToken($token);
 
         $token = self::getAccessToken();
         if (!$token) {
@@ -293,23 +337,38 @@ class ConnectCalender {
             wp_send_json_error(['message' => 'No calendar found for this user.']);
         }
 
-        $token = get_user_meta($user_id, 'google_calendar_access_token', true);
-        if (!$token) {
-            wp_send_json_error(['message' => 'User is not authenticated.']);
-        }
+        // 🔹 Step 1: Get the current access token
+        $token = json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true);
 
-        $token = json_decode($token, true);
+        // 🔹 Step 2: Check if the token is expired
         $client = self::getClient();
         $client->setAccessToken($token);
 
         if ($client->isAccessTokenExpired()) {
-            wp_send_json_error(['message' => 'Access token expired. Please reconnect.']);
+            error_log("Access token expired for user " . $user_id . ". Attempting to refresh...");
+
+            // 🔹 Step 3: Refresh the token automatically
+            $new_token = self::refreshAccessToken($user_id);
+
+            if (!$new_token) {
+                error_log("Token refresh failed for user " . $user_id);
+                wp_send_json_error(['message' => 'Access token expired. Please reconnect your Google account.']);
+            }
+
+            $client->setAccessToken($new_token);
+            error_log("Token refreshed successfully for user " . $user_id);
         }
 
+        // 🔹 Step 4: Fetch upcoming events using the valid token
         $service = new \Google_Service_Calendar($client);
+
+        // Get current date and time in RFC3339 format
+        $now = (new \DateTime('now', new \DateTimeZone('UTC')))->format(\DateTime::RFC3339);
+
         $events = $service->events->listEvents($calendar_id, [
             'singleEvents' => true,
-            'orderBy'      => 'startTime'
+            'orderBy'      => 'startTime',
+            'timeMin'      => $now, // Get only future events
         ]);
 
         $event_list = [];
@@ -319,7 +378,6 @@ class ConnectCalender {
             $start_time = $event->getStart()->getDateTime() ?: $event->getStart()->getDate();
             $end_time = $event->getEnd()->getDateTime() ?: $event->getEnd()->getDate();
 
-            // Convert to UK timezone if datetime is provided (not just date)
             if ($event->getStart()->getDateTime()) {
                 $start_datetime = new \DateTime($start_time);
                 $start_datetime->setTimezone($uk_timezone);

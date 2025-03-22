@@ -83,23 +83,27 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
         let eventStart, eventEnd;
         if (event.eventType === 'unavailable') {
-            const parsedStart = parseDateString(event.date, '00:00');
-            const parsedEnd = parseDateString(event.end, '23:59');
+            const startParts = event.date.split(" ");
+            const endParts = event.end.split(" ");
 
-            if (!parsedStart) {
-                console.error("❌ Could not parse start date for unavailable event:", event);
+            if (!startParts.length || !endParts.length) {
+                console.error("❌ Invalid start or end:", event);
                 return null;
             }
 
-            // Add +1 day to parsed end for FullCalendar (because end is exclusive)
-            let endDate = parsedStart.split("T")[0]; // fallback
-            if (parsedEnd) {
-                const endDateObj = new Date(parsedEnd);
-                endDateObj.setDate(endDateObj.getDate() + 1);
-                endDate = endDateObj.toISOString().split("T")[0];
-            }
+            const [startDateStr] = startParts;
+            const [endDateStr] = endParts;
 
-            eventStart = parsedStart.split("T")[0]; // date-only
+            // Convert DD/MM/YYYY → YYYY-MM-DD
+            const [startDay, startMonth, startYear] = startDateStr.split("/");
+            const [endDay, endMonth, endYear] = endDateStr.split("/");
+
+            const startDate = `${startYear}-${startMonth}-${startDay}`; // e.g. 2025-05-27
+            const endDateObj = new Date(`${endYear}-${endMonth}-${endDay}`);
+            endDateObj.setDate(endDateObj.getDate() + 1); // FullCalendar's exclusive end
+            const endDate = endDateObj.toISOString().split("T")[0];
+
+            eventStart = startDate;
             eventEnd = endDate;
         } else {
             // Process other events normally
@@ -211,8 +215,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         label: (
                             <div>
                                 <h6>{event.title}</h6>
-                                <p><strong>Start:</strong> {event.start ? event.start.toISOString().split('T')[0] : 'N/A'} {event.start ? event.start.toLocaleTimeString() : ''}</p>
-                                <p><strong>End:</strong> {event.end ? event.end.toISOString().split('T')[0] : 'N/A'} {event.end ? event.end.toLocaleTimeString() : ''}</p>
+                                <p><strong>Start:</strong> {event.start ? event.start.toISOString().split('T')[0] : 'N/A'}</p>
+                                <p><strong>End:</strong> {event.end ? new Date(event.end).toISOString().split('T')[0] : 'N/A'}</p>
                             </div>
                         ),
                     },
@@ -253,6 +257,25 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         };
     };
 
+    const convertTo24Hour = (time12h) => {
+        if (!time12h) return "00:00";
+
+        const [time, modifier] = time12h.split(" ");
+        let [hours, minutes] = time.split(":");
+
+        hours = parseInt(hours, 10);
+        minutes = minutes || "00";
+
+        if (modifier === "PM" && hours < 12) {
+            hours += 12;
+        }
+        if (modifier === "AM" && hours === 12) {
+            hours = 0;
+        }
+
+        return `${hours.toString().padStart(2, "0")}:${minutes}`;
+    };
+
     const handleSaveEvent = async () => {
         if (!eventTitle || !selectedSlot.start) {
             console.error("❌ Missing required fields.");
@@ -265,8 +288,11 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         const endTime = selectedSlot.endTime || "23:59";
 
         // Format dates properly
-        const formattedStart = parseDateString(selectedSlot.start, selectedSlot.startTime || "00:00");
-        const formattedEnd = parseDateString(endDate, endTime);
+        // const formattedStart = parseDateString(selectedSlot.start, selectedSlot.startTime || "00:00");
+        // const formattedEnd = parseDateString(endDate, endTime);
+
+        const formattedStart = parseDateString(selectedSlot.start, convertTo24Hour(selectedSlot.startTime));
+        const formattedEnd = parseDateString(endDate, convertTo24Hour(endTime));
 
         if (!formattedStart || !formattedEnd) {
             console.error("❌ Error formatting event start/end dates.");

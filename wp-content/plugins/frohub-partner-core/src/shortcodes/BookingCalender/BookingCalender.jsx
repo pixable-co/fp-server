@@ -113,7 +113,7 @@ export default function BookingCalender() {
     const fetchUnavailableDates = async () => {
         try {
             const response = await axios.post(
-                'http://localhost:10023/wp-json/frohub/v1/custom-events/fetch',
+                'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/custom-events/fetch',
                 { partner_id }
             );
 

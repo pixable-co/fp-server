@@ -215,8 +215,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         label: (
                             <div>
                                 <h6>{event.title}</h6>
-                                <p><strong>Start:</strong> {event.start ? event.start.toISOString().split('T')[0] : 'N/A'}</p>
-                                <p><strong>End:</strong> {event.end ? new Date(event.end).toISOString().split('T')[0] : 'N/A'}</p>
+                                {/*<p><strong>Start:</strong> {event.start ? event.start.toISOString().split('T')[0] : 'N/A'}</p>*/}
+                                {/*<p><strong>End:</strong> {event.end ? new Date(event.end).toISOString().split('T')[0] : 'N/A'}</p>*/}
                             </div>
                         ),
                     },
@@ -286,10 +286,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         const defaultEndDate = selectedSlot.start.split('T')[0]; // Same day as start_date
         const endDate = selectedSlot.end || defaultEndDate;
         const endTime = selectedSlot.endTime || "23:59";
-
-        // Format dates properly
-        // const formattedStart = parseDateString(selectedSlot.start, selectedSlot.startTime || "00:00");
-        // const formattedEnd = parseDateString(endDate, endTime);
 
         const formattedStart = parseDateString(selectedSlot.start, convertTo24Hour(selectedSlot.startTime));
         const formattedEnd = parseDateString(endDate, convertTo24Hour(endTime));

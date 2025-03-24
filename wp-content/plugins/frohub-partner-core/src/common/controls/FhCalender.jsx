@@ -12,6 +12,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     const partner_id = fpserver_settings.partner_post_id;
     const isDayView = type === 'day';
     const [loading, setLoading] = useState(true);
+    const [modifyingEventIds, setModifyingEventIds] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [eventTitle, setEventTitle] = useState("");
@@ -177,6 +178,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
     const getEventContent = (event) => {
         const eventType = event.extendedProps.eventType;
+        const eventId = event.id; // Add this line to define eventId
 
         if (eventType === 'google-calendar') {
             return null; // Google Calendar events are not interactive
@@ -186,6 +188,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             const eventIndex = event.extendedProps.eventIndex; // Get the event index
 
             const handleDelete = async () => {
+                setModifyingEventIds(prev => [...prev, eventId]);
                 try {
                     const response = await axios.post(
                         'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/custom-events/delete',
@@ -195,16 +198,14 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                     console.log("✅ Delete API Response:", response.data);
 
                     if (response.data.success) {
-                        fetchData(); // Refresh the data in the parent component
-                        swal({
-                            title: "Success",
-                            text: "Event deleted successfully",
-                            icon: "success",
-                            buttons: false,
-                        })
+                        await fetchData(); // Use await to ensure it compl
+                        setTimeout(() => {
+                            setModifyingEventIds(prev => prev.filter(id => id !== eventId));
+                        }, 1000); // 1 second delay after fetch completes
                     }
                 } catch (error) {
                     console.error("❌ Error deleting event:", error.response?.data || error.message);
+                    setModifyingEventIds(prev => prev.filter(id => id !== eventId));
                 }
             };
 
@@ -282,6 +283,32 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             return;
         }
 
+        // Create a temporary ID for the new event
+        const tempId = `temp-${Date.now()}`;
+
+        // Add a placeholder event to the display while saving
+        const tempEvent = {
+            id: tempId,
+            title: eventTitle,
+            start: selectedSlot.start,
+            end: selectedSlot.end || selectedSlot.start,
+            allDay: isAllDay,
+            backgroundColor: '#FF0000',
+            borderColor: '#FF0000',
+            textColor: '#fff',
+            extendedProps: {
+                eventType: 'unavailable',
+                isPlaceholder: true
+            }
+        };
+
+        // Add the temp event to events and mark it as being modified
+        setEvents(prev => [...prev, tempEvent]);
+        setModifyingEventIds(prev => [...prev, tempId]);
+
+        // Close the modal
+        handleModalClose();
+
         // Ensure default values for end_date and end_time
         const defaultEndDate = selectedSlot.start.split('T')[0]; // Same day as start_date
         const endDate = selectedSlot.end || defaultEndDate;
@@ -316,19 +343,143 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             );
             console.log("✅ API Response:", response.data);
             if (response.data.success) {
-                swal({
-                    title: "Success",
-                    text: "Event added successfully",
-                    icon: "success",
-                    buttons: false,
-                })
-                fetchData(); // Trigger fetchData to refresh the data in the parent
+                await fetchData(); // Trigger fetchData to refresh the data in the parent
+
+                setTimeout(() => {
+                    // Remove the temp event after the fetch completes and new data is rendered
+                    setEvents(prev => prev.filter(e => e.id !== tempId));
+                    setModifyingEventIds(prev => prev.filter(id => id !== tempId));
+                }, 1000);
             }
             handleModalClose();
         } catch (error) {
             console.error("❌ Error creating unavailable event:", error);
+            setEvents(prev => prev.filter(e => e.id !== tempId));
+            setModifyingEventIds(prev => prev.filter(id => id !== tempId));
         }
     };
+
+    const renderEventContent = (arg) => {
+        // Show skeleton for global loading or for specific events being modified
+        if (loading ||
+            arg.event.extendedProps.isPlaceholder ||
+            modifyingEventIds.includes(arg.event.id)) {
+            return (
+                <div style={{
+                    width: '100%',
+                    height: '100%',
+                    padding: '4px 6px',
+                }}>
+                    <Skeleton.Button
+                        active
+                        size="small"
+                        style={{
+                            width: '150px',
+                            height: '100%',
+                            minHeight: '20px',
+                            margin: 0
+                        }}
+                    />
+                </div>
+            );
+        }
+
+        // Your existing event content logic
+        const isGoogleEvent = arg.event.extendedProps.eventType === 'google-calendar';
+
+        if (isGoogleEvent) {
+            return (
+                <div
+                    className="google-calendar-event"
+                    style={{
+                        backgroundColor: arg.event.backgroundColor || '#4285f4',
+                        color: '#fff',
+                        padding: '4px 6px',
+                        borderRadius: '4px',
+                        width: '100%',
+                        height: '100%',
+                        cursor: 'default',
+                    }}
+                >
+                    {arg.event.title}
+                </div>
+            );
+        }
+
+        return (
+            <Dropdown
+                menu={getEventContent(arg.event)}
+                trigger={['click']}
+                placement="bottomLeft"
+            >
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                        backgroundColor: arg.event.backgroundColor || '#4285f4',
+                        color: '#fff',
+                        padding: '4px 6px',
+                        borderRadius: '4px',
+                        width: '100%',
+                        height: '100%',
+                        cursor: 'pointer',
+                    }}
+                >
+                    {arg.event.title}
+                </div>
+            </Dropdown>
+        );
+    };
+
+    // Add this function before your return statement
+    const generatePlaceholderEvents = () => {
+        // Get current date
+        const currentDate = new Date();
+        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+        const placeholderEvents = [];
+
+        // Generate random placeholder events throughout the month
+        for (let i = 0; i < 10; i++) {
+            // Random day between start and end of month
+            const randomDay = Math.floor(Math.random() * (endOfMonth.getDate() - 1)) + 1;
+            const eventDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), randomDay);
+
+            // Random duration between 1-3 hours
+            const durationHours = Math.floor(Math.random() * 3) + 1;
+
+            // Random start hour between 9 AM and 5 PM
+            const startHour = Math.floor(Math.random() * 8) + 9;
+
+            const start = new Date(eventDate);
+            start.setHours(startHour, 0, 0);
+
+            const end = new Date(start);
+            end.setHours(start.getHours() + durationHours);
+
+            placeholderEvents.push({
+                id: `placeholder-${i}`,
+                title: 'Loading...',
+                start: start.toISOString(),
+                end: end.toISOString(),
+                allDay: false,
+                extendedProps: {
+                    isPlaceholder: true
+                }
+            });
+        }
+
+        return placeholderEvents;
+    };
+
+    // Add this after your transformedEvents definition
+    const displayEvents = loading
+        ? generatePlaceholderEvents()
+        : [...transformedEvents,
+            ...events.filter(event =>
+                event.extendedProps?.isPlaceholder ||
+                modifyingEventIds.includes(event.id)
+            )];
 
     return (
         <div>
@@ -352,56 +503,61 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                             right: 'dayGridMonth,timeGridWeek,timeGridDay'
                         }}
                         weekends={false}
-                        events={transformedEvents}
-                        selectable={true}
-                        selectMirror={true}
+                        // events={transformedEvents}
+                        events={displayEvents}
+                        selectable={!loading}
+                        selectMirror={!loading}
+                        // selectable={true}
+                        // selectMirror={true}
                         select={handleSelect}
-                        eventClick={handleEventClick}
-                        eventContent={(arg) => {
-                            const isGoogleEvent = arg.event.extendedProps.eventType === 'google-calendar';
-
-                            if (isGoogleEvent) {
-                                return (
-                                    <div
-                                        className="google-calendar-event"
-                                        style={{
-                                            backgroundColor: arg.event.backgroundColor || '#4285f4',
-                                            color: '#fff',
-                                            padding: '4px 6px',
-                                            borderRadius: '4px',
-                                            width: '100%',
-                                            height: '100%',
-                                            cursor: 'default',
-                                        }}
-                                    >
-                                        {arg.event.title}
-                                    </div>
-                                );
-                            }
-
-                            return (
-                                <Dropdown
-                                    menu={getEventContent(arg.event)}
-                                    trigger={['click']}
-                                    placement="bottomLeft"
-                                >
-                                    <div
-                                        onClick={(e) => e.stopPropagation()}
-                                        style={{
-                                            backgroundColor: arg.event.backgroundColor || '#4285f4',
-                                            color: '#fff',
-                                            padding: '4px 6px',
-                                            borderRadius: '4px',
-                                            width: '100%',
-                                            height: '100%',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        {arg.event.title}
-                                    </div>
-                                </Dropdown>
-                            );
-                        }}
+                        // eventClick={handleEventClick}
+                        eventClick={loading ? undefined : handleEventClick}
+                        eventContent={renderEventContent}
+                        // eventContent={(arg) => {
+                        //     const isGoogleEvent = arg.event.extendedProps.eventType === 'google-calendar';
+                        //
+                        //     if (isGoogleEvent) {
+                        //         return (
+                        //             <div
+                        //                 className="google-calendar-event"
+                        //                 style={{
+                        //                     backgroundColor: arg.event.backgroundColor || '#4285f4',
+                        //                     color: '#fff',
+                        //                     padding: '4px 6px',
+                        //                     borderRadius: '4px',
+                        //                     width: '100%',
+                        //                     height: '100%',
+                        //                     cursor: 'default',
+                        //                 }}
+                        //             >
+                        //                 {arg.event.title}
+                        //             </div>
+                        //         );
+                        //     }
+                        //
+                        //     return (
+                        //         <Dropdown
+                        //             menu={getEventContent(arg.event)}
+                        //             trigger={['click']}
+                        //             placement="bottomLeft"
+                        //         >
+                        //             <div
+                        //                 onClick={(e) => e.stopPropagation()}
+                        //                 style={{
+                        //                     backgroundColor: arg.event.backgroundColor || '#4285f4',
+                        //                     color: '#fff',
+                        //                     padding: '4px 6px',
+                        //                     borderRadius: '4px',
+                        //                     width: '100%',
+                        //                     height: '100%',
+                        //                     cursor: 'pointer',
+                        //                 }}
+                        //             >
+                        //                 {arg.event.title}
+                        //             </div>
+                        //         </Dropdown>
+                        //     );
+                        // }}
                         eventTimeFormat={{
                             hour: '2-digit',
                             minute: '2-digit',

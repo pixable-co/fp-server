@@ -82,52 +82,67 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             return null; // Skip invalid events
         }
 
-        let eventStart, eventEnd;
         if (event.eventType === 'unavailable') {
-            const startParts = event.date.split(" ");
-            const endParts = event.end.split(" ");
+            const startISO = parseDateString(event.date);
+            const endISO = event.end ? parseDateString(event.end) : null;
 
-            if (!startParts.length || !endParts.length) {
-                console.error("❌ Invalid start or end:", event);
+            if (!startISO) {
+                console.error("❌ Invalid start date:", event);
                 return null;
             }
 
-            const [startDateStr] = startParts;
-            const [endDateStr] = endParts;
+            let finalEnd = endISO;
 
-            // Convert DD/MM/YYYY → YYYY-MM-DD
-            const [startDay, startMonth, startYear] = startDateStr.split("/");
-            const [endDay, endMonth, endYear] = endDateStr.split("/");
-
-            const startDate = `${startYear}-${startMonth}-${startDay}`; // e.g. 2025-05-27
-            const endDateObj = new Date(`${endYear}-${endMonth}-${endDay}`);
-            endDateObj.setDate(endDateObj.getDate() + 1); // FullCalendar's exclusive end
-            const endDate = endDateObj.toISOString().split("T")[0];
-
-            eventStart = startDate;
-            eventEnd = endDate;
-        } else {
-            // Process other events normally
-            const eventDate = new Date(event.date);
-            if (isNaN(eventDate.getTime())) {
-                console.error("Skipping event due to invalid date format:", event);
-                return null;
+            // 👇 If end is missing or same as start date, add +1 hour
+            if (!endISO || startISO.split("T")[0] === endISO.split("T")[0]) {
+                const startDateObj = new Date(startISO);
+                const endDateObj = new Date(startDateObj);
+                endDateObj.setHours(startDateObj.getHours() + 1); // add 1 hour
+                finalEnd = endDateObj.toISOString();
             }
-            const eventTime = event.time || '00:00';
-            const [hours, minutes] = eventTime.split(':');
-            eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
-            eventStart = eventDate.toISOString();
-            eventEnd = null; // Other events may not need an explicit end time
+
+            return {
+                id: event.id,
+                title: event.title,
+                start: startISO,
+                end: finalEnd,
+                allDay: false,
+                backgroundColor: '#FF0000',
+                borderColor: '#FF0000',
+                textColor: '#fff',
+                extendedProps: {
+                    eventType: event.eventType,
+                    booking_time: event.time,
+                    customer: event.customer,
+                    email: event.email,
+                    phone: event.phone,
+                    service: event.service,
+                    eventIndex: event.event_index,
+                }
+            };
         }
+
+        // 🔹 Fallback for other event types
+        const eventDate = new Date(event.date);
+        if (isNaN(eventDate.getTime())) {
+            console.error("Skipping event due to invalid date format:", event);
+            return null;
+        }
+        const eventTime = event.time || '00:00';
+        const [hours, minutes] = eventTime.split(':');
+        eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
+
+        const endDate = new Date(eventDate);
+        endDate.setHours(eventDate.getHours() + 1); // Add 1 hour if needed
 
         return {
             id: event.id,
             title: event.title,
-            start: eventStart,
-            end: eventEnd,
-            allDay: event.eventType === 'unavailable', // ✅ Show as full-day block
-            backgroundColor: event.eventType === 'unavailable' ? '#FF0000' : '#4285f4',
-            borderColor: event.eventType === 'unavailable' ? '#FF0000' : '#4285f4',
+            start: eventDate.toISOString(),
+            end: endDate.toISOString(),
+            allDay: false,
+            backgroundColor: '#4285f4',
+            borderColor: '#4285f4',
             textColor: '#fff',
             extendedProps: {
                 eventType: event.eventType,
@@ -136,10 +151,106 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 email: event.email,
                 phone: event.phone,
                 service: event.service,
-                eventIndex: event.event_index // Add event_index here
+                eventIndex: event.event_index
             }
         };
     }).filter(event => event !== null);
+
+    // const transformedEvents = events.map(event => {
+    //     if (!event.date) {
+    //         console.error("Invalid event date:", event);
+    //         return null; // Skip invalid events
+    //     }
+    //
+    //     let eventStart, eventEnd;
+    //     if (event.eventType === 'unavailable') {
+    //         // const startParts = event.date.split(" ");
+    //         // const endParts = event.end.split(" ");
+    //         // const eventStart = parseDateString(event.date);
+    //         // const eventEnd = parseDateString(event.end);
+    //         //
+    //         // if (!eventStart || !eventEnd) {
+    //         //     console.error("❌ Invalid start or end:", event);
+    //         //     return null;
+    //         // }
+    //         //
+    //         // const [startDateStr] = startParts;
+    //         // const [endDateStr] = endParts;
+    //         //
+    //         // // Convert DD/MM/YYYY → YYYY-MM-DD
+    //         // const [startDay, startMonth, startYear] = startDateStr.split("/");
+    //         // const [endDay, endMonth, endYear] = endDateStr.split("/");
+    //         //
+    //         // const startDate = `${startYear}-${startMonth}-${startDay}`; // e.g. 2025-05-27
+    //         // const endDateObj = new Date(`${endYear}-${endMonth}-${endDay}`);
+    //         // endDateObj.setDate(endDateObj.getDate() + 1); // FullCalendar's exclusive end
+    //         // const endDate = endDateObj.toISOString().split("T")[0];
+    //         //
+    //         // eventStart = startDate;
+    //         // eventEnd = endDate;
+    //         if (event.eventType === 'unavailable') {
+    //             const eventStart = parseDateString(event.date);
+    //             const eventEnd = parseDateString(event.end);
+    //
+    //             if (!eventStart || !eventEnd) {
+    //                 console.error("❌ Invalid start or end date in event:", event);
+    //                 return null;
+    //             }
+    //
+    //             return {
+    //                 id: event.id,
+    //                 title: event.title,
+    //                 start: eventStart,
+    //                 end: eventEnd,
+    //                 allDay: false, // Set to false to show time-based blocks
+    //                 backgroundColor: '#FF0000',
+    //                 borderColor: '#FF0000',
+    //                 textColor: '#fff',
+    //                 extendedProps: {
+    //                     eventType: event.eventType,
+    //                     booking_time: event.time,
+    //                     customer: event.customer,
+    //                     email: event.email,
+    //                     phone: event.phone,
+    //                     service: event.service,
+    //                     eventIndex: event.event_index,
+    //                 }
+    //             };
+    //         }
+    //     } else {
+    //         // Process other events normally
+    //         const eventDate = new Date(event.date);
+    //         if (isNaN(eventDate.getTime())) {
+    //             console.error("Skipping event due to invalid date format:", event);
+    //             return null;
+    //         }
+    //         const eventTime = event.time || '00:00';
+    //         const [hours, minutes] = eventTime.split(':');
+    //         eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
+    //         eventStart = eventDate.toISOString();
+    //         eventEnd = null; // Other events may not need an explicit end time
+    //     }
+    //
+    //     return {
+    //         id: event.id,
+    //         title: event.title,
+    //         start: eventStart,
+    //         end: eventEnd,
+    //         allDay: event.eventType === 'unavailable', // ✅ Show as full-day block
+    //         backgroundColor: event.eventType === 'unavailable' ? '#FF0000' : '#4285f4',
+    //         borderColor: event.eventType === 'unavailable' ? '#FF0000' : '#4285f4',
+    //         textColor: '#fff',
+    //         extendedProps: {
+    //             eventType: event.eventType,
+    //             booking_time: event.time,
+    //             customer: event.customer,
+    //             email: event.email,
+    //             phone: event.phone,
+    //             service: event.service,
+    //             eventIndex: event.event_index // Add event_index here
+    //         }
+    //     };
+    // }).filter(event => event !== null);
 
     const handleEventClick = (clickInfo) => {
         if (clickInfo.event.extendedProps.eventType === 'google-calendar') {
@@ -209,6 +320,19 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 }
             };
 
+            const formatDateTime = (input) => {
+                const date = new Date(input);
+                if (isNaN(date.getTime())) return 'N/A';
+                return date.toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
+            };
+
             return {
                 items: [
                     {
@@ -216,8 +340,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         label: (
                             <div>
                                 <h6>{event.title}</h6>
-                                {/*<p><strong>Start:</strong> {event.start ? event.start.toISOString().split('T')[0] : 'N/A'}</p>*/}
-                                {/*<p><strong>End:</strong> {event.end ? new Date(event.end).toISOString().split('T')[0] : 'N/A'}</p>*/}
+                                {/*<p><strong>Start:</strong> {formatDateTime(event.start)}</p>*/}
+                                {/*<p><strong>End:</strong> {formatDateTime(event.end)}</p>*/}
                             </div>
                         ),
                     },

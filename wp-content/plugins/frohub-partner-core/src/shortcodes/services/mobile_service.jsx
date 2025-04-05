@@ -188,7 +188,6 @@ const MobileService = () => {
             </div>
 
             {/* Travel Radius and Fees */}
-            {/* test */}
             <div style={{ marginTop: "30px" }}>
                 <h3>Travel Radius and Fees</h3>
                 <p style={{ color: "#666" }}>Add the distances you are willing to travel and the corresponding fees.</p>

@@ -40,7 +40,7 @@ const MobileService = () => {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.streetAddress) {
-                        setAddress(data.streetAddress + ',' + data.city); // ✅ Set address from API
+                        setAddress(data.streetAddress + ',' + data.city + ',' + data.postcode); // ✅ Set address from API
                     }
 
                     // if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee)) {

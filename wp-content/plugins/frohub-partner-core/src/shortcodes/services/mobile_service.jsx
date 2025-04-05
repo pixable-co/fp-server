@@ -39,10 +39,17 @@ const MobileService = () => {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    if (data.streetAddress) {
-                        setAddress(data.streetAddress + ',' + data.city + ',' + data.postcode); // ✅ Set address from API
+                    if (data) {
+                        const addressParts = [
+                            data.streetAddress,
+                            data.city,
+                            data.countyDistrict,
+                            data.postcode,
+                        ].filter(Boolean); // removes undefined, null, or empty string
+                    
+                        setAddress(addressParts.join(', ')); // Join with commas
                     }
-
+                    
                     // if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee)) {
                     //     setTravelFees(
                     //         data.mobileServiceFee.map((fee) => ({

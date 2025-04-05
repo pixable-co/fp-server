@@ -50,8 +50,10 @@ const BookingChart = () => {
 
                     order.line_items.forEach(item => {
                         // Extract deposit amount from the string (remove '£' and convert to number)
-                        const depositString = item.meta.deposit_due || "£0";
-                        const deposit = parseFloat(depositString.replace('£', '')) || 0;
+                        const depositHtml = item.meta.deposit_due || "£0";
+                        const depositMatch = depositHtml.match(/[\d,.]+/);
+                        const deposit = depositMatch ? parseFloat(depositMatch[0]) : 0;
+                        
 
                         // Get the total due amount
                         const totalDue = parseFloat(item.total || 0);

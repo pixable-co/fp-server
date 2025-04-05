@@ -165,7 +165,7 @@ const MobileService = () => {
                     placeholder="Loading address..."
                     style={{
                         padding: "10px",
-                        width: "300px",
+                        maxWidth: "600px",
                         marginRight: "10px",
                         borderRadius: "5px",
                         border: "1px solid #ccc",

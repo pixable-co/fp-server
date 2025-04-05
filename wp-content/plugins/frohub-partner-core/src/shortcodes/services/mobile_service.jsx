@@ -193,27 +193,74 @@ const MobileService = () => {
                 <p style={{ color: "#666" }}>Add the distances you are willing to travel and the corresponding fees.</p>
 
                 {travelFees.map((item, index) => (
-                    <div key={index} style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                    <div
+                        key={index}
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr auto 1fr auto auto auto",
+                            gap: "10px",
+                            marginBottom: "12px",
+                            alignItems: "center",
+                            maxWidth: "600px",
+                        }}
+                    >
                         <input
                             type="number"
                             value={item.miles || ""}
                             onChange={(e) => handleInputChange(index, "miles", e.target.value)}
-                            placeholder="Miles"
+                            placeholder="Distance (miles)"
+                            style={{
+                                padding: "8px",
+                                borderRadius: "5px",
+                                border: "1px solid #ccc",
+                                width: "100%",
+                            }}
                         />
-                        <span> miles </span>
+                        <span style={{ whiteSpace: "nowrap" }}>miles</span>
+
                         <input
                             type="number"
                             value={item.fee || ""}
                             onChange={(e) => handleInputChange(index, "fee", e.target.value)}
                             placeholder="Fee"
+                            style={{
+                                padding: "8px",
+                                borderRadius: "5px",
+                                border: "1px solid #ccc",
+                                width: "100%",
+                            }}
                         />
-                        <span> £ </span>
-                        <button onClick={addTravelFee}>+</button>
-                        <button onClick={() => removeTravelFee(index)} disabled={travelFees.length === 1}>
+                        <span style={{ whiteSpace: "nowrap" }}>£</span>
+
+                        <button
+                            onClick={addTravelFee}
+                            style={{
+                                padding: "4px 10px",
+                                borderRadius: "5px",
+                                border: "1px solid #ccc",
+                                background: "#f0f0f0",
+                                cursor: "pointer",
+                            }}
+                        >
+                            +
+                        </button>
+                        <button
+                            onClick={() => removeTravelFee(index)}
+                            disabled={travelFees.length === 1}
+                            style={{
+                                padding: "4px 10px",
+                                borderRadius: "5px",
+                                border: "1px solid #ccc",
+                                background: travelFees.length === 1 ? "#eee" : "#f0f0f0",
+                                color: travelFees.length === 1 ? "#aaa" : "#000",
+                                cursor: travelFees.length === 1 ? "not-allowed" : "pointer",
+                            }}
+                        >
                             -
                         </button>
                     </div>
                 ))}
+
             </div>
 
             {/* Save Button with Loading */}

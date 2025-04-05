@@ -39,17 +39,29 @@ const MobileService = () => {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    if (data.address) {
-                        setAddress(data.address); // ✅ Set address from API
+                    if (data.streetAddress) {
+                        setAddress(data.streetAddress + ',' + data.city); // ✅ Set address from API
                     }
 
-                    if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee)) {
+                    // if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee)) {
+                    //     setTravelFees(
+                    //         data.mobileServiceFee.map((fee) => ({
+                    //             miles: parseFloat(fee.radius) || 0,
+                    //             fee: parseFloat(fee.price) || 0,
+                    //         }))
+                    //     );
+                    // }
+
+                    if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee) && data.mobileServiceFee.length > 0) {
                         setTravelFees(
                             data.mobileServiceFee.map((fee) => ({
                                 miles: parseFloat(fee.radius) || 0,
                                 fee: parseFloat(fee.price) || 0,
                             }))
                         );
+                    } else {
+                        // Ensure at least one empty row is shown if no fees exist
+                        setTravelFees([{ miles: "", fee: "" }]);
                     }
 
                     setPosition({

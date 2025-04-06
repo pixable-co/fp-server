@@ -107,8 +107,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 start: startISO,
                 end: finalEnd,
                 allDay: false,
-                backgroundColor: '#FF0000',
-                borderColor: '#FF0000',
+                backgroundColor: '#7D8793',
+                borderColor: '#7D8793',
                 textColor: '#fff',
                 extendedProps: {
                     eventType: event.eventType,

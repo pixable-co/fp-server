@@ -76,6 +76,30 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         return formattedDate;
     };
 
+    const parseDurationString = (durationStr) => {
+        if (!durationStr || typeof durationStr !== "string") return 60;
+
+        // Normalize and simplify
+        const cleanStr = durationStr.toLowerCase().replace(/\s+/g, '');
+
+        let totalMinutes = 0;
+
+        // Match patterns like "2hr", "2hrs", "1h"
+        const hrMatch = cleanStr.match(/(\d+)(?:h|hr|hrs)/);
+        if (hrMatch) {
+            totalMinutes += parseInt(hrMatch[1], 10) * 60;
+        }
+
+        // Match patterns like "30min", "30mins", "90m"
+        const minMatch = cleanStr.match(/(\d+)(?:m|min|mins)/);
+        if (minMatch) {
+            totalMinutes += parseInt(minMatch[1], 10);
+        }
+
+        // Final fallback
+        return totalMinutes > 0 ? totalMinutes : 60;
+    };
+
     const transformedEvents = events.map(event => {
         if (!event.date) {
             console.error("Invalid event date:", event);
@@ -132,8 +156,11 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         const [hours, minutes] = eventTime.split(':');
         eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
 
+        const durationStr = event.duration;
+        const durationInMinutes = parseDurationString(durationStr);
+
         const endDate = new Date(eventDate);
-        endDate.setHours(eventDate.getHours() + 1); // Add 1 hour if needed
+        endDate.setMinutes(endDate.getMinutes() + durationInMinutes);
 
         return {
             id: event.id,
@@ -151,106 +178,11 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 email: event.email,
                 phone: event.phone,
                 service: event.service,
-                eventIndex: event.event_index
+                eventIndex: event.event_index,
+                duration: durationStr,
             }
         };
     }).filter(event => event !== null);
-
-    // const transformedEvents = events.map(event => {
-    //     if (!event.date) {
-    //         console.error("Invalid event date:", event);
-    //         return null; // Skip invalid events
-    //     }
-    //
-    //     let eventStart, eventEnd;
-    //     if (event.eventType === 'unavailable') {
-    //         // const startParts = event.date.split(" ");
-    //         // const endParts = event.end.split(" ");
-    //         // const eventStart = parseDateString(event.date);
-    //         // const eventEnd = parseDateString(event.end);
-    //         //
-    //         // if (!eventStart || !eventEnd) {
-    //         //     console.error("❌ Invalid start or end:", event);
-    //         //     return null;
-    //         // }
-    //         //
-    //         // const [startDateStr] = startParts;
-    //         // const [endDateStr] = endParts;
-    //         //
-    //         // // Convert DD/MM/YYYY → YYYY-MM-DD
-    //         // const [startDay, startMonth, startYear] = startDateStr.split("/");
-    //         // const [endDay, endMonth, endYear] = endDateStr.split("/");
-    //         //
-    //         // const startDate = `${startYear}-${startMonth}-${startDay}`; // e.g. 2025-05-27
-    //         // const endDateObj = new Date(`${endYear}-${endMonth}-${endDay}`);
-    //         // endDateObj.setDate(endDateObj.getDate() + 1); // FullCalendar's exclusive end
-    //         // const endDate = endDateObj.toISOString().split("T")[0];
-    //         //
-    //         // eventStart = startDate;
-    //         // eventEnd = endDate;
-    //         if (event.eventType === 'unavailable') {
-    //             const eventStart = parseDateString(event.date);
-    //             const eventEnd = parseDateString(event.end);
-    //
-    //             if (!eventStart || !eventEnd) {
-    //                 console.error("❌ Invalid start or end date in event:", event);
-    //                 return null;
-    //             }
-    //
-    //             return {
-    //                 id: event.id,
-    //                 title: event.title,
-    //                 start: eventStart,
-    //                 end: eventEnd,
-    //                 allDay: false, // Set to false to show time-based blocks
-    //                 backgroundColor: '#FF0000',
-    //                 borderColor: '#FF0000',
-    //                 textColor: '#fff',
-    //                 extendedProps: {
-    //                     eventType: event.eventType,
-    //                     booking_time: event.time,
-    //                     customer: event.customer,
-    //                     email: event.email,
-    //                     phone: event.phone,
-    //                     service: event.service,
-    //                     eventIndex: event.event_index,
-    //                 }
-    //             };
-    //         }
-    //     } else {
-    //         // Process other events normally
-    //         const eventDate = new Date(event.date);
-    //         if (isNaN(eventDate.getTime())) {
-    //             console.error("Skipping event due to invalid date format:", event);
-    //             return null;
-    //         }
-    //         const eventTime = event.time || '00:00';
-    //         const [hours, minutes] = eventTime.split(':');
-    //         eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
-    //         eventStart = eventDate.toISOString();
-    //         eventEnd = null; // Other events may not need an explicit end time
-    //     }
-    //
-    //     return {
-    //         id: event.id,
-    //         title: event.title,
-    //         start: eventStart,
-    //         end: eventEnd,
-    //         allDay: event.eventType === 'unavailable', // ✅ Show as full-day block
-    //         backgroundColor: event.eventType === 'unavailable' ? '#FF0000' : '#4285f4',
-    //         borderColor: event.eventType === 'unavailable' ? '#FF0000' : '#4285f4',
-    //         textColor: '#fff',
-    //         extendedProps: {
-    //             eventType: event.eventType,
-    //             booking_time: event.time,
-    //             customer: event.customer,
-    //             email: event.email,
-    //             phone: event.phone,
-    //             service: event.service,
-    //             eventIndex: event.event_index // Add event_index here
-    //         }
-    //     };
-    // }).filter(event => event !== null);
 
     const handleEventClick = (clickInfo) => {
         if (clickInfo.event.extendedProps.eventType === 'google-calendar') {
@@ -637,51 +569,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         // eventClick={handleEventClick}
                         eventClick={loading ? undefined : handleEventClick}
                         eventContent={renderEventContent}
-                        // eventContent={(arg) => {
-                        //     const isGoogleEvent = arg.event.extendedProps.eventType === 'google-calendar';
-                        //
-                        //     if (isGoogleEvent) {
-                        //         return (
-                        //             <div
-                        //                 className="google-calendar-event"
-                        //                 style={{
-                        //                     backgroundColor: arg.event.backgroundColor || '#4285f4',
-                        //                     color: '#fff',
-                        //                     padding: '4px 6px',
-                        //                     borderRadius: '4px',
-                        //                     width: '100%',
-                        //                     height: '100%',
-                        //                     cursor: 'default',
-                        //                 }}
-                        //             >
-                        //                 {arg.event.title}
-                        //             </div>
-                        //         );
-                        //     }
-                        //
-                        //     return (
-                        //         <Dropdown
-                        //             menu={getEventContent(arg.event)}
-                        //             trigger={['click']}
-                        //             placement="bottomLeft"
-                        //         >
-                        //             <div
-                        //                 onClick={(e) => e.stopPropagation()}
-                        //                 style={{
-                        //                     backgroundColor: arg.event.backgroundColor || '#4285f4',
-                        //                     color: '#fff',
-                        //                     padding: '4px 6px',
-                        //                     borderRadius: '4px',
-                        //                     width: '100%',
-                        //                     height: '100%',
-                        //                     cursor: 'pointer',
-                        //                 }}
-                        //             >
-                        //                 {arg.event.title}
-                        //             </div>
-                        //         </Dropdown>
-                        //     );
-                        // }}
                         eventTimeFormat={{
                             hour: '2-digit',
                             minute: '2-digit',

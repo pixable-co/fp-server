@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import FhCalender from "../../common/controls/FhCalender.jsx";
+import NotificationBar from "../../common/controls/NotificationBar.jsx";
 import axios from 'axios';
 
 export default function BookingCalender() {
@@ -216,6 +217,7 @@ export default function BookingCalender() {
 
     return (
         <div>
+            <NotificationBar message={"Need to block out availability? Click anywhere on the calendar to add an event, or drag to select multiple days."} />
             <FhCalender
                 type="day"
                 events={events}

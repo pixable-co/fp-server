@@ -89,7 +89,7 @@ class ReviewCount {
             }
         }
     
-        return ($review_count > 0) ? number_format($total_rating / $review_count, 1) . ' / 5' : "No Reviews";
+        return ($review_count > 0) ? number_format($total_rating / $review_count, 1) . ' / 5' : "No reviews (yet) 👀";
     }
     
 }

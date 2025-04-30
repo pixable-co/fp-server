@@ -36,7 +36,7 @@ class UnreadConversations {
 
         // Return the count within a div element
         return '<div class="unread-conversations dashboard-stats"> 
-         <h2>  Unread Conversations </h2>
+         <h2>  Unread Messages </h2>
          <p class="booking-stats-value">' . esc_html($count) . '</p>
          </div>';
     }

@@ -42,7 +42,7 @@ class UpcomingOrder {
         // Check if the API request was successful and contains data
         if (!$response || !isset($response['success']) || $response['success'] !== true || empty($response['data'])) {
             return '<div class="upcoming-order-container dashboard-stats">
-                        <p>No upcoming bookings found.</p>
+                        <p>You have no upcoming bookings.</p>
                     </div>';
         }
 

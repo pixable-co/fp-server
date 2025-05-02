@@ -35,5 +35,6 @@ class Shortcodes {
 		UpcomingOrder::init();
 		PendingBookings::init();
 		UnreadConversations::init();
+		NavMenu::init();
 	}
 }

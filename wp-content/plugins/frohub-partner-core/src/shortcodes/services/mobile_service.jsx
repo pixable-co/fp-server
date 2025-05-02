@@ -162,7 +162,7 @@ const MobileService = () => {
                     type="text"
                     value={address}
                     disabled // ✅ Field is now disabled
-                    placeholder="Loading address..."
+                    placeholder="No Address Set"
                     style={{
                         padding: "10px",
                         maxWidth: "600px",
@@ -197,20 +197,25 @@ const MobileService = () => {
             {/* Travel Radius and Fees */}
             <div style={{ marginTop: "30px" }}>
                 <h3>Travel Radius and Fees</h3>
-                <p style={{ color: "#666" }}>Add the distances you are willing to travel and the corresponding fees.</p>
+                <p style={{ color: "#666" }}>
+                    Set your travel radius and fees to define how far you’ll travel for mobile appointments. Adjust fees based on distance to ensure fair compensation for your time and travel.
+                </p>
+
+                <p>Tip: Clients are usually attracted to lower travel fees, so stylists who set a higher service fee but a lower travel fee usually get more bookings.</p>
 
                 {travelFees.map((item, index) => (
                     <div
                         key={index}
                         style={{
-                            display: "grid",
-                            gridTemplateColumns: "1fr auto 1fr auto auto auto",
+                            display: "flex",
+                            // gridTemplateColumns: "1fr 1fr auto auto",
                             gap: "10px",
                             marginBottom: "12px",
                             alignItems: "center",
                             maxWidth: "600px",
                         }}
                     >
+                        <span style={{ whiteSpace: "nowrap" }}>Distence</span>
                         <input
                             type="number"
                             value={item.miles || ""}
@@ -225,6 +230,7 @@ const MobileService = () => {
                         />
                         <span style={{ whiteSpace: "nowrap" }}>miles</span>
 
+                        <span style={{ whiteSpace: "nowrap" }}>Fee £</span>
                         <input
                             type="number"
                             value={item.fee || ""}
@@ -237,7 +243,6 @@ const MobileService = () => {
                                 width: "100%",
                             }}
                         />
-                        <span style={{ whiteSpace: "nowrap" }}>£</span>
 
                         <button
                             onClick={addTravelFee}

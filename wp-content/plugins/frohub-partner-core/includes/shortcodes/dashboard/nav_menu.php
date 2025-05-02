@@ -33,12 +33,10 @@ class NavMenu {
 
         <style>
         .fp-nav-sidebar {
-            width: auto;
-            height: 100vh;
-            background: #000;
+            width: 250px;
+            height: 100%;
+            background: var('_header_middle_bg');
             padding: 15px;
-/*             font-family: sans-serif; */
-/*             border-right: 1px solid #222; */
             transition: width 0.3s ease;
             color: #fff;
         }
@@ -98,7 +96,7 @@ class NavMenu {
 
         .fp-submenu li,
         .fp-nav-sidebar .sub-menu li {
-            padding: 8px 35px;
+/*             padding: 8px 35px; */
             font-size: 13px;
             border-top: 1px solid #222;
             color: white;

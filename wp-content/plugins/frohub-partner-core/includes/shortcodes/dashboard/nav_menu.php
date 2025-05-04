@@ -8,22 +8,27 @@ class NavMenu {
     public static function init() {
         $self = new self();
 
-        // Register shortcode
         add_shortcode('nav_menu', [$self, 'nav_menu_shortcode']);
-
-        // Filter menu item titles to wrap with <span class="label">
         add_filter('nav_menu_item_title', [$self, 'wrap_menu_label'], 10, 4);
     }
 
     public function nav_menu_shortcode() {
         ob_start();
         ?>
+        <!-- ✅ Topbar -->
+        <div class="fp-topbar">
+            <div class="fp-topbar-content">
+                <span>Active Dashboard</span>
+            </div>
+        </div>
+
+        <!-- ✅ Sidebar -->
         <div class="fp-nav-sidebar expanded">
             <button class="fp-nav-toggle">&lt;</button>
             <nav class="fp-menu-wrapper">
                 <?php
                 wp_nav_menu([
-                    'menu' => 'sidebar_menu', // Replace with your menu slug or ID
+                    'menu' => 'sidebar_menu',
                     'menu_class' => 'fp-nav-list',
                     'container' => false
                 ]);
@@ -32,12 +37,40 @@ class NavMenu {
         </div>
 
         <style>
+        /* ===== TOPBAR ===== */
+        .fp-topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+        }
+
+        .fp-topbar-content {
+            padding: 0 20px;
+            font-size: 14px;
+            color: #444;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        body.admin-bar .fp-topbar {
+            margin-top: 32px;
+        }
+
+        /* ===== SIDEBAR ===== */
         .fp-nav-sidebar {
             width: 250px;
             height: 100vh;
             background-color: #1e3050;
             padding: 15px;
-            padding-top: 5rem;
+            padding-top: 60px;
             transition: width 0.3s ease;
             color: #fff;
             position: fixed;
@@ -46,21 +79,12 @@ class NavMenu {
             z-index: 999;
         }
 
-        @media (max-width: 768px) {
-            .fp-nav-sidebar {
-                transform: translateX(-100%);
-            }
+        body.admin-bar .fp-nav-sidebar {
+            padding-top: 92px;
+        }
 
-            .fp-nav-sidebar.expanded {
-                transform: translateX(0);
-            }
-
-            .fp-nav-toggle {
-                position: fixed;
-                left: 10px;
-                top: 10px;
-                z-index: 1000;
-            }
+        body:not(.admin-bar) .fp-nav-sidebar {
+            padding-top: 60px;
         }
 
         .fp-nav-sidebar.collapsed {
@@ -76,6 +100,10 @@ class NavMenu {
             margin-bottom: 10px;
             padding: 6px 10px;
             font-size: 14px;
+        }
+
+        .fp-menu-wrapper {
+            margin-top: 10px;
         }
 
         .fp-nav-list {
@@ -115,11 +143,11 @@ class NavMenu {
             padding: 0;
             margin: 0;
             list-style: none;
+            transition: all 0.3s ease;
         }
 
         .fp-submenu li,
         .fp-nav-sidebar .sub-menu li {
-/*             padding: 8px 35px; */
             font-size: 13px;
             border-top: 1px solid #222;
             color: white;
@@ -141,6 +169,42 @@ class NavMenu {
         .fp-nav-sidebar.collapsed .menu-item-has-children .sub-menu {
             display: none !important;
         }
+
+        @media (max-width: 768px) {
+            .fp-nav-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .fp-nav-sidebar.expanded {
+                transform: translateX(0);
+            }
+
+            .fp-nav-toggle {
+                position: fixed;
+                left: 10px;
+                top: 10px;
+                z-index: 1000;
+            }
+        }
+
+        /* ===== MAIN CONTENT SHIFTING (for Impreza) ===== */
+        body:not(.admin-bar) #page-content.l-main {
+            margin-left: 250px;
+            margin-top: 60px;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.admin-bar #page-content.l-main {
+            margin-left: 250px;
+        }
+
+        .fp-nav-sidebar.collapsed ~ #page-content.l-main {
+            margin-left: 80px;
+        }
+
+        #page-content.l-main {
+            padding: 20px;
+        }
         </style>
 
         <script>
@@ -154,7 +218,7 @@ class NavMenu {
                 toggleBtn.innerHTML = sidebar.classList.contains('collapsed') ? '›' : '&lt;';
             });
 
-            // Auto-collapse sidebar when a link is clicked on mobile
+            // Collapse sidebar on link click for mobile
             document.querySelectorAll('.fp-nav-list a').forEach(link => {
                 link.addEventListener('click', () => {
                     if (window.innerWidth <= 768) {
@@ -171,7 +235,6 @@ class NavMenu {
 
     public function wrap_menu_label($title, $item, $args, $depth) {
         if (!empty($args->menu_class) && $args->menu_class === 'fp-nav-list') {
-            // If icon is present in title, wrap only the label part
             if (preg_match('/<\/i>\s*(.+)/', $title, $matches)) {
                 return preg_replace('/<\/i>\s*(.+)/', '</i> <span class="label">' . $matches[1] . '</span>', $title);
             }

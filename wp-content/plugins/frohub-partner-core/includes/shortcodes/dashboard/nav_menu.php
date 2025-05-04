@@ -34,15 +34,37 @@ class NavMenu {
         <style>
         .fp-nav-sidebar {
             width: 250px;
-            height: 100%;
-            background: var('_header_middle_bg');
+            height: 100vh;
+            background-color: #1e3050;
             padding: 15px;
+            padding-top: 5rem;
             transition: width 0.3s ease;
             color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .fp-nav-sidebar {
+                transform: translateX(-100%);
+            }
+
+            .fp-nav-sidebar.expanded {
+                transform: translateX(0);
+            }
+
+            .fp-nav-toggle {
+                position: fixed;
+                left: 10px;
+                top: 10px;
+                z-index: 1000;
+            }
         }
 
         .fp-nav-sidebar.collapsed {
-            width: 60px;
+            width: 80px;
         }
 
         .fp-nav-toggle {
@@ -73,6 +95,7 @@ class NavMenu {
             padding: 10px;
             text-decoration: none;
             color: #fff;
+            gap: 10px;
         }
 
         .fp-nav-list li a:hover {
@@ -107,7 +130,7 @@ class NavMenu {
             background: #222;
         }
 
-        .fp-nav-sidebar .menu-item-has-children.active > .sub-menu {
+        .fp-nav-sidebar .menu-item-has-children:hover > .sub-menu {
             display: block;
         }
 
@@ -131,12 +154,12 @@ class NavMenu {
                 toggleBtn.innerHTML = sidebar.classList.contains('collapsed') ? '›' : '&lt;';
             });
 
-            document.querySelectorAll('.menu-item-has-children > a').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    if (!sidebar.classList.contains('collapsed')) {
-                        e.preventDefault();
-                        const parent = this.parentElement;
-                        parent.classList.toggle('active');
+            // Auto-collapse sidebar when a link is clicked on mobile
+            document.querySelectorAll('.fp-nav-list a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('expanded');
+                        sidebar.classList.add('collapsed');
                     }
                 });
             });

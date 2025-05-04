@@ -18,7 +18,22 @@ class NavMenu {
         <!-- ✅ Topbar -->
         <div class="fp-topbar">
             <div class="fp-topbar-content">
-                <span>Active Dashboard</span>
+                <img src="<?php echo site_url('/wp-content/uploads/2025/03/FroHub-Partners-5.png'); ?>" alt="FroHub Logo" style="height: 28px; margin-right: 10px;">
+            </div>
+            <div class="fp-topbar-icons">
+                <i class="fas fa-link"></i>
+                <i class="fas fa-envelope"></i>
+                <div class="fp-user-dropdown">
+                    <i class="fas fa-user" id="fpUserToggle"></i>
+                    <div class="fp-dropdown-menu" id="fpDropdownMenu">
+                        <a href="#">Account</a>
+                        <a href="#">Help & FAQs</a>
+                        <a href="#">Business & Marketing</a>
+                        <a href="#">Invite a Friend</a>
+                        <hr>
+                        <a href="<?php echo wp_logout_url(home_url()); ?>">Log out</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -58,6 +73,58 @@ class NavMenu {
             display: flex;
             align-items: center;
             height: 100%;
+        }
+
+        .fp-topbar-icons {
+            margin-left: auto;
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .fp-topbar-icons i {
+            font-size: 18px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .fp-user-dropdown {
+            position: relative;
+        }
+
+        .fp-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            border-radius: 6px;
+            width: 180px;
+            z-index: 1002;
+        }
+
+        .fp-dropdown-menu a {
+            display: block;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .fp-dropdown-menu a:hover {
+            background-color: #f5f5f5;
+        }
+
+        .fp-dropdown-menu hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid #eee;
         }
 
         body.admin-bar .fp-topbar {
@@ -170,6 +237,10 @@ class NavMenu {
             display: none !important;
         }
 
+        .fp-nav-sidebar.collapsed .menu-item-has-children > a::after {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .fp-nav-sidebar {
                 transform: translateX(-100%);
@@ -198,8 +269,12 @@ class NavMenu {
             margin-left: 250px;
         }
 
+/*         .fp-nav-sidebar.collapsed ~ #page-content.l-main { */
+/*             margin-left: 80px; */
+/*         } */
+
         .fp-nav-sidebar.collapsed ~ #page-content.l-main {
-            margin-left: 80px;
+            margin-left: 0;
         }
 
         #page-content.l-main {
@@ -226,6 +301,20 @@ class NavMenu {
                         sidebar.classList.add('collapsed');
                     }
                 });
+            });
+
+            // User dropdown toggle
+            const userToggle = document.getElementById('fpUserToggle');
+            const dropdownMenu = document.getElementById('fpDropdownMenu');
+
+            userToggle.addEventListener('click', function (e) {
+                dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
+                e.stopPropagation();
+            });
+
+            // Close on outside click
+            document.addEventListener('click', function () {
+                dropdownMenu.style.display = 'none';
             });
         });
         </script>

@@ -1,3 +1,4 @@
+import PartnerIntegrations from './shortcodes/Partner/partner_integrations';
 import BookingChart from './shortcodes/Dashboard/booking_chart';
 import MobileService from './shortcodes/Services/mobile_service';
 import GoogleCalender from './shortcodes/bookings/google_calender';
@@ -112,5 +113,13 @@ bookingChartElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <BookingChart dataKey={key} />
+    );
+});
+
+const partnerIntegrationsElements = document.querySelectorAll('.partner_integrations');
+partnerIntegrationsElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <PartnerIntegrations dataKey={key} />
     );
 });

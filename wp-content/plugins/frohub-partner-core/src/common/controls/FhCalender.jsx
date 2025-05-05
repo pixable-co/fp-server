@@ -17,6 +17,28 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     const [selectedSlot, setSelectedSlot] = useState(null);
     const [eventTitle, setEventTitle] = useState("");
     const [isAllDay, setIsAllDay] = useState(false);
+    const [customTitle, setCustomTitle] = useState("");
+
+    const formatUKDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
+    const handleDatesSet = (arg) => {
+        const start = arg.start;
+        const end = new Date(arg.end.getTime() - 1); // subtract 1ms to get correct end date
+
+        const startStr = formatUKDate(start);
+        const endStr = formatUKDate(end);
+
+        if (startStr === endStr) {
+            setCustomTitle(startStr);
+        } else {
+            setCustomTitle(`${startStr} – ${endStr}`);
+        }
+    };
 
     useEffect(() => {
         if (events.length > 0) {
@@ -293,7 +315,9 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         }
 
         // Handle order events
-        const eventDate = event.start ? event.start.toISOString().split('T')[0] : event.date || 'N/A';
+        // const eventDate = event.start ? event.start.toISOString().split('T')[0] : event.date || 'N/A';
+        const eventDateObj = event.start ? new Date(event.start) : new Date(event.date);
+        const eventDate = isNaN(eventDateObj.getTime()) ? 'N/A' : `${String(eventDateObj.getDate()).padStart(2, '0')}-${String(eventDateObj.getMonth() + 1).padStart(2, '0')}-${eventDateObj.getFullYear()}`;
         return {
             items: [
                 {
@@ -303,10 +327,10 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                             <h6>{event.title}</h6>
                             <p><strong>Date:</strong> {eventDate}</p>
                             <p><strong>Time:</strong> {event.extendedProps.booking_time}</p>
-                            <p><strong>Customer:</strong> {event.extendedProps.customer}</p>
-                            <p><strong>Email:</strong> {event.extendedProps.email}</p>
+                            <p><strong>Client:</strong> {event.extendedProps.customer}</p>
+                            {/*<p><strong>Email:</strong> {event.extendedProps.email}</p>*/}
                             <p><strong>Phone:</strong> {event.extendedProps.phone || 'N/A'}</p>
-                            <p><strong>Service:</strong> {event.extendedProps.service || 'N/A'}</p>
+                            <p><strong>Service Type:</strong> {event.extendedProps.service || 'N/A'}</p>
                         </div>
                     ),
                 },
@@ -558,7 +582,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                             center: 'title',
                             right: 'dayGridMonth,timeGridWeek,timeGridDay'
                         }}
-                        weekends={false}
+                        weekends={true}
                         // events={transformedEvents}
                         events={displayEvents}
                         selectable={!loading}
@@ -575,6 +599,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                             meridiem: false
                         }}
                         height="auto"
+
                     />
 
                     <FhModal

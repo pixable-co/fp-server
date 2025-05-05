@@ -13,6 +13,7 @@ use FPServer\ReviewCount;
 use FPServer\UpcomingOrder;
 use FPServer\PendingBookings;
 use FPServer\UnreadConversations;
+use FPServer\PartnerIntegrations;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -36,5 +37,6 @@ class Shortcodes {
 		PendingBookings::init();
 		UnreadConversations::init();
 		NavMenu::init();
+		PartnerIntegrations::init();
 	}
 }

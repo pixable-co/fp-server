@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchData } from "../../services/fetchData.js"; // Import your existing AJAX function
+import {toastNotification} from "../../utils/toastNotification.js";
 
 const GoogleCalendar = () => {
     const [isConnected, setIsConnected] = useState(false);
@@ -69,7 +70,7 @@ const GoogleCalendar = () => {
                 fetchSavedCalendar();
             } else {
                 console.error("Failed to refresh token:", response.message);
-                alert("Google Calendar session expired. Please reconnect.");
+                toastNotification('info', 'Google Calendar Disconnected','Google Calendar session expired. Please reconnect.')
             }
         });
     };
@@ -104,14 +105,14 @@ const GoogleCalendar = () => {
     // ✅ Save the selected calendar
     const handleSaveCalendar = () => {
         if (!selectedCalendar) {
-            alert("Please select a calendar first.");
+            toastNotification('error', 'Calendar Not Selected','Please select a calendar first.')
             return;
         }
 
         fetchData("fpserver/save_user_calendar", (response) => {
             if (response.success) {
                 setSavedCalendar(selectedCalendar);
-                alert("Calendar saved successfully.");
+                toastNotification('success', 'Success','Calendar saved successfully.')
             } else {
                 console.error("Failed to save calendar:", response.message);
             }
@@ -134,7 +135,7 @@ const GoogleCalendar = () => {
                 setIsConnected(false);
                 setCalendars([]);
                 setSavedCalendar("");
-                alert("Disconnected from Google Calendar.");
+                toastNotification('success', 'Disconnected','Disconnected from Google Calendar.')
             } else {
                 console.error("Failed to disconnect:", response.message);
             }
@@ -155,12 +156,14 @@ const GoogleCalendar = () => {
                             </option>
                         ))}
                     </select>
-                    <button onClick={handleSaveCalendar} className="btn btn-primary" style={{ marginLeft: "10px" }}>
-                        Save Calendar
-                    </button>
-                    <button onClick={handleDisconnect} className="btn btn-danger" style={{ marginLeft: "10px" }}>
-                        Disconnect Calendar
-                    </button>
+                    <div className="flex justify-start gap-6 mt-6">
+                        <button onClick={handleSaveCalendar} className="btn btn-primary">
+                            Save Calendar
+                        </button>
+                        <button onClick={handleDisconnect} className="btn btn-danger">
+                            Disconnect Calendar
+                        </button>
+                    </div>
 
                     {/* Show saved calendar info */}
                     {savedCalendar && (

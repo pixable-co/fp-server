@@ -287,6 +287,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 });
             };
 
+
             return {
                 items: [
                     {
@@ -294,6 +295,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         label: (
                             <div>
                                 <h6>{event.title}</h6>
+                                <p><strong>Start:</strong> {formatDateTime(event.start)}</p>
+                                <p><strong>End:</strong> {formatDateTime(event.end)}</p>
                                 {/*<p><strong>Start:</strong> {formatDateTime(event.start)}</p>*/}
                                 {/*<p><strong>End:</strong> {formatDateTime(event.end)}</p>*/}
                             </div>
@@ -610,17 +613,15 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         width={500}
                     >
                         <div className="p-4">
-                            <h2 className="text-lg font-semibold mb-2">Create Unavailable Event</h2>
-                            <p className="text-gray-500 text-sm mb-4">
-                                Your services won’t be available for booking during this event.
-                            </p>
+                            <h2 className="text-lg font-semibold mb-2">Block Out Time</h2>
+                            <p className="text-gray-500 text-sm mb-4">Clients won’t be able to book during this time.</p>
 
                             {/* Event Title Input */}
                             <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
                             <input
                                 type="text"
                                 className="w-full border-gray-300 rounded-md p-2 mb-4"
-                                placeholder="Enter event title"
+                                placeholder="(e.g. personal appointment, vacation, etc.)"
                                 value={eventTitle}
                                 onChange={(e) => setEventTitle(e.target.value)}
                             />

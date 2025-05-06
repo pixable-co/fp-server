@@ -14,7 +14,7 @@ export default defineConfig({
       },
 
       output:{
-        dir: 'includes/assets',
+        dir: 'includes/assets/build',
         watch: true,
         entryFileNames: '[name].js',
         assetFileNames: '[name].[ext]',

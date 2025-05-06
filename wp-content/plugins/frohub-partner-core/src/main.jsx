@@ -1,3 +1,4 @@
+import ValueOfBookingChart from './shortcodes/Dashboard/value_of_booking_chart';
 import PartnerIntegrations from './shortcodes/Partner/partner_integrations';
 import BookingChart from './shortcodes/Dashboard/booking_chart';
 import MobileService from './shortcodes/Services/mobile_service';
@@ -121,5 +122,13 @@ partnerIntegrationsElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <PartnerIntegrations dataKey={key} />
+    );
+});
+
+const valueOfBookingChartElements = document.querySelectorAll('.value_of_booking_chart');
+valueOfBookingChartElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <ValueOfBookingChart dataKey={key} />
     );
 });

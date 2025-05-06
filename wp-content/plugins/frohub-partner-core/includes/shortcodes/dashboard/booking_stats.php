@@ -130,39 +130,43 @@ class BookingStats {
         ob_start();
         ?>
         <div class="booking-stats-container">
-            <div class="booking-stats">
-                <h2 class="w-text-h">Total Value of Bookings</h2>
-                <p class="booking-stats__price">£<?php echo number_format($total_value, 2); ?></p>
+            <!-- Total Value of Bookings -->
+            <div class="booking-card">
+                <div class="booking-card-header">Total value of bookings</div>
+                <div class="booking-card-value">£<?php echo number_format($total_value, 2); ?></div>
+                <div class="booking-card-subtext">Goal: £3000.00</div>
+                <div class="booking-card-footer warning">▼ 10% <span>Nearly there!</span></div>
             </div>
 
-            <div class="booking-stats">
-                <h2 class="w-text-h">Total Value of Deposits</h2>
-                <p class="booking-stats__price">£<?php echo number_format($total_deposits, 2); ?></p>
+            <!-- New vs Repeating Clients -->
+            <div class="booking-card">
+                <div class="booking-card-header">New vs Repeating Clients</div>
+                <div class="booking-split">
+                    <div class="booking-split-item"><span>New</span><strong>£<?php echo number_format($new_clients_value, 2); ?></strong></div>
+                    <div class="booking-split-item"><span>Repeating</span><strong>£<?php echo number_format($returning_clients_value, 2); ?></strong></div>
+                </div>
             </div>
 
-            <div class="booking-stats">
-                <h2 class="w-text-h">Total Number of Bookings</h2>
-                <p class="booking-stats__price"><?php echo $total_bookings; ?></p>
+            <!-- Total Bookings -->
+            <div class="booking-card">
+                <div class="booking-card-header">Total number of bookings</div>
+                <div class="booking-card-value"><?php echo $total_bookings; ?></div>
             </div>
 
-            <div class="booking-stats">
-                <h2 class="w-text-h">Average Booking Value</h2>
-                <p class="booking-stats__price">£<?php echo number_format($average_booking_value, 2); ?></p>
+            <!-- Average Booking Value -->
+            <div class="booking-card">
+                <div class="booking-card-header">Average Booking Value</div>
+                <div class="booking-card-value">£<?php echo number_format($average_booking_value, 2); ?></div>
             </div>
 
-            <div class="booking-stats">
-                <h2 class="w-text-h">New vs Repeating Clients</h2>
-                    <p class="booking-stats__price">New: £<?php echo number_format($new_clients_value, 2); ?></p>
-                    <p class="booking-stats__price">Returning: £<?php echo number_format($returning_clients_value, 2); ?></p>
-            </div>
-
-            <div class="booking-stats top-booked-service">
-                <h2 class="w-text-h">Top Booked Services</h2>
-                <ul class="booking-stats__list">
+            <!-- Top Booked Services -->
+            <div class="booking-card top-services">
+                <div class="booking-card-header">Top booked services</div>
+                <ol class="booking-card-list">
                     <?php foreach ($top_services as $service) : ?>
                         <li><?php echo esc_html($service); ?></li>
                     <?php endforeach; ?>
-                </ul>
+                </ol>
             </div>
         </div>
         <?php

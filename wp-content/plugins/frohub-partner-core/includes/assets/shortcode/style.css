@@ -118,3 +118,77 @@
     color: #888;
 }
 
+
+.booking-card {
+    flex: 1 1 calc(25% - 16px);
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    min-width: 200px;
+}
+
+.booking-card-header {
+    font-size: 16px;
+    color: #444;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.booking-card-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 4px;
+}
+
+.booking-card-subtext {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.booking-card-footer.warning {
+    font-size: 13px;
+    color: #f97316; /* Tailwind's orange-500 */
+}
+
+.booking-card-footer.warning span {
+    font-weight: 500;
+    margin-left: 4px;
+}
+
+.booking-split {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.booking-split-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    color: #555;
+}
+
+.booking-split-item strong {
+    color: #222;
+}
+
+.booking-card-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 14px;
+    color: #333;
+}
+
+.top-services li {
+    margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+    .booking-card {
+        flex: 1 1 100%;
+    }
+}

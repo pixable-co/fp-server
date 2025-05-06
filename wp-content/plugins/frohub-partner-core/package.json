@@ -21,6 +21,7 @@
     "antd": "^5.22.6",
     "axios": "^1.7.9",
     "chart.js": "^4.4.8",
+    "chartjs-plugin-annotation": "^3.1.0",
     "dayjs": "^1.11.13",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.469.0",

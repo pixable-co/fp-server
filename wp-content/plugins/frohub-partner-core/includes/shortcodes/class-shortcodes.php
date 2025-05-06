@@ -14,6 +14,7 @@ use FPServer\UpcomingOrder;
 use FPServer\PendingBookings;
 use FPServer\UnreadConversations;
 use FPServer\PartnerIntegrations;
+use FPServer\ValueOfBookingChart;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,5 +39,6 @@ class Shortcodes {
 		UnreadConversations::init();
 		NavMenu::init();
 		PartnerIntegrations::init();
+		ValueOfBookingChart::init();
 	}
 }

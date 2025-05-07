@@ -26,7 +26,7 @@ class NavMenu {
                 <div class="fp-user-dropdown">
                     <i class="fas fa-user" id="fpUserToggle"></i>
                     <div class="fp-dropdown-menu" id="fpDropdownMenu">
-                        <a href="#">Account</a>
+                        <a href="/my-account">Account</a>
                         <a href="#">Help & FAQs</a>
                         <a href="#">Business & Marketing</a>
                         <a href="#">Invite a Friend</a>

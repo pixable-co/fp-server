@@ -68,7 +68,7 @@ final class FrohubServer {
 		FPServer\Shortcodes::init();
 		FPServer\Ajax::init();
 		FPServer\API::init();
-// 		FPServer\Actions::init();
+		FPServer\Actions::init();
 	}
 
 	public function load_textdomain() {

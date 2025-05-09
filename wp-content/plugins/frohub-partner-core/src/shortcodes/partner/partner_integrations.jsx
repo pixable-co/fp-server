@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchData } from "../../services/fetchData.js";
 import { toastNotification } from "../../utils/toastNotification.js";
+import FhProUpgrade from "../../common/controls/FhProUpgrade.jsx";
 
 const PartnerIntegrations = () => {
     const [isConnected, setIsConnected] = useState(false);
@@ -8,6 +9,18 @@ const PartnerIntegrations = () => {
     const [calendars, setCalendars] = useState([]);
     const [selectedCalendar, setSelectedCalendar] = useState("");
     const [savedCalendar, setSavedCalendar] = useState("");
+
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false); // ✅ Modal state
+
+    // ✅ Check subscription on load
+    useEffect(() => {
+        if (
+            typeof fpserver_settings !== "undefined" &&
+            fpserver_settings.has_active_subscription === ""
+        ) {
+            setShowUpgradeModal(true);
+        }
+    }, []);
 
     useEffect(() => {
         fetchData("fpserver/check_google_auth_status", (response) => {
@@ -96,6 +109,7 @@ const PartnerIntegrations = () => {
     };
 
     return (
+        <>
         <div className="space-y-12">
             {/* Calendars */}
             <section>
@@ -226,6 +240,11 @@ const PartnerIntegrations = () => {
                 </div>
             </section>
         </div>
+            <FhProUpgrade
+                visible={showUpgradeModal}
+                onClose={() => window.location.href = "/"}
+            />
+        </>
     );
 };
 

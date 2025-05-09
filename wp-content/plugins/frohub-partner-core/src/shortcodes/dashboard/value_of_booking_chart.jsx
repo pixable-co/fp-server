@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import FhChart from "../../common/controls/FhChart.jsx";
+import FhProUpgrade from "../../common/controls/FhProUpgrade.jsx";
 
 const ValueOfBookingChart = () => {
     const partner_id = fpserver_settings.partner_post_id;
@@ -7,6 +8,18 @@ const ValueOfBookingChart = () => {
 
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+    useEffect(() => {
+        // Show upgrade modal if user lacks active subscription
+        if (
+            typeof fpserver_settings !== 'undefined' &&
+            fpserver_settings.has_active_subscription === ''
+        ) {
+            setShowUpgradeModal(true);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchChartData = async () => {
@@ -88,6 +101,16 @@ const ValueOfBookingChart = () => {
             ) : (
                 <FhChart data={chartData} goal={chartGoal} />
             )}
+
+            {/* Modal rendered conditionally */}
+            <FhProUpgrade
+                visible={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                onUpgrade={() => {
+                    // handle upgrade action here
+                    console.log('Redirect to upgrade page');
+                }}
+            />
         </div>
     );
 };

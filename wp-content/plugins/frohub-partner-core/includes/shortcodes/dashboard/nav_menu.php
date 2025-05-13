@@ -269,6 +269,14 @@ class NavMenu {
             margin-left: 250px;
         }
 
+        /* Mobile styles */
+        @media (max-width: 767px) {
+            body:not(.admin-bar) #page-content.l-main,
+            body.admin-bar #page-content.l-main {
+                margin-left: 0px;
+            }
+        }
+
 /*         .fp-nav-sidebar.collapsed ~ #page-content.l-main { */
 /*             margin-left: 80px; */
 /*         } */

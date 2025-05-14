@@ -38,8 +38,8 @@ class NavMenu {
         </div>
 
         <!-- ✅ Sidebar -->
-        <div class="fp-nav-sidebar expanded">
-            <button class="fp-nav-toggle">&lt;</button>
+        <div class="fp-nav-sidebar">
+            <span class="fp-toggle-container"><button class="fp-nav-toggle"><i class="far fa-chevron-left"></i></button></span>
             <nav class="fp-menu-wrapper">
                 <?php
                 wp_nav_menu([
@@ -50,6 +50,9 @@ class NavMenu {
                 ?>
             </nav>
         </div>
+
+        <!-- Mobile toggle button that appears when sidebar is collapsed -->
+        <button class="mobile-menu-toggle"><i class="far fa-bars"></i></button>
 
         <style>
         /* ===== TOPBAR ===== */
@@ -135,15 +138,20 @@ class NavMenu {
         .fp-nav-sidebar {
             width: 250px;
             height: 100vh;
-            background-color: #1e3050;
-            padding: 15px;
-            padding-top: 60px;
-            transition: width 0.3s ease;
-            color: #fff;
+            background-color: #f5f5f5;
+            transition: all 0.3s ease;
+            color: #444;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding-top: 60px;
+            /* Default state is expanded */
+            transform: translateX(0);
         }
 
         body.admin-bar .fp-nav-sidebar {
@@ -155,22 +163,38 @@ class NavMenu {
         }
 
         .fp-nav-sidebar.collapsed {
-            width: 80px;
+            width: 60px;
+        }
+
+        .fp-toggle-container {
+            margin-left: 1rem;
+            margin-top: 2rem;
         }
 
         .fp-nav-toggle {
-            background: #222;
-            color: #fff;
-            border: none;
+            background: #f5f5f5;
+            color: #444;
+            border: 1px solid #ddd;
             border-radius: 4px;
             cursor: pointer;
-            margin-bottom: 10px;
-            padding: 6px 10px;
-            font-size: 14px;
+            padding: 0;
+            font-size: 16px;
+            position: relative;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .fp-nav-sidebar.collapsed .fp-nav-toggle {
+            margin-bottom: 15px;
         }
 
         .fp-menu-wrapper {
-            margin-top: 10px;
+            width: 100%;
+            overflow-y: auto;
         }
 
         .fp-nav-list {
@@ -187,26 +211,21 @@ class NavMenu {
         .fp-nav-list li a {
             display: flex;
             align-items: center;
-            padding: 10px;
+            padding: 12px 15px;
             text-decoration: none;
-            color: #fff;
-            gap: 10px;
+            color: #444;
+            gap: 15px;
+            border-bottom: 1px solid #eee;
         }
 
         .fp-nav-list li a:hover {
-            background: #111;
-        }
-
-        .fp-nav-list li.menu-item-has-children > a::after {
-            content: "▼";
-            margin-left: auto;
-            font-size: 10px;
+            background: #e9e9e9;
         }
 
         .fp-submenu,
         .fp-nav-sidebar .sub-menu {
             display: none;
-            background: #111;
+            background: #f0f0f0;
             padding: 0;
             margin: 0;
             list-style: none;
@@ -216,13 +235,13 @@ class NavMenu {
         .fp-submenu li,
         .fp-nav-sidebar .sub-menu li {
             font-size: 13px;
-            border-top: 1px solid #222;
-            color: white;
+            border-top: 1px solid #e0e0e0;
+            color: #444;
         }
 
         .fp-submenu li:hover,
         .fp-nav-sidebar .sub-menu li:hover {
-            background: #222;
+            background: #e5e5e5;
         }
 
         .fp-nav-sidebar .menu-item-has-children:hover > .sub-menu {
@@ -241,20 +260,94 @@ class NavMenu {
             display: none;
         }
 
+        /* Pro badge styling */
+        .pro-badge {
+            background: #666;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 5px;
+        }
+
+        /* Reset and ensure icons stay left-aligned in collapsed mode */
+        .fp-nav-sidebar.collapsed .fp-nav-list li a {
+            justify-content: flex-start !important; /* Force left alignment */
+            padding-left: 20px !important; /* Add specific left padding to control icon position */
+            padding-right: 0 !important; /* Remove right padding when collapsed */
+        }
+
+        /* Control icon spacing specifically */
+        .fp-nav-sidebar.collapsed .fp-nav-list li a i {
+            margin-right: 0 !important; /* Remove right margin on icons */
+        }
+
+        /* Ensure chevron icon for dropdown is hidden */
+        .fp-nav-sidebar.collapsed .fp-nav-list .menu-item-has-children > a i.fa-chevron-down {
+            display: none !important;
+        }
+
+        /* If the issue persists, try this more forceful approach */
+        @media (min-width: 769px) {
+            .fp-nav-sidebar.collapsed .fp-nav-list li a {
+                display: flex !important;
+                justify-content: flex-start !important;
+                align-items: center !important;
+                padding-left: 20px !important;
+            }
+        }
+
+        /* ===== MOBILE SPECIFIC STYLES ===== */
         @media (max-width: 768px) {
+            /* Hide sidebar by default on mobile */
             .fp-nav-sidebar {
                 transform: translateX(-100%);
+                width: 250px; /* Always full width on mobile when shown */
             }
 
-            .fp-nav-sidebar.expanded {
+            /* Show sidebar when it has mobile-expanded class */
+            .fp-nav-sidebar.mobile-expanded {
                 transform: translateX(0);
             }
 
-            .fp-nav-toggle {
+            /* Mobile menu toggle button */
+            .mobile-menu-toggle {
                 position: fixed;
                 left: 10px;
-                top: 10px;
-                z-index: 1000;
+                top: 70px;
+                z-index: 998;
+                display: flex; /* Always show on mobile */
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+                color: #444;
+                width: 40px;
+                height: 40px;
+                border-radius: 4px;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+            body.admin-bar .mobile-menu-toggle {
+                top: 102px;
+            }
+
+            /* Hide regular toggle on mobile */
+            .fp-nav-sidebar .fp-nav-toggle {
+                display: none;
+            }
+
+            /* Make the dropdown menu touch-friendly */
+            .fp-dropdown-menu a {
+                padding: 12px 16px;
+            }
+        }
+
+        /* Hide mobile menu toggle on desktop */
+        @media (min-width: 769px) {
+            .mobile-menu-toggle {
+                display: none;
             }
         }
 
@@ -270,43 +363,94 @@ class NavMenu {
         }
 
         /* Mobile styles */
-        @media (max-width: 767px) {
+        @media (max-width: 768px) {
             body:not(.admin-bar) #page-content.l-main,
             body.admin-bar #page-content.l-main {
-                margin-left: 0px;
+                margin-left: 0px !important;
             }
         }
 
-/*         .fp-nav-sidebar.collapsed ~ #page-content.l-main { */
-/*             margin-left: 80px; */
-/*         } */
-
         .fp-nav-sidebar.collapsed ~ #page-content.l-main {
-            margin-left: 0;
+            margin-left: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .fp-nav-sidebar.collapsed ~ #page-content.l-main {
+                margin-left: 0 !important;
+            }
         }
 
         #page-content.l-main {
             padding: 20px;
         }
+
+        /* Add this overlay to darken background when mobile menu is open */
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .mobile-overlay.active {
+            display: block;
+        }
         </style>
+
+        <div class="mobile-overlay"></div>
 
         <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.fp-nav-sidebar');
             const toggleBtn = document.querySelector('.fp-nav-toggle');
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const overlay = document.querySelector('.mobile-overlay');
+            const isMobile = window.innerWidth <= 768;
 
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                sidebar.classList.toggle('expanded');
-                toggleBtn.innerHTML = sidebar.classList.contains('collapsed') ? '›' : '&lt;';
-            });
+            // Initialize sidebar state based on screen size
+            if (isMobile) {
+                sidebar.classList.remove('collapsed');
+                // Don't add mobile-expanded initially on mobile
+            } else {
+                sidebar.classList.remove('collapsed');
+            }
 
-            // Collapse sidebar on link click for mobile
+            // Toggle sidebar when the internal button is clicked (desktop)
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    toggleBtn.innerHTML = sidebar.classList.contains('collapsed') ?
+                        '<i class="far fa-chevron-right"></i>' :
+                        '<i class="far fa-chevron-left"></i>';
+                });
+            }
+
+            // Toggle sidebar when the mobile button is clicked
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('mobile-expanded');
+                    overlay.classList.toggle('active');
+                });
+            }
+
+            // Close sidebar when clicking on overlay
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('mobile-expanded');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            // Close sidebar on link click for mobile
             document.querySelectorAll('.fp-nav-list a').forEach(link => {
                 link.addEventListener('click', () => {
                     if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('expanded');
-                        sidebar.classList.add('collapsed');
+                        sidebar.classList.remove('mobile-expanded');
+                        overlay.classList.remove('active');
                     }
                 });
             });
@@ -315,14 +459,31 @@ class NavMenu {
             const userToggle = document.getElementById('fpUserToggle');
             const dropdownMenu = document.getElementById('fpDropdownMenu');
 
-            userToggle.addEventListener('click', function (e) {
-                dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
-                e.stopPropagation();
-            });
+            if (userToggle && dropdownMenu) {
+                userToggle.addEventListener('click', function (e) {
+                    dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
+                    e.stopPropagation();
+                });
 
-            // Close on outside click
-            document.addEventListener('click', function () {
-                dropdownMenu.style.display = 'none';
+                // Close on outside click
+                document.addEventListener('click', function () {
+                    dropdownMenu.style.display = 'none';
+                });
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const currentIsMobile = window.innerWidth <= 768;
+
+                // Update layout when switching between mobile and desktop
+                if (currentIsMobile !== isMobile) {
+                    if (currentIsMobile) {
+                        sidebar.classList.remove('mobile-expanded');
+                        overlay.classList.remove('active');
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                    }
+                }
             });
         });
         </script>
@@ -332,10 +493,25 @@ class NavMenu {
 
     public function wrap_menu_label($title, $item, $args, $depth) {
         if (!empty($args->menu_class) && $args->menu_class === 'fp-nav-list') {
-            if (preg_match('/<\/i>\s*(.+)/', $title, $matches)) {
-                return preg_replace('/<\/i>\s*(.+)/', '</i> <span class="label">' . $matches[1] . '</span>', $title);
+            // Check if the title already contains an icon
+            if (strpos($title, '<i class="') !== false) {
+                $label = preg_replace('/<\/i>\s*(.+)/', '</i> <span class="label">$1</span>', $title);
+            } else {
+                // Default icon if none exists
+                $label = '<i class="far fa-circle"></i> <span class="label">' . $title . '</span>';
             }
-            return '<span class="label">' . $title . '</span>';
+
+            // Add Pro badge if this item has a specific class
+            if (in_array('pro-item', $item->classes)) {
+                $label .= ' <span class="pro-badge">PRO</span>';
+            }
+
+            // Add dropdown icon if menu item has children
+            if (in_array('menu-item-has-children', $item->classes) && $depth === 0) {
+                $label .= ' <i class="far fa-chevron-down"></i>';
+            }
+
+            return $label;
         }
         return $title;
     }

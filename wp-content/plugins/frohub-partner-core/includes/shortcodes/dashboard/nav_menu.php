@@ -241,7 +241,7 @@ class NavMenu {
 
         .fp-submenu li:hover,
         .fp-nav-sidebar .sub-menu li:hover {
-            background: #e5e5e5;
+            background: #495c7d;
         }
 
         .fp-nav-sidebar .menu-item-has-children:hover > .sub-menu {

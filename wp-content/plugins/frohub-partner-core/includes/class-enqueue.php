@@ -19,7 +19,7 @@ class Enqueue {
             $has_valid_subscription = false;
 
                 if ( function_exists( 'wcs_get_users_subscriptions' ) ) {
-                    $subscriptions = wcs_get_users_subscriptions( 193 );
+                    $subscriptions = wcs_get_users_subscriptions( 194 );
 
                     foreach ( $subscriptions as $subscription ) {
                         if ( ! $subscription->has_status( 'active' ) ) {

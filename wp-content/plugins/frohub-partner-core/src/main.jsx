@@ -13,6 +13,7 @@ import UserLogin from "./shortcodes/UserLogin/UserLogin.jsx"
 import ServiceForm from "./shortcodes/ServiceForm/ServiceForm.jsx";
 import PartnerBookings from "./shortcodes/PartnerBookings/PartnerBookings.jsx";
 import BookingCalender from "./shortcodes/BookingCalender/BookingCalender.jsx";
+import SubscriptionDetails from "./shortcodes/dashboard/SubscriptionDetails.jsx";
 
 // Define your theme configuration
 const themeConfig = {
@@ -130,5 +131,25 @@ valueOfBookingChartElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <ValueOfBookingChart dataKey={key} />
+    );
+});
+
+
+const subscriptionDetailsElements = document.querySelectorAll('.subscription_details');
+
+subscriptionDetailsElements.forEach(element => {
+    // const dataKey = element.getAttribute('data-key');
+    let subscriptionData = {};
+
+    // Get the localized data from wp_localize_script global object
+    // if (typeof frohubSubscriptionData !== 'undefined' && frohubSubscriptionData.subscription) {
+    //     subscriptionData = frohubSubscriptionData.subscription;
+    // }
+
+    // Render React Component into .subscription_details
+    createRoot(element).render(
+        <WithConfigProvider>
+            <SubscriptionDetails data={subscriptionData} />
+        </WithConfigProvider>
     );
 });

@@ -192,3 +192,15 @@
         flex: 1 1 100%;
     }
 }
+
+/*Subscriptions Styles*/
+.order_details{
+    display: none;
+}
+
+.woocommerce-orders-table--orders {
+    display: none;
+}
+.woocommerce-customer-details {
+    display: none;
+}

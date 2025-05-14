@@ -87,3 +87,85 @@ a:hover {
 .fh__border {
     border-color: #D9D9D9;
 }
+
+/*Subscriptions Styles*/
+
+.frohub-subscription-wrapper {
+    font-family: sans-serif;
+    margin: 20px 0;
+}
+
+.subscription-card {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    background: #f9f9f9;
+}
+
+.subscription-card.pro {
+    background: #f3f3f3;
+}
+
+.subscription-card.lite {
+    background: #fff;
+}
+
+.subscription-card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.current-plan-badge {
+    background: #000;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.features {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.features li {
+    margin-bottom: 8px;
+}
+
+.pricing {
+    margin-top: 20px;
+}
+
+.upgrade-button, .pay-button {
+    background: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.billing-history {
+    margin-top: 40px;
+}
+
+.billing-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.billing-history th, .billing-history td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.downgrade-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #000;
+    text-decoration: underline;
+}

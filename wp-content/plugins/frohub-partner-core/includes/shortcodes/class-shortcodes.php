@@ -40,5 +40,6 @@ class Shortcodes {
 		NavMenu::init();
 		PartnerIntegrations::init();
 		ValueOfBookingChart::init();
+		ForgetPassword::init();
 	}
 }

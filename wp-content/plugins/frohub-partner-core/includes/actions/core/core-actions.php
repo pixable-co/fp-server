@@ -10,32 +10,35 @@ class CoreActions {
     public static function init() {
         $self = new self();
         add_action( 'template_redirect', array($self, 'restrict_site_access_except_login_signup'));
+        add_filter( 'login_redirect', array($self, 'redirect_after_login'), 10, 3 );
     }
 
     public function restrict_site_access_except_login_signup() {
-        if (is_user_logged_in()) {
-            return; // User is logged in, allow access
-        }
+        $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+        $current_slug = explode('/', $current_path)[0];
 
-        // Allowed slugs for non-logged-in users
         $allowed_pages = [
             'partner-login',
             'partner-signup',
         ];
 
-        // Get the current URL path (without domain)
-        $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-
-        // Extract the first part of the path (like 'partner-login')
-        $current_slug = explode('/', $current_path)[0];
-
-        // Allow if the slug is in allowed list
-        if (in_array($current_slug, $allowed_pages)) {
-            return; // Allow access
+        if (is_user_logged_in()) {
+            if (in_array($current_slug, $allowed_pages)) {
+                wp_redirect(home_url('/'));
+                exit;
+            }
+            return; // Allow other pages
         }
 
-        // Redirect non-logged-in user to partner-login
+        if (in_array($current_slug, $allowed_pages)) {
+            return; // Allow access to login/signup
+        }
+
         wp_redirect(site_url('/partner-login'));
         exit;
+    }
+
+    public function redirect_after_login($redirect_to, $requested_redirect_to, $user) {
+        return home_url('/'); // Redirect to homepage
     }
 }

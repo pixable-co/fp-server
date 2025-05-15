@@ -2,39 +2,40 @@
 namespace FPServer;
 
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+    exit;
 }
 
 class CoreActions {
 
-	public static function init() {
-		$self = new self();
-		add_action( 'template_redirect', array($self, 'restrict_site_access_except_login_signup'), 10, 2);
-	}
-
+    public static function init() {
+        $self = new self();
+        add_action( 'template_redirect', array($self, 'restrict_site_access_except_login_signup'));
+    }
 
     public function restrict_site_access_except_login_signup() {
         if (is_user_logged_in()) {
-            return;
+            return; // User is logged in, allow access
         }
 
-        // Allowed pages (modify slugs or paths as needed)
+        // Allowed slugs for non-logged-in users
         $allowed_pages = [
-            'login',    // Replace with the slug of your login page
-            'sign-up',  // Replace with the slug of your signup page
+            'partner-login',
+            'partner-signup',
         ];
 
-        // Get the current page slug
-        global $post;
-        $current_page_slug = isset($post->post_name) ? $post->post_name : '';
+        // Get the current URL path (without domain)
+        $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
-        // Check if the current page is one of the allowed pages
-        if (in_array($current_page_slug, $allowed_pages)) {
+        // Extract the first part of the path (like 'partner-login')
+        $current_slug = explode('/', $current_path)[0];
+
+        // Allow if the slug is in allowed list
+        if (in_array($current_slug, $allowed_pages)) {
             return; // Allow access
         }
 
-        // Redirect to the login page if not allowed
-        wp_redirect(site_url('/login')); // Replace '/login' with the URL of your login page
+        // Redirect non-logged-in user to partner-login
+        wp_redirect(site_url('/partner-login'));
         exit;
     }
 }

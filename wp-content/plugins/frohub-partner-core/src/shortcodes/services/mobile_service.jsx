@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { GoogleMap, Marker, Circle, useJsApiLoader, Autocomplete } from "@react-google-maps/api";
-import { Spin } from "antd";
+import { Spin, Skeleton } from "antd";
+import swal from "sweetalert";
 
 const containerStyle = {
     width: "100%",
@@ -46,18 +47,9 @@ const MobileService = () => {
                             data.countyDistrict,
                             data.postcode,
                         ].filter(Boolean); // removes undefined, null, or empty string
-                    
+
                         setAddress(addressParts.join(', ')); // Join with commas
                     }
-                    
-                    // if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee)) {
-                    //     setTravelFees(
-                    //         data.mobileServiceFee.map((fee) => ({
-                    //             miles: parseFloat(fee.radius) || 0,
-                    //             fee: parseFloat(fee.price) || 0,
-                    //         }))
-                    //     );
-                    // }
 
                     if (data.mobileServiceFee && Array.isArray(data.mobileServiceFee) && data.mobileServiceFee.length > 0) {
                         setTravelFees(
@@ -99,25 +91,31 @@ const MobileService = () => {
     // Update miles or fee for a specific entry
     const handleInputChange = (index, field, value) => {
         const updatedFees = [...travelFees];
-        updatedFees[index][field] = field === "fee" ? parseFloat(value) : parseInt(value, 10);
+        updatedFees[index][field] = value; // Don't parse here to allow empty strings in UI
         setTravelFees(updatedFees);
     };
 
     // Save the data to the API
     const saveLocationData = async () => {
         if (!partnerId) {
-            alert("Invalid partner ID. Data cannot be saved.");
+            swal("Oops", "Invalid partner ID. Data cannot be saved.", "error");
             return;
         }
 
         setSaving(true);
+
+        // Make sure to parse values before sending to API
+        const parsedFees = travelFees.map(fee => ({
+            miles: parseFloat(fee.miles) || 0,
+            fee: parseFloat(fee.fee) || 0
+        }));
 
         const payload = {
             partner_id: partnerId,
             latitude: position.lat.toString(),
             longitude: position.lng.toString(),
             address: address,
-            radius_fees: travelFees.map((fee) => ({
+            radius_fees: parsedFees.map((fee) => ({
                 radius: fee.miles.toString(),
                 price: fee.fee.toString(),
             })),
@@ -137,20 +135,20 @@ const MobileService = () => {
 
             const data = await response.json();
             if (data.success) {
-                alert("Location data saved successfully!");
+                swal("Success", "Location data saved successfully!", "success");
             } else {
-                alert("Failed to save location data.");
+                swal("Oops", "Failed to save location data.", "error");
             }
         } catch (error) {
             console.error("Error saving data:", error);
-            alert("An error occurred while saving.");
+            swal("Oops", "Something went wrong!", "error");
         } finally {
             setSaving(false);
         }
     };
 
     if (!isMapLoaded || loading)
-        return <Spin size="large" style={{ display: "block", margin: "50px auto" }} />;
+        return <Skeleton active paragraph={{ rows: 6 }} style={{ margin: "50px auto", maxWidth: "800px" }} />;
 
     return (
         <div>
@@ -172,25 +170,28 @@ const MobileService = () => {
                     }}
                 />
             </Autocomplete>
-            <p class="mt-4">To change your address go to <a href="/partner-profile">Partner Profile</a> Settings</p>
+            <p className="mt-4">To change your address go to <a href="/partner-profile">Partner Profile</a> Settings</p>
 
             {/* Google Map */}
             <div style={{ marginTop: "20px" }}>
                 <GoogleMap mapContainerStyle={containerStyle} center={position} zoom={13}>
                     <Marker position={position} />
                     {travelFees.length > 0 &&
-                        travelFees.map((item, index) => (
-                            <Circle
-                                key={index}
-                                center={position}
-                                radius={item.miles * 1609.34}
-                                options={{
-                                    fillColor: "red",
-                                    fillOpacity: 0.2 + index * 0.1,
-                                    strokeColor: "red",
-                                }}
-                            />
-                        ))}
+                        travelFees.map((item, index) => {
+                            const miles = parseFloat(item.miles);
+                            return miles > 0 ? (
+                                <Circle
+                                    key={index}
+                                    center={position}
+                                    radius={miles * 1609.34}
+                                    options={{
+                                        fillColor: "red",
+                                        fillOpacity: 0.2 + index * 0.1,
+                                        strokeColor: "red",
+                                    }}
+                                />
+                            ) : null;
+                        })}
                 </GoogleMap>
             </div>
 
@@ -198,86 +199,75 @@ const MobileService = () => {
             <div style={{ marginTop: "30px" }}>
                 <h3>Travel Radius and Fees</h3>
                 <p style={{ color: "#666" }}>
-                    Set your travel radius and fees to define how far you’ll travel for mobile appointments. Adjust fees based on distance to ensure fair compensation for your time and travel.
+                    Set your travel radius and fees to define how far you'll travel for mobile appointments. Adjust fees based on distance to ensure fair compensation for your time and travel.
                 </p>
 
                 <p>Tip: Clients are usually attracted to lower travel fees, so stylists who set a higher service fee but a lower travel fee usually get more bookings.</p>
 
                 {travelFees.map((item, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            display: "flex",
-                            // gridTemplateColumns: "1fr 1fr auto auto",
-                            gap: "10px",
-                            marginBottom: "12px",
-                            alignItems: "center",
-                            maxWidth: "600px",
-                        }}
-                    >
-                        <span style={{ whiteSpace: "nowrap" }}>Distence</span>
-                        <input
-                            type="number"
-                            value={item.miles || ""}
-                            onChange={(e) => handleInputChange(index, "miles", e.target.value)}
-                            placeholder="Distance (miles)"
-                            style={{
-                                padding: "8px",
-                                borderRadius: "5px",
-                                border: "1px solid #ccc",
-                                width: "100%",
-                            }}
-                        />
-                        <span style={{ whiteSpace: "nowrap" }}>miles</span>
+                    <div className="fee-row" key={index}>
+                        {/* Miles input with suffix */}
+                        <div className="input-wrapper suffix">
+                            <input
+                                type="number"
+                                min="0"
+                                value={item.miles}
+                                onChange={(e) => handleInputChange(index, "miles", e.target.value)}
+                                className="input-field"
+                            />
+                            <span className="suffix-text">miles</span>
+                        </div>
 
-                        <span style={{ whiteSpace: "nowrap" }}>Fee £</span>
-                        <input
-                            type="number"
-                            value={item.fee || ""}
-                            onChange={(e) => handleInputChange(index, "fee", e.target.value)}
-                            placeholder="Fee"
-                            style={{
-                                padding: "8px",
-                                borderRadius: "5px",
-                                border: "1px solid #ccc",
-                                width: "100%",
-                            }}
-                        />
+                        {/* Fee input with prefix */}
+                        <div className="input-wrapper prefix">
+                            <span className="prefix-text">£</span>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={item.fee}
+                                onChange={(e) => handleInputChange(index, "fee", e.target.value)}
+                                className="input-field"
+                            />
+                        </div>
 
-                        <button
-                            onClick={addTravelFee}
-                            style={{
-                                padding: "4px 10px",
-                                borderRadius: "5px",
-                                border: "1px solid #ccc",
-                                background: "#f0f0f0",
-                                cursor: "pointer",
-                            }}
-                        >
-                            +
-                        </button>
-                        <button
-                            onClick={() => removeTravelFee(index)}
-                            disabled={travelFees.length === 1}
-                            style={{
-                                padding: "4px 10px",
-                                borderRadius: "5px",
-                                border: "1px solid #ccc",
-                                background: travelFees.length === 1 ? "#eee" : "#f0f0f0",
-                                color: travelFees.length === 1 ? "#aaa" : "#000",
-                                cursor: travelFees.length === 1 ? "not-allowed" : "pointer",
-                            }}
-                        >
-                            -
-                        </button>
+                        {/* Action buttons for adding and removing rows */}
+                        <div className="action-buttons">
+                            <button
+                                type="button"
+                                className="action-btn"
+                                onClick={addTravelFee}
+                            >
+                                +
+                            </button>
+                            <button
+                                type="button"
+                                className="action-btn"
+                                onClick={() => removeTravelFee(index)}
+                                disabled={travelFees.length === 1}
+                            >
+                                −
+                            </button>
+                        </div>
                     </div>
                 ))}
-
             </div>
 
             {/* Save Button with Loading */}
-            <button onClick={saveLocationData} disabled={saving} style={{ marginTop: "20px" }}>
-                {saving ? <Spin size="small" /> : "Save"}
+            <button
+                onClick={saveLocationData}
+                disabled={saving}
+                style={{
+                    marginTop: "20px",
+                    padding: "8px 16px",
+                    borderRadius: "5px",
+                    background: "#007bff",
+                    color: "white",
+                    border: "none",
+                    cursor: saving ? "not-allowed" : "pointer"
+                }}
+            >
+                {saving ? "Saving..." : "Save"}
             </button>
         </div>
     );

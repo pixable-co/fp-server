@@ -188,7 +188,7 @@ class PartnerProfileForm
             .partner-profile-wrapper { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 10px;}
             .form-group { margin-bottom: 24px; }
             .form-label { display: block; font-weight: 600; margin-bottom: 8px; }
-            .form-input, .form-textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+            .form-input, .form-textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom:1rem; }
             .form-textarea { resize: vertical; height: 120px; }
             .save-btn { padding: 10px 20px; background-color: #000; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
             .text-right { text-align: right; }

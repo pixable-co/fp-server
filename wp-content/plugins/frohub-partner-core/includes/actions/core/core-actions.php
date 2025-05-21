@@ -14,8 +14,8 @@ class CoreActions {
     }
 
     public function restrict_site_access_except_login_signup() {
-        $current_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $current_slug = explode('/', $current_path)[0];
+        global $wp;
+        $current_slug = $wp->request;
 
         $allowed_pages = [
             'partner-login',
@@ -28,14 +28,14 @@ class CoreActions {
                 wp_redirect(home_url('/'));
                 exit;
             }
-            return; // Allow other pages
+            return;
         }
 
         if (in_array($current_slug, $allowed_pages)) {
-            return; // Allow access to login/signup
+            return;
         }
 
-        wp_redirect(site_url('/partner-login'));
+        wp_redirect(home_url('/partner-login'));
         exit;
     }
 

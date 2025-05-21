@@ -54,7 +54,7 @@ class ForgotPassword {
             'headers' => ['Content-Type' => 'application/json'],
             'body'    => json_encode([
                 'email'              => $user->user_email,
-                'reset_password_url' => $reset_url,
+                'reset_password_url' => preg_replace('#^https?://#', '', $reset_url),
                 'first_name'         => $first_name ?: '',
             ]),
         ]);

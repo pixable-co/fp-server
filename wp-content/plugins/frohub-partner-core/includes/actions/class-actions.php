@@ -13,7 +13,7 @@ class Actions {
 
 	public static function init() {
 		$self = new self();
-		CoreActions::init();
+// 		CoreActions::init();
 // 		GravityForms::init();
 		MyAccount::init();
 	}

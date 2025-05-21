@@ -166,7 +166,7 @@ class MyAccount {
 		<style>
 			.fp-tab-wrapper {
 				display: flex;
-				justify-content: center;
+				justify-content: flex-start;
 				gap: 30px;
 				border-bottom: 1px solid #ddd;
 				padding-bottom: 15px;

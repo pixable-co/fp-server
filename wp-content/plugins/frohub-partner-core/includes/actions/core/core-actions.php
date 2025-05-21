@@ -20,7 +20,7 @@ class CoreActions {
         $allowed_pages = [
             'partner-login',
             'registration',
-            'forgot-password',
+            'partner-forgot-password',
         ];
 
         if (is_user_logged_in()) {

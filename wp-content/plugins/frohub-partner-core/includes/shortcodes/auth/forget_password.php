@@ -23,7 +23,7 @@ class ForgotPasswordForm {
         <form class="fp-forgot-password-form" method="post" onsubmit="return false;">
             <div class="fp-message" style="margin-bottom: 1em;"></div>
             <p>
-                <label for="user_login">Username or Email</label><br>
+                <label for="user_login">Email</label><br>
                 <input type="text" name="user_login" id="user_login" required>
             </p>
             <p>

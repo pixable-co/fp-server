@@ -1,5 +1,5 @@
 <?php
-namespace FECore;
+namespace FPServer;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -10,72 +10,59 @@ class ForgotPassword {
     public static function init() {
         $self = new self();
 
-        // Register shortcode
-        add_shortcode( 'forget_password', array( $self, 'render_forgot_password_form' ) );
+        // Register AJAX handler
+        add_action('wp_ajax_fpserver/forgot_password', array($self, 'handle'));
+        add_action('wp_ajax_nopriv_fpserver/forgot_password', array($self, 'handle'));
     }
 
-    public function render_forgot_password_form() {
-        ob_start();
+    public function handle() {
+        check_ajax_referer('fpserver_nonce');
 
-        $nonce = wp_create_nonce('fpserver_nonce');
-        $ajax_url = admin_url('admin-ajax.php');
-        ?>
-        <form class="fp-forgot-password-form" method="post" onsubmit="return false;">
-            <div class="fp-message" style="margin-bottom: 1em;"></div>
-            <p>
-                <label for="user_login">Username or Email</label><br>
-                <input type="text" name="user_login" id="user_login" required>
-            </p>
-            <p>
-                <input type="hidden" name="fp_nonce" value="<?php echo esc_attr($nonce); ?>">
-                <button type="submit">Send Reset Link</button>
-            </p>
-        </form>
+        $user_login = sanitize_text_field($_POST['user_login'] ?? '');
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.querySelector('.fp-forgot-password-form');
-            if (!form) return;
+        if (empty($user_login)) {
+            wp_send_json_error(['message' => 'Please enter your username or email.']);
+        }
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+        $user = get_user_by('login', $user_login) ?: get_user_by('email', $user_login);
+        if (!$user) {
+            wp_send_json_error(['message' => 'No user found with that username or email.']);
+        }
 
-                const messageBox = form.querySelector('.fp-message');
-                messageBox.textContent = '';
-                messageBox.style.color = '';
-                const formData = new FormData(form);
+        $reset_key = get_password_reset_key($user);
+        if (is_wp_error($reset_key)) {
+            wp_send_json_error(['message' => 'Could not generate reset link. Please try again.']);
+        }
 
-                formData.append('action', 'fpserver/forgot_password');
-                formData.append('_ajax_nonce', formData.get('fp_nonce'));
+        $reset_url = network_site_url("wp-login.php?action=rp&key={$reset_key}&login=" . rawurlencode($user->user_login), 'login');
 
-                fetch('<?php echo esc_url($ajax_url); ?>', {
-                    method: 'POST',
-                    body: new URLSearchParams(formData)
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Request failed with status ' + res.status);
-                    return res.json();
-                })
-                .then(response => {
-                    if (response.success) {
-                        messageBox.style.color = 'green';
-                        messageBox.textContent = response.data.message;
-                        form.reset();
-                    } else {
-                        messageBox.style.color = 'red';
-                        messageBox.textContent = response.data.message;
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    messageBox.style.color = 'red';
-                    messageBox.textContent = 'Something went wrong. Please try again.';
-                });
-            });
-        });
-        </script>
-        <?php
+        // ✅ Send the reset email
+        $sent = wp_mail(
+            $user->user_email,
+            'Password Reset Request',
+            "Click the link below to reset your password:\n\n" . $reset_url
+        );
 
-        return ob_get_clean();
+        if (!$sent) {
+            wp_send_json_error(['message' => 'Failed to send email. Please try again later.']);
+        }
+
+        // ✅ Send data to Zoho webhook
+        $webhook_url = 'https://flow.zoho.eu/20103370577/flow/webhook/incoming?zapikey=1001.41a0654ca8278cb1367b6f643c99cc59.ab1adbc257cd64052d037fc346a0a473&isdebug=false';
+
+        $response = wp_remote_post($webhook_url, [
+            'headers' => ['Content-Type' => 'application/json'],
+            'body'    => json_encode([
+                'email' => $user->user_email,
+                'reset_password_url' => $reset_url,
+            ]),
+        ]);
+
+        // Optional: log if Zoho call fails (you can remove this in production)
+        if (is_wp_error($response)) {
+            error_log('Zoho Flow call failed: ' . $response->get_error_message());
+        }
+
+        wp_send_json_success(['message' => 'A password reset link has been sent to your email.']);
     }
 }

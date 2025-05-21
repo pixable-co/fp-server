@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class ForgetPassword {
+class ForgotPasswordForm {
 
     public static function init() {
         $self = new self();
@@ -19,7 +19,6 @@ class ForgetPassword {
 
         $nonce = wp_create_nonce('fpserver_nonce');
         $ajax_url = admin_url('admin-ajax.php');
-
         ?>
         <form class="fp-forgot-password-form" method="post" onsubmit="return false;">
             <div class="fp-message" style="margin-bottom: 1em;"></div>
@@ -46,7 +45,7 @@ class ForgetPassword {
                 const user_login = form.find('[name="user_login"]').val();
                 const nonce = form.find('[name="fp_nonce"]').val();
 
-                jQuery.post('<?php echo esc_url($ajax_url); ?>', {
+                $.post('<?php echo esc_url($ajax_url); ?>', {
                     action: 'fpserver/forgot_password',
                     _ajax_nonce: nonce,
                     user_login: user_login

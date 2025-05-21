@@ -9,6 +9,7 @@ use FPServer\GoCardless;
 use FPServer\Xero;
 
 use FPServer\MediaUpload;
+use FPServer\ForgotPassword;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -23,5 +24,6 @@ class Ajax {
 // 		GoCardless::init();
 // 		Xero::init();
 		ConnectCalender::init();
+		ForgotPassword::init();
 	}
 }

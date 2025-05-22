@@ -19,7 +19,7 @@ class Enqueue {
             $billing_history = [];
 
             if ( function_exists('wcs_get_users_subscriptions') ) {
-                $subscriptions = wcs_get_users_subscriptions(199);
+                $subscriptions = wcs_get_users_subscriptions($current_user_id);
 
                 foreach ( $subscriptions as $subscription ) {
                     if ( $subscription && $subscription->has_status('active') ) {

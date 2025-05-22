@@ -69,17 +69,13 @@ class PartnerProfileAutoMessage {
                 wp_redirect(add_query_arg('updated', 'true', $_SERVER['REQUEST_URI']));
                 exit;
             } else {
-                $update_error = true;
+                wp_redirect(add_query_arg('updated', 'false', $_SERVER['REQUEST_URI']));
+                exit;
             }
         }
 
-
         $isAutoMessage = !empty($partner_data['auto_message']);
         $autoMessageContent = esc_textarea(wp_strip_all_tags($partner_data['auto_message_text'] ?? ''));
-
-        $update_success = false;
-        $update_error = false;
-
 
         ob_start();
         ?>
@@ -89,7 +85,7 @@ class PartnerProfileAutoMessage {
 
             <?php if (isset($_GET['updated']) && $_GET['updated'] === 'true') : ?>
                 <p style='color: green;'>✅ Auto message updated successfully!</p>
-            <?php elseif ($update_error) : ?>
+            <?php if (isset($_GET['updated']) && $_GET['updated'] === 'false') : ?>
                 <p style='color: red;'>❌ Failed to update auto message. Please try again.</p>
             <?php endif; ?>
 

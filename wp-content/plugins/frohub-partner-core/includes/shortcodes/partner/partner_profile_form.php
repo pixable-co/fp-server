@@ -180,8 +180,10 @@ class PartnerProfileForm
                 </div>
 
                 <div class="profile-form-footer">
-                    <a class="us-btn-style_5 w-btn" href="/"> View Profile </a>
-                    <button type="submit" class="save-btn">Save</button>
+                    <div class="btn-group">
+                        <a class="us-btn-style_5 w-btn" href="/"> View Profile </a>
+                        <button type="submit" class="save-btn">Save</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -228,6 +230,10 @@ class PartnerProfileForm
                 padding: 2rem;
                 background: #F5F5F5;
                 box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+            }
+            .btn-group{
+                position: absolute;
+                right:10rem;
             }
         </style>
 

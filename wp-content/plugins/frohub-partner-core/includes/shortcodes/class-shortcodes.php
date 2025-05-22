@@ -15,6 +15,7 @@ use FPServer\PendingBookings;
 use FPServer\UnreadConversations;
 use FPServer\PartnerIntegrations;
 use FPServer\ValueOfBookingChart;
+use FPServer\PartnerProfileAutoMessage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -43,5 +44,6 @@ class Shortcodes {
 		ForgotPasswordForm::init();
 		PartnerProfileForm::init();
 		PartnerProfileAvailibility::init();
+		PartnerProfileAutoMessage::init();
 	}
 }

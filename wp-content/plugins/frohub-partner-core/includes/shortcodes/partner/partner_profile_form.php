@@ -308,9 +308,8 @@ class PartnerProfileForm
             "payments"      => sanitize_textarea_field($_POST['payments'] ?? ''),
             "profileImage"  => $profileImageUrl,
             "bannerImage"   => $bannerImageUrl,
-            "auto_message"       => isset($_POST['auto_message']) ? true : false,
-            "auto_message_text"  => sanitize_textarea_field($_POST['auto_message_text'] ?? ''),
-
+            "email" => sanitize_email($_POST["email"]),
+            "phone" => sanitize_text_field($_POST["phone"]),
         ];
 
         $ecommerce_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-partner";

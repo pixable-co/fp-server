@@ -66,7 +66,9 @@ class PartnerProfileAutoMessage {
             ]);
 
             if (!is_wp_error($submit_response)) {
-                echo "<p style='color: green;'>✅ Auto message updated successfully!</p>";
+                wp_redirect(add_query_arg('updated', 'true', $_SERVER['REQUEST_URI']));
+                exit;
+
             } else {
                 echo "<p style='color: red;'>❌ Failed to update auto message.</p>";
             }
@@ -74,6 +76,11 @@ class PartnerProfileAutoMessage {
 
         $isAutoMessage = !empty($partner_data['auto_message']);
         $autoMessageContent = esc_textarea(wp_strip_all_tags($partner_data['auto_message_text'] ?? ''));
+
+        if (isset($_GET['updated']) && $_GET['updated'] === 'true') {
+    echo "<p style='color: green;'>✅ Auto message updated successfully!</p>";
+}
+
 
         ob_start();
         ?>

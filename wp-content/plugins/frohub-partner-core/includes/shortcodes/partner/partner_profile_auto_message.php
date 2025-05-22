@@ -85,9 +85,10 @@ class PartnerProfileAutoMessage {
 
             <?php if (isset($_GET['updated']) && $_GET['updated'] === 'true') : ?>
                 <p style='color: green;'>✅ Auto message updated successfully!</p>
-            <?php if (isset($_GET['updated']) && $_GET['updated'] === 'false') : ?>
+            <?php elseif (isset($_GET['updated']) && $_GET['updated'] === 'false') : ?>
                 <p style='color: red;'>❌ Failed to update auto message. Please try again or contact support.</p>
             <?php endif; ?>
+
 
 
             <form method="post">

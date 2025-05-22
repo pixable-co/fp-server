@@ -68,15 +68,17 @@ class PartnerProfileAutoMessage {
             if (!is_wp_error($submit_response)) {
                 wp_redirect(add_query_arg('updated', 'true', $_SERVER['REQUEST_URI']));
                 exit;
-
             } else {
-                echo "<p style='color: red;'>❌ Failed to update auto message.</p>";
+                $update_error = true;
             }
         }
+
 
         $isAutoMessage = !empty($partner_data['auto_message']);
         $autoMessageContent = esc_textarea(wp_strip_all_tags($partner_data['auto_message_text'] ?? ''));
 
+        $update_success = false;
+        $update_error = false;
 
 
         ob_start();
@@ -86,8 +88,11 @@ class PartnerProfileAutoMessage {
             <p class="subtext">Enable and customize an automatic message that will be sent to clients after they complete a booking with you or send a message to you. Use this to thank them, confirm next steps, or share important information.</p>
 
             <?php if (isset($_GET['updated']) && $_GET['updated'] === 'true') : ?>
-            <p style='color: green;'>✅ Auto message updated successfully!</p>
+                <p style='color: green;'>✅ Auto message updated successfully!</p>
+            <?php elseif ($update_error) : ?>
+                <p style='color: red;'>❌ Failed to update auto message. Please try again.</p>
             <?php endif; ?>
+
 
             <form method="post">
                 <div class="form-group">

@@ -77,21 +77,26 @@ class PartnerProfileAutoMessage {
 
         ob_start();
         ?>
-        <form method="post">
-            <div class="form-group">
-                <label class="form-label">
-                    <input type="checkbox" name="auto_message" id="auto_message" <?php echo $isAutoMessage ? 'checked' : ''; ?>>
-                    Enable Auto Message
-                </label>
-            </div>
+        <div class="auto-message-wrapper">
+            <h2>Auto Message Settings</h2>
+            <p class="subtext">Enable and customize an automatic message that will be sent to clients after they complete a booking with you or send a message to you. Use this to thank them, confirm next steps, or share important information.</p>
 
-            <div class="form-group" id="auto_message_text_group" style="display: <?php echo $isAutoMessage ? 'block' : 'none'; ?>;">
-                <label class="form-label">Auto Message Content</label>
-                <textarea name="auto_message_text" class="form-textarea"><?php echo $autoMessageContent; ?></textarea>
-            </div>
+            <form method="post">
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" name="auto_message" id="auto_message" <?php echo $isAutoMessage ? 'checked' : ''; ?>>
+                        Enable Auto Message
+                    </label>
+                </div>
 
-            <button type="submit" name="auto_message_form_submit" class="save-btn">Save Auto Message</button>
-        </form>
+                <div class="form-group" id="auto_message_text_group" style="display: <?php echo $isAutoMessage ? 'block' : 'none'; ?>;">
+                    <label class="form-label">Auto Message Content</label>
+                    <textarea name="auto_message_text" class="form-textarea"><?php echo $autoMessageContent; ?></textarea>
+                </div>
+
+                <button type="submit" name="auto_message_form_submit" class="save-btn">Save Auto Message</button>
+            </form>
+        </div>
 
         <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -104,10 +109,12 @@ class PartnerProfileAutoMessage {
         </script>
 
         <style>
+            .auto-message-wrapper { max-width: 700px; margin: 0 auto 40px; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
             .form-group { margin-bottom: 20px; }
             .form-label { font-weight: bold; display: block; margin-bottom: 5px; }
             .form-textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
             .save-btn { padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 5px; }
+            .subtext { font-size: 14px; color: #666; margin-bottom: 25px; }
         </style>
         <?php
         return ob_get_clean();

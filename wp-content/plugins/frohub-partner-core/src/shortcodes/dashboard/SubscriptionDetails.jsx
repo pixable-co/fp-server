@@ -3,11 +3,16 @@ const SubscriptionDetails = () => {
         return <p>No subscription data found.</p>;
     }
     console.log(fpserver_settings)
+
     const hasActiveSubscription = fpserver_settings.has_active_subscription;
     const subscriptionData = fpserver_settings.subscription_data || {};
     const billingHistory = fpserver_settings.billing_history || [];
 
     const isLitePlan = !hasActiveSubscription || hasActiveSubscription === '';
+
+    const handleUpgrade = () => {
+        window.location.href = `/checkout/?clear-cart&add-to-cart=4154`;
+    };
 
     return (
         <div className="frohub-subscription-wrapper">
@@ -39,7 +44,7 @@ const SubscriptionDetails = () => {
                             <p><strong>£16/month + 7% per booking</strong></p>
                             <p>Save 20% when paid annually</p>
                         </div>
-                        <button className="upgrade-button">Upgrade</button>
+                        <button onClick={handleUpgrade} className="mt-4 upgrade-button">Upgrade</button>
                     </div>
                 </>
             ) : (
@@ -55,33 +60,37 @@ const SubscriptionDetails = () => {
                         )}
                     </div>
 
-                    <div className="billing-history">
-                        <h3>Billing History</h3>
-                        <table>
+                    <div className="billing-history mt-6">
+                        <h3 className="text-lg font-semibold mb-2">Billing History</h3>
+                        <table className="w-full text-sm border-collapse">
                             <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Total</th>
-                                <th>Status</th>
+                            <tr className="text-left border-b border-gray-300">
+                                <th className="py-2">Date</th>
+                                <th className="py-2">Total</th>
+                                <th className="py-2">Status</th>
                             </tr>
                             </thead>
                             <tbody>
                             {billingHistory.map((entry, index) => (
-                                <tr key={index}>
-                                    <td>{entry.date}</td>
-                                    <td>{entry.total}</td>
-                                    <td>
+                                <tr key={index} className="border-b border-gray-200">
+                                    <td className="py-2">{entry.start_date}</td>
+                                    <td className="py-2">{entry.total}</td>
+                                    <td className="py-2">
                                         {entry.status === 'Failed' ? (
-                                            <button className="pay-button">Pay</button>
+                                            <button className="text-red-600 underline hover:text-red-800">
+                                                Pay
+                                            </button>
                                         ) : (
-                                            entry.status
+                                            <span className="text-green-700">{entry.status}</span>
                                         )}
                                     </td>
                                 </tr>
                             ))}
                             </tbody>
                         </table>
-                        <a href="/downgrade" className="downgrade-link">Downgrade to FroHub Lite</a>
+                        <a href="/downgrade" className="inline-block mt-4 text-blue-600 underline hover:text-blue-800">
+                            Downgrade to FroHub Lite
+                        </a>
                     </div>
                 </>
             )}

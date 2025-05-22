@@ -135,7 +135,7 @@ valueOfBookingChartElements.forEach(element => {
 });
 
 
-const subscriptionDetailsElements = document.querySelectorAll('.subscription_details');
+const subscriptionDetailsElements = document.querySelectorAll('.woocommerce_account_subscriptions');
 
 subscriptionDetailsElements.forEach(element => {
     // const dataKey = element.getAttribute('data-key');

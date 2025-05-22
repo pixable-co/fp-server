@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal } from 'antd';
 import './style.css';
 
@@ -12,11 +12,19 @@ const features = [
     'Verified Partner Badge for boosted trust and visibility',
 ];
 
-const FhProUpgrade = ({ visible, onUpgrade }) => {
-    // Redirect when modal is closed
+const FhProUpgrade = ({ visible }) => {
+    const [billingType, setBillingType] = useState('annual');
+
     const handleClose = () => {
-        window.location.href = '/'; // redirect to homepage
+        window.location.href = '/';
     };
+
+    const handleUpgrade = () => {
+        const productId = billingType === 'annual' ? 4154 : 4153;
+        window.location.href = `/checkout/?clear-cart&add-to-cart=${productId}`;
+    };
+
+    const isAnnual = billingType === 'annual';
 
     return (
         <Modal
@@ -49,7 +57,8 @@ const FhProUpgrade = ({ visible, onUpgrade }) => {
                             type="radio"
                             name="billing"
                             value="annual"
-                            defaultChecked
+                            checked={isAnnual}
+                            onChange={() => setBillingType('annual')}
                             className="accent-black"
                         />
                         <span>Pay Annually</span>
@@ -59,6 +68,8 @@ const FhProUpgrade = ({ visible, onUpgrade }) => {
                             type="radio"
                             name="billing"
                             value="monthly"
+                            checked={!isAnnual}
+                            onChange={() => setBillingType('monthly')}
                             className="accent-black"
                         />
                         <span>Pay Monthly</span>
@@ -67,16 +78,17 @@ const FhProUpgrade = ({ visible, onUpgrade }) => {
 
                 <div className="mb-4">
                     <h3 className="text-lg font-bold">
-                        £16 <span className="text-gray-500 text-base">/month + 7% per booking</span>
+                        £{isAnnual ? '16' : '20'} <span className="text-gray-500 text-base">/month + 7% per booking</span>
                     </h3>
-                    <p className="text-green-600 text-sm">Save 20%</p>
+                    {isAnnual && (
+                        <p className="text-green-600 text-sm">Save 20% (£192/year)</p>
+                    )}
                 </div>
 
                 <div className="text-right">
                     <button
-                        onClick={onUpgrade}
+                        onClick={handleUpgrade}
                         className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
-                        disabled
                     >
                         Upgrade
                     </button>

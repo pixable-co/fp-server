@@ -18,25 +18,25 @@ class Enqueue {
 
             $has_valid_subscription = false;
 
-                if ( function_exists( 'wcs_get_users_subscriptions' ) ) {
-                    $subscriptions = wcs_get_users_subscriptions( 194 );
-
-                    foreach ( $subscriptions as $subscription ) {
-                        if ( ! $subscription->has_status( 'active' ) ) {
-                            continue;
+            if ( function_exists('wcs_get_users_subscriptions') ) {
+                $subscriptions = wcs_get_users_subscriptions(199);
+                foreach ( $subscriptions as $subscription ) {
+                    if ( $subscription && $subscription->has_status('active') ) {
+                        foreach ( $subscription->get_items() as $item_id => $item ) {
+                            if ( is_object($item) ) {
+                                $plan_name = $item->get_name();
+                                $clean_name = str_replace('Frohub - ', '', $plan_name);
+                                if ( $clean_name === 'Pro' ) {
+                                    $has_valid_subscription = true;
+                                    break 2;
+                                }
+                            }
                         }
-
-                    foreach ( $subscription->get_items() as $item ) {
-                                // Optionally use get_meta directly
-                       $plan_name = $item->get_meta( 'Subscription Plan' );
-
-                       if ( in_array( $plan_name, array( 'Pro', 'Pro Yearly' ) ) ) {
-                               $has_valid_subscription = true;
-                               break 2; // Found valid subscription, exit both loops
-                       }
-                   }
-               }
-           }
+                    }
+                }
+            } else {
+                $has_valid_subscription = false;
+            }
 
             wp_enqueue_style( 'fpserver-shortcode-style', FPSERVER_ROOT_DIR_URL . 'includes/assets/shortcode/style.css' );
 			wp_enqueue_style( 'fpserver-style', FPSERVER_ROOT_DIR_URL . 'includes/assets/build/frontend.css' );

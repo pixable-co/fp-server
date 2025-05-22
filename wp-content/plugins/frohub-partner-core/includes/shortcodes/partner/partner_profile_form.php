@@ -78,6 +78,7 @@ class PartnerProfileForm
         ob_start();
         ?>
         <div class="partner-profile-wrapper">
+            <h2>My Partner Profile</h2>
             <?php if (isset($_GET['updated']) && $_GET['updated'] === 'true') : ?>
                 <p style="color: green;">✅ Partner details updated successfully!</p>
             <?php endif; ?>
@@ -178,7 +179,8 @@ class PartnerProfileForm
                     <textarea name="auto_message_text" class="form-textarea"><?php echo $autoMessageContent; ?></textarea>
                 </div>
 
-                <div class="text-right">
+                <div class="profile-form-footer">
+                    <a class="us-btn-style_5 w-btn" href="/"> View Profile </a>
                     <button type="submit" class="save-btn">Save</button>
                 </div>
             </form>
@@ -215,6 +217,18 @@ class PartnerProfileForm
             }
             .add-row:hover { background: #d4f0d4; }
             .remove-row:hover { background: #f8d7da; }
+
+            .profile-form-footer 
+            { 
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                left: 0;
+                height: 100px;
+                padding: 2rem;
+                background: #F5F5F5;
+                box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+            }
         </style>
 
         <script>

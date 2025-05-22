@@ -34,7 +34,11 @@ class ForgotPassword {
             wp_send_json_error(['message' => 'Could not generate reset link. Please try again.']);
         }
 
-        $reset_url = network_site_url("wp-login.php?action=rp&key={$reset_key}&login=" . rawurlencode($user->user_login), 'login');
+        $custom_reset_url = home_url('/reset-password/');
+        $reset_url = add_query_arg([
+            'key'   => $reset_key,
+            'login' => rawurlencode($user->user_login),
+        ], $custom_reset_url);
 
         $mail_sent = wp_mail(
             $user->user_email,

@@ -77,9 +77,6 @@ class PartnerProfileAutoMessage {
         $isAutoMessage = !empty($partner_data['auto_message']);
         $autoMessageContent = esc_textarea(wp_strip_all_tags($partner_data['auto_message_text'] ?? ''));
 
-        if (isset($_GET['updated']) && $_GET['updated'] === 'true') {
-    echo "<p style='color: green;'>✅ Auto message updated successfully!</p>";
-}
 
 
         ob_start();
@@ -87,6 +84,10 @@ class PartnerProfileAutoMessage {
         <div class="auto-message-wrapper">
             <h2>Auto Message Settings</h2>
             <p class="subtext">Enable and customize an automatic message that will be sent to clients after they complete a booking with you or send a message to you. Use this to thank them, confirm next steps, or share important information.</p>
+
+            <?php if (isset($_GET['updated']) && $_GET['updated'] === 'true') : ?>
+            <p style='color: green;'>✅ Auto message updated successfully!</p>
+            <?php endif; ?>
 
             <form method="post">
                 <div class="form-group">

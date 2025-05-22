@@ -167,18 +167,6 @@ class PartnerProfileForm
                     <textarea name="payments" class="form-textarea"><?php echo $payments; ?></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" name="auto_message" id="auto_message" <?php echo $isAutoMessage ? 'checked' : ''; ?>>
-                        Enable Auto Message
-                    </label>
-                </div>
-
-                <div class="form-group" id="auto_message_text_group" style="display: <?php echo $isAutoMessage ? 'block' : 'none'; ?>;">
-                    <label class="form-label">Auto Message Content</label>
-                    <textarea name="auto_message_text" class="form-textarea"><?php echo $autoMessageContent; ?></textarea>
-                </div>
-
                 <div class="profile-form-footer">
                     <div class="btn-group">
                         <a class="us-btn-style_5 w-btn" href="/"> View Profile </a>

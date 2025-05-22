@@ -56,7 +56,7 @@ class PartnerProfileAutoMessage {
                 'auto_message_text' => $auto_message_text,
             ];
 
-            $update_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-partner-auto-message";
+            $update_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-profile-auto-message";
 
             $submit_response = wp_remote_post($update_api_url, [
                 'body'    => json_encode($payload),
@@ -73,7 +73,7 @@ class PartnerProfileAutoMessage {
         }
 
         $isAutoMessage = !empty($partner_data['auto_message']);
-        $autoMessageContent = esc_textarea($partner_data['auto_message_text'] ?? '');
+        $autoMessageContent = esc_textarea(wp_strip_all_tags($partner_data['auto_message_text'] ?? ''));
 
         ob_start();
         ?>

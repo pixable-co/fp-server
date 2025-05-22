@@ -239,11 +239,6 @@ class NavMenu {
             color: #444;
         }
 
-        .fp-submenu li:hover,
-        .fp-nav-sidebar .sub-menu li:hover {
-            background: #495c7d;
-        }
-
         .fp-nav-sidebar .menu-item-has-children:hover > .sub-menu {
             display: block;
         }

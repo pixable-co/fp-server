@@ -88,9 +88,9 @@ const SubscriptionDetails = () => {
                             ))}
                             </tbody>
                         </table>
-                        <a href="/downgrade" className="inline-block mt-4 text-blue-600 underline hover:text-blue-800">
-                            Downgrade to FroHub Lite
-                        </a>
+                        {/*<a href="/downgrade" className="inline-block mt-4 text-blue-600 underline hover:text-blue-800">*/}
+                        {/*    Downgrade to FroHub Lite*/}
+                        {/*</a>*/}
                     </div>
                 </>
             )}

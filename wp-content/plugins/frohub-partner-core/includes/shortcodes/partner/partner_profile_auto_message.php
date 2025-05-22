@@ -56,7 +56,7 @@ class PartnerProfileAutoMessage {
                 'auto_message_text' => $auto_message_text,
             ];
 
-            $update_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-partner";
+            $update_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-partner-auto-message";
 
             $submit_response = wp_remote_post($update_api_url, [
                 'body'    => json_encode($payload),

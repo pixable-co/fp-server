@@ -198,6 +198,38 @@
     display: none;
 }
 
+.notice-fields {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notice-item {
+    flex: 1;
+    max-width: 500px;
+}
+
+.inline-input-suffix {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-input {
+    margin-top: 0.5rem;
+}
+
+.inline-input-suffix .form-input {
+    flex: 0 0 80%;
+}
+
+.suffix-label {
+    font-weight: 500;
+    color: #555;
+}
+
+
 .woocommerce-orders-table--orders {
     display: none;
 }

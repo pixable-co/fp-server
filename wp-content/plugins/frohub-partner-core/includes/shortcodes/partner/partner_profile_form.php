@@ -72,6 +72,10 @@ class PartnerProfileForm
         $terms = esc_textarea($partner_data['terms'] ?? '');
         $lateFees = esc_textarea($partner_data['lateFees'] ?? '');
         $payments = esc_textarea($partner_data['payments'] ?? '');
+        $bookingNotice = esc_attr($partner_data['bookingNotice'] ?? 0);
+        $bookingScope = esc_attr($partner_data['bookingScope'] ?? 0);
+        $bufferPeriodMin = esc_attr($partner_data['bufferPeriodMin'] ?? 0);
+        $bufferPeriodHour = esc_attr($partner_data['bufferPeriodHour'] ?? 0);
 
 
         ob_start();
@@ -166,6 +170,42 @@ class PartnerProfileForm
                                 <button type="button" class="remove-row">−</button>
                             </div>
                         <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notice Period</label>
+
+                    <div class="notice-fields">
+                        <div class="notice-item">
+                            <label>How much notice do you need before a client can book an appointment?</label>
+                            <div class="inline-input-suffix">
+                                <input type="number" name="bookingNotice" class="form-input" value="<?php echo esc_attr($bookingNotice); ?>" />
+                                <span class="suffix-label">Day(s)</span>
+                            </div>
+                        </div>
+
+                        <div class="notice-item">
+                            <label>How far into the future can clients book an appointment with you?</label>
+                            <div class="inline-input-suffix">
+                                <input type="number" name="bookingScope" class="form-input" value="<?php echo esc_attr($bookingScope); ?>" />
+                                <span class="suffix-label">Day(s)</span>
+                             </div>
+                        </div>
+
+                        <div class="notice-item">
+                            <label>How much time do you need between bookings?</label>
+                            <div>
+                                <div class="inline-input-suffix">
+                                    <input type="number" name="bufferPeriodMin" class="form-input" value="<?php echo esc_attr($bufferPeriodMin); ?>" />
+                                    <span class="suffix-label">Minute(s)</span>
+                                </div>
+                                <div class="inline-input-suffix">
+                                    <input type="number" name="bufferPeriodHour" class="form-input" value="<?php echo esc_attr($bufferPeriodHour); ?>" />
+                                    <span class="suffix-label">Hour(s)</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -318,6 +358,10 @@ class PartnerProfileForm
             "bannerImage"   => $bannerImageUrl,
             "email" => sanitize_email($_POST["email"]),
             "phone" => sanitize_text_field($_POST["phone"]),
+            "bookingNotice" => intval($_POST["bookingNotice"]),
+            "bookingScope"  => intval($_POST["bookingScope"]),
+            "bufferPeriodMin"  => intval($_POST["bufferPeriodMin"]),
+            "bufferPeriodHour"  => intval($_POST["bufferPeriodHour"]),
         ];
 
         $ecommerce_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-partner";

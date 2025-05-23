@@ -140,14 +140,13 @@ class PartnerProfileForm
 
                 <!-- Banner Image Upload -->
                 <div class="image-upload">
-                <label for="banner-image">Banner Image:</label>
+                <label for="banner-image">Cover Image:</label>
                 <div class="image-upload-container banner-upload-container" onclick="document.getElementById('bannerImageInput').click();">
                     <img id="bannerPreview" src="<?php echo esc_url($partner_data['bannerImage'] ?? 'https://via.placeholder.com/1200x250'); ?>" alt="Banner Image">
                     <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
                 </div>
                 <input type="file" id="bannerImageInput" name="bannerImage" accept="image/*" onchange="previewImage(event, 'bannerPreview')">
                     </div>
-
 
                 <div class="form-group">
                     <label class="form-label">Availability</label>

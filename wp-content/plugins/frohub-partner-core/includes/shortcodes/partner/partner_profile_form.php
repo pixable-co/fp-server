@@ -72,8 +72,7 @@ class PartnerProfileForm
         $terms = esc_textarea($partner_data['terms'] ?? '');
         $lateFees = esc_textarea($partner_data['lateFees'] ?? '');
         $payments = esc_textarea($partner_data['payments'] ?? '');
-        $isAutoMessage = !empty($partner_data['auto_message']);
-        $autoMessageContent = esc_textarea($partner_data['auto_message_text'] ?? '');
+
 
         ob_start();
         ?>
@@ -127,6 +126,27 @@ class PartnerProfileForm
                     <label class="form-label">Bio</label>
                     <textarea name="bio" class="form-textarea"><?php echo $bio; ?></textarea>
                 </div>
+
+                <!-- Banner Image Upload -->
+                <div class="image-upload">
+                <label for="banner-image">Banner Image:</label>
+                <div class="image-upload-container banner-upload-container" onclick="document.getElementById('bannerImageInput').click();">
+                    <img id="bannerPreview" src="<?php echo esc_url($partner_data['bannerImage'] ?? 'https://via.placeholder.com/1200x250'); ?>" alt="Banner Image">
+                    <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
+                </div>
+                <input type="file" id="bannerImageInput" name="bannerImage" accept="image/*" onchange="previewImage(event, 'bannerPreview')">
+                    </div>
+
+                <!-- Profile Image Upload -->
+                <div class="image-upload">
+                <label for="profile-image">Profile Image:</label>
+                <div class="image-upload-container profile-upload-container" onclick="document.getElementById('profileImageInput').click();">
+                    <img id="profilePreview" src="<?php echo esc_url($partner_data['featuredImage'] ?? 'https://via.placeholder.com/120'); ?>" alt="Profile Image">
+                    <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
+                </div>
+                <input type="file" id="profileImageInput" name="profileImage" accept="image/*" onchange="previewImage(event, 'profilePreview')">
+                </div>
+
 
                 <div class="form-group">
                     <label class="form-label">Availability</label>

@@ -127,15 +127,6 @@ class PartnerProfileForm
                     <textarea name="bio" class="form-textarea"><?php echo $bio; ?></textarea>
                 </div>
 
-                <!-- Banner Image Upload -->
-                <div class="image-upload">
-                <label for="banner-image">Banner Image:</label>
-                <div class="image-upload-container banner-upload-container" onclick="document.getElementById('bannerImageInput').click();">
-                    <img id="bannerPreview" src="<?php echo esc_url($partner_data['bannerImage'] ?? 'https://via.placeholder.com/1200x250'); ?>" alt="Banner Image">
-                    <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
-                </div>
-                <input type="file" id="bannerImageInput" name="bannerImage" accept="image/*" onchange="previewImage(event, 'bannerPreview')">
-                    </div>
 
                 <!-- Profile Image Upload -->
                 <div class="image-upload">
@@ -146,6 +137,16 @@ class PartnerProfileForm
                 </div>
                 <input type="file" id="profileImageInput" name="profileImage" accept="image/*" onchange="previewImage(event, 'profilePreview')">
                 </div>
+
+                <!-- Banner Image Upload -->
+                <div class="image-upload">
+                <label for="banner-image">Banner Image:</label>
+                <div class="image-upload-container banner-upload-container" onclick="document.getElementById('bannerImageInput').click();">
+                    <img id="bannerPreview" src="<?php echo esc_url($partner_data['bannerImage'] ?? 'https://via.placeholder.com/1200x250'); ?>" alt="Banner Image">
+                    <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
+                </div>
+                <input type="file" id="bannerImageInput" name="bannerImage" accept="image/*" onchange="previewImage(event, 'bannerPreview')">
+                    </div>
 
 
                 <div class="form-group">

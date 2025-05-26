@@ -26,7 +26,7 @@ class ForgotPassword {
 
         $user = get_user_by('email', $email);
         if (!$user) {
-            wp_send_json_error(['message' => 'No user found with that email address.']);
+            wp_send_json_error(['message' => 'If the email exists, you’ll receive a password reset link — check your inbox and junk folder.']);
         }
 
         $reset_key = get_password_reset_key($user);

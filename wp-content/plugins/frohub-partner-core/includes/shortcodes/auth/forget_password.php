@@ -21,7 +21,7 @@ class ForgotPasswordForm {
         $ajax_url = admin_url('admin-ajax.php');
         ?>
         <form class="fp-forgot-password-form" method="post" onsubmit="return false;">
-            <div class="fp-message" style="margin-bottom: 1em;"></div>
+            <div class="fp-message" style="margin-bottom: 1em; margin-top:1rem;"></div>
             <p>
                 <label for="user_login">Email</label><br>
                 <input type="text" name="user_login" id="user_login" required>

@@ -194,9 +194,9 @@
 }
 
 /*Subscriptions Styles*/
-.order_details{
-    display: none;
-}
+/*.order_details{*/
+/*    display: none;*/
+/*}*/
 
 .notice-fields {
     display: flex;

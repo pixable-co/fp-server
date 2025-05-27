@@ -136,19 +136,19 @@ valueOfBookingChartElements.forEach(element => {
 });
 
 // Combine multiple selectors using a comma
-const selectors = '.woocommerce_account_subscriptions, .subscription_details';
-const subscriptionDetailsElements = document.querySelectorAll(selectors);
-
-subscriptionDetailsElements.forEach(element => {
-    let subscriptionData = {};
-
-    // Render React component into the element
-    createRoot(element).render(
-        <WithConfigProvider>
-            <SubscriptionDetails data={subscriptionData} />
-        </WithConfigProvider>
-    );
-});
+// const selectors = '.woocommerce_account_subscriptions, .subscription_details';
+// const subscriptionDetailsElements = document.querySelectorAll(selectors);
+//
+// subscriptionDetailsElements.forEach(element => {
+//     let subscriptionData = {};
+//
+//     // Render React component into the element
+//     createRoot(element).render(
+//         <WithConfigProvider>
+//             <SubscriptionDetails data={subscriptionData} />
+//         </WithConfigProvider>
+//     );
+// });
 
 
 // Combine multiple selectors using a comma

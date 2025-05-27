@@ -63,6 +63,7 @@ class Enqueue {
 				array(
 					'ajax_url'        => admin_url( 'admin-ajax.php' ),
 					'nonce'           => wp_create_nonce( 'fpserver_nonce' ),
+					'cancel_subscription_nonce' => wp_create_nonce('wcs_change_subscription_to_cancelled'),
                     'partner_post_id' => get_field('partner_post_id', 'user_' . $current_user_id),
                     'has_active_subscription'=> $has_valid_subscription,
                     'billing_history'=> $billing_history

@@ -4,7 +4,7 @@ import BookingChart from './shortcodes/Dashboard/booking_chart';
 import MobileService from './shortcodes/Services/mobile_service';
 import GoogleCalender from './shortcodes/bookings/google_calender';
 import FpBookingTable from './shortcodes/BookingTable/fp_booking_table';
-import { StrictMode } from 'react'
+import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ConfigProvider } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs';
@@ -14,6 +14,7 @@ import ServiceForm from "./shortcodes/ServiceForm/ServiceForm.jsx";
 import PartnerBookings from "./shortcodes/PartnerBookings/PartnerBookings.jsx";
 import BookingCalender from "./shortcodes/BookingCalender/BookingCalender.jsx";
 import SubscriptionDetails from "./shortcodes/dashboard/SubscriptionDetails.jsx";
+import FhProUpgrade from "./common/controls/FhProUpgrade.jsx";
 
 // Define your theme configuration
 const themeConfig = {
@@ -145,6 +146,22 @@ subscriptionDetailsElements.forEach(element => {
     createRoot(element).render(
         <WithConfigProvider>
             <SubscriptionDetails data={subscriptionData} />
+        </WithConfigProvider>
+    );
+});
+
+
+// Combine multiple selectors using a comma
+const clientsProCheck = document.querySelectorAll('.clients_pro_check');
+
+clientsProCheck.forEach(element => {
+    const showUpgradeModal = true;
+    // Render React component into the element
+    createRoot(element).render(
+        <WithConfigProvider>
+            <FhProUpgrade
+                visible={showUpgradeModal}
+            />
         </WithConfigProvider>
     );
 });

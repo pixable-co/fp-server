@@ -48,6 +48,10 @@ class BookingStats {
             return '<p>No valid booking data found.</p>';
         }
 
+        if (!isset($orders[0]) || !is_array($orders[0])) {
+            return '<p>No orders found or invalid data format.</p>';
+        }
+
         // Get current year
         $current_year = date("Y");
 

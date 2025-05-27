@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { XCircle } from 'lucide-react'; // Optional: using Lucide icons for styling
 import FhChart from "../../common/controls/FhChart.jsx";
 import FhProUpgrade from "../../common/controls/FhProUpgrade.jsx";
 
 const ValueOfBookingChart = () => {
     const partner_id = fpserver_settings.partner_post_id;
-    const chartGoal = 150; // 🎯 static goal for this chart
+    const chartGoal = 150;
 
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const [noOrders, setNoOrders] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
     useEffect(() => {
-        // Show upgrade modal if user lacks active subscription
         if (
             typeof fpserver_settings !== 'undefined' &&
             fpserver_settings.has_active_subscription === ''
@@ -30,9 +30,19 @@ const ValueOfBookingChart = () => {
                     body: JSON.stringify({ partner_id }),
                 });
 
-                const orders = await response.json();
-                const currentYear = new Date().getFullYear();
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
 
+                const orders = await response.json();
+
+                if (!Array.isArray(orders) || orders.length === 0) {
+                    setNoOrders(true);
+                    setLoading(false);
+                    return;
+                }
+
+                const currentYear = new Date().getFullYear();
                 const newClientsPerMonth = new Array(12).fill(0);
                 const returningClientsPerMonth = new Array(12).fill(0);
                 const customerOrderCount = {};
@@ -41,6 +51,12 @@ const ValueOfBookingChart = () => {
                     ['processing', 'completed'].includes(order.status) &&
                     new Date(order.created_at).getFullYear() === currentYear
                 );
+
+                if (filteredOrders.length === 0) {
+                    setNoOrders(true);
+                    setLoading(false);
+                    return;
+                }
 
                 filteredOrders.forEach(order => {
                     const email = order.billing?.email || 'unknown';
@@ -86,6 +102,7 @@ const ValueOfBookingChart = () => {
                 setLoading(false);
             } catch (error) {
                 console.error("Failed to load booking chart:", error);
+                setNoOrders(true);
                 setLoading(false);
             }
         };
@@ -98,18 +115,20 @@ const ValueOfBookingChart = () => {
             <h2 className="text-xl font-semibold mb-4">Total value of bookings</h2>
             {loading ? (
                 <p>Loading chart...</p>
+            ) : noOrders ? (
+                <div className="flex flex-col items-center justify-center h-64 bg-gray-100 rounded-lg p-6">
+                    <XCircle className="w-12 h-12 text-red-500 mb-4" />
+                    <p className="text-lg font-medium text-gray-700">No orders found</p>
+                    <p className="text-sm text-gray-500">Your booking data for this year will appear here when available.</p>
+                </div>
             ) : (
                 <FhChart data={chartData} goal={chartGoal} />
             )}
 
-            {/* Modal rendered conditionally */}
             <FhProUpgrade
                 visible={showUpgradeModal}
                 onClose={() => setShowUpgradeModal(false)}
-                onUpgrade={() => {
-                    // handle upgrade action here
-                    console.log('Redirect to upgrade page');
-                }}
+                onUpgrade={() => console.log('Redirect to upgrade page')}
             />
         </div>
     );

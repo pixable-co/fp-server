@@ -134,19 +134,14 @@ valueOfBookingChartElements.forEach(element => {
     );
 });
 
-
-const subscriptionDetailsElements = document.querySelectorAll('.woocommerce_account_subscriptions');
+// Combine multiple selectors using a comma
+const selectors = '.woocommerce_account_subscriptions, .subscription_details';
+const subscriptionDetailsElements = document.querySelectorAll(selectors);
 
 subscriptionDetailsElements.forEach(element => {
-    // const dataKey = element.getAttribute('data-key');
     let subscriptionData = {};
 
-    // Get the localized data from wp_localize_script global object
-    // if (typeof frohubSubscriptionData !== 'undefined' && frohubSubscriptionData.subscription) {
-    //     subscriptionData = frohubSubscriptionData.subscription;
-    // }
-
-    // Render React Component into .subscription_details
+    // Render React component into the element
     createRoot(element).render(
         <WithConfigProvider>
             <SubscriptionDetails data={subscriptionData} />

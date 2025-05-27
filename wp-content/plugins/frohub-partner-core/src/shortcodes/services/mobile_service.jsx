@@ -202,7 +202,7 @@ const MobileService = () => {
                     Set your travel radius and fees to define how far you'll travel for mobile appointments. Adjust fees based on distance to ensure fair compensation for your time and travel.
                 </p>
 
-                <p>Tip: Clients are usually attracted to lower travel fees, so stylists who set a higher service fee but a lower travel fee usually get more bookings.</p>
+                <p>Tip: Clients are usually attracted to lower travel fees, so stylists who set a higher service price but a lower travel fee usually get more bookings.</p>
 
                 {travelFees.map((item, index) => (
                     <div className="fee-row" key={index}>

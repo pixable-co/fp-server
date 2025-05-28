@@ -167,9 +167,26 @@ class MyAccount {
             .fp-tab-wrapper {
                 display: flex; justify-content: flex-start; gap: 30px;
                 border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 40px;
+                overflow-x: auto; /* Allow horizontal scroll on small screens */
             }
-            .fp-tab { text-decoration: none; color: #333; font-weight: 500; padding: 6px 12px; border-bottom: 2px solid transparent; }
+            .fp-tab-wrapper::-webkit-scrollbar {
+                display: none; /* Hide scrollbar on mobile */
+            }
+            .fp-tab {
+                text-decoration: none; color: #333; font-weight: 500;
+                padding: 6px 12px; border-bottom: 2px solid transparent;
+                flex-shrink: 0; /* Prevent tabs from shrinking */
+                white-space: nowrap; /* Prevent tab text from wrapping */
+            }
             .fp-tab.active { border-bottom: 2px solid #000; font-weight: 600; }
+
+            /* Optional: Stack tabs vertically on very narrow screens */
+            @media (max-width: 480px) {
+                .fp-tab-wrapper {
+                    flex-direction: column; gap: 10px; align-items: flex-start;
+                }
+            }
+
             .fp-security-wrapper { max-width: 640px; margin: 0 auto; padding: 10px; }
             .fp-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
             .fp-row { display: flex; gap: 20px; flex-wrap: wrap; }

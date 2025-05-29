@@ -222,11 +222,16 @@ a:hover {
 .input-wrapper.suffix .input-field {
     padding-right: 30px;
     padding-left: 10px;
+
 }
 
 .input-wrapper.prefix .input-field {
     padding-left: 20px;
     padding-right: 10px;
+}
+
+.fee-field {
+    padding-left: 1rem !important;
 }
 
 .action-buttons {

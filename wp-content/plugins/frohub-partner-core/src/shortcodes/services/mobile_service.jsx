@@ -227,7 +227,7 @@ const MobileService = () => {
                                 step="0.01"
                                 value={item.fee}
                                 onChange={(e) => handleInputChange(index, "fee", e.target.value)}
-                                className="input-field"
+                                className="input-field fee-field"
                             />
                         </div>
 

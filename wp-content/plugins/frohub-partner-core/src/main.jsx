@@ -1,3 +1,4 @@
+import PartnerMessage from './shortcodes/Partner/partner_message';
 import ValueOfBookingChart from './shortcodes/Dashboard/value_of_booking_chart';
 import PartnerIntegrations from './shortcodes/Partner/partner_integrations';
 import BookingChart from './shortcodes/Dashboard/booking_chart';
@@ -163,5 +164,13 @@ clientsProCheck.forEach(element => {
                 visible={showUpgradeModal}
             />
         </WithConfigProvider>
+    );
+});
+
+const partnerMessageElements = document.querySelectorAll('.partner_message');
+partnerMessageElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <PartnerMessage dataKey={key} />
     );
 });

@@ -1,6 +1,8 @@
 <?php
 namespace FPServer;
 
+use FPServer\PartnerConversations;
+
 use FPServer\ConnectCalender;
 
 
@@ -25,5 +27,6 @@ class Ajax {
 // 		Xero::init();
 		ConnectCalender::init();
 		ForgotPassword::init();
+		PartnerConversations::init();
 	}
 }

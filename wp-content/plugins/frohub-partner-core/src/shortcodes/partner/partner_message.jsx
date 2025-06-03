@@ -53,7 +53,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
             if (activeConversation) {
                 loadComments(activeConversation.client_id, false);
             }
-        }, 3000);
+        }, 5000);
     };
 
     const stopConversationPolling = () => {
@@ -152,8 +152,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         lastCommentTimestampRef.current = null;
     };
 
-    const handleSendMessage = async (content) => {
-        if (!activeConversation || !content.trim()) return;
+    const handleSendMessage = async (content, imageUrl = '') => {
+        if (!activeConversation || (!content.trim() && !imageUrl)) return;
 
         const tempMessage = {
             comment_id: `temp_${Date.now()}`,
@@ -161,6 +161,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
             author: 'You',
             partner_id: currentUserPartnerPostId,
             date: new Date().toISOString(),
+            image_url: imageUrl,
             status: 'pending'
         };
 
@@ -176,12 +177,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                 loadComments(activeConversation.client_id, false);
                 setConversations(prev => prev.map(conv =>
                     conv.client_id === activeConversation.client_id
-                        ? {
-                            ...conv,
-                            last_message: content,
-                            last_activity: new Date().toISOString(),
-                            read_by_partner: true
-                        }
+                        ? { ...conv, last_message: content, last_activity: new Date().toISOString(), read_by_partner: true }
                         : conv
                 ));
             } else {
@@ -197,9 +193,59 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
             post_id: postId,
             conversation_id: activeConversationId,
             partner_id: currentUserPartnerPostId,
-            comment: content
+            comment: content,
+            image_url: imageUrl  // <-- make sure to include this
         });
     };
+
+    // const handleSendMessage = async (content) => {
+    //     if (!activeConversation || !content.trim()) return;
+    //
+    //     const tempMessage = {
+    //         comment_id: `temp_${Date.now()}`,
+    //         content,
+    //         author: 'You',
+    //         partner_id: currentUserPartnerPostId,
+    //         date: new Date().toISOString(),
+    //         status: 'pending'
+    //     };
+    //
+    //     setComments(prev => [...prev, tempMessage]);
+    //     setLoading(prev => ({ ...prev, sending: true }));
+    //     setError(null);
+    //
+    //     const postId = activeConversationId || activeConversation.client_id;
+    //
+    //     fetchData('fpserver/send_partner_message', (response) => {
+    //         if (response.success) {
+    //             setComments(prev => prev.filter(comment => comment.comment_id !== tempMessage.comment_id));
+    //             loadComments(activeConversation.client_id, false);
+    //             setConversations(prev => prev.map(conv =>
+    //                 conv.client_id === activeConversation.client_id
+    //                     ? {
+    //                         ...conv,
+    //                         last_message: content,
+    //                         last_activity: new Date().toISOString(),
+    //                         read_by_partner: true
+    //                     }
+    //                     : conv
+    //             ));
+    //         } else {
+    //             setComments(prev => prev.map(comment =>
+    //                 comment.comment_id === tempMessage.comment_id
+    //                     ? { ...comment, status: 'failed' }
+    //                     : comment
+    //             ));
+    //             setError('Failed to send message: ' + (response.message || 'Unknown error'));
+    //         }
+    //         setLoading(prev => ({ ...prev, sending: false }));
+    //     }, {
+    //         post_id: postId,
+    //         conversation_id: activeConversationId,
+    //         partner_id: currentUserPartnerPostId,
+    //         comment: content
+    //     });
+    // };
 
     return (
         <div className="flex h-screen bg-gray-50">

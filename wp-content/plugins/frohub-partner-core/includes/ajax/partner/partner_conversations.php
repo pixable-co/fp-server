@@ -14,11 +14,13 @@ class PartnerConversations {
         add_action('wp_ajax_fpserver/partner_conversations', array($self, 'partner_conversations'));
         add_action('wp_ajax_fpserver/get_conversation_comments', array($self, 'get_conversation_comments'));
         add_action('wp_ajax_fpserver/send_partner_message', array($self, 'send_partner_message'));
+        add_action('wp_ajax_fpserver/upload_comment_image', array($self, 'upload_comment_image'));
 
         // AJAX for non-logged-in users
         add_action('wp_ajax_nopriv_fpserver/partner_conversations', array($self, 'partner_conversations'));
         add_action('wp_ajax_nopriv_fpserver/get_conversation_comments', array($self, 'get_conversation_comments'));
         add_action('wp_ajax_nopriv_fpserver/send_partner_message', array($self, 'send_partner_message'));
+        add_action('wp_ajax_nopriv_fpserver/upload_comment_image', array($self, 'upload_comment_image'));
     }
 
     public function partner_conversations() {
@@ -86,103 +88,6 @@ class PartnerConversations {
             wp_send_json_error(['message' => 'A fatal error occurred.']);
         }
     }
-
-//     public function partner_conversations() {
-//         try {
-//
-//             check_ajax_referer('fpserver_nonce');
-//
-//             // Get current user and partner ID
-//             if (!is_user_logged_in()) {
-//                 error_log('User not logged in');
-//                 wp_send_json_error(['message' => 'User not logged in.']);
-//                 return;
-//             }
-//
-//             $current_user_id = get_current_user_id();
-//             error_log('Current user ID: ' . $current_user_id);
-//
-//             $partner_id = get_field('partner_post_id', 'user_' . $current_user_id);
-//             error_log('Partner ID: ' . ($partner_id ?: 'not found'));
-//
-//             if (!$partner_id) {
-//                 wp_send_json_error(['message' => 'Partner ID not found for current user.']);
-//                 return;
-//             }
-//
-//             // Query for client posts associated with this partner
-//             $args = array(
-//                 'post_type'      => 'client',
-//                 'posts_per_page' => -1,
-//                 'meta_query'     => array(
-//                     array(
-//                         'key'     => 'partner_id',
-//                         'value'   => $partner_id,
-//                         'compare' => '='
-//                     )
-//                 ),
-//                 'post_status' => 'publish'
-//             );
-//
-//             $query = new \WP_Query($args);
-//             error_log('Query found posts: ' . $query->found_posts);
-//
-//             $conversations = [];
-//
-//             if ($query->have_posts()) {
-//                 while ($query->have_posts()) {
-//                     $query->the_post();
-//                     $client_id = get_the_ID();
-//
-//                     // Get client details - check if ACF functions exist
-//                     $firstName = function_exists('get_field') ? get_field('first_name', $client_id) : '';
-//                     $lastName = function_exists('get_field') ? get_field('last_name', $client_id) : '';
-//                     $fullName = trim($firstName . ' ' . $lastName);
-//
-//                     // Get conversation metadata
-//                     $ecomm_conversation_id = function_exists('get_field') ? get_field('ecommerce_conversation_post_id', $client_id) : '';
-//                     $read_by_partner = function_exists('get_field') ? get_field('read_by_partner', $client_id) : false;
-//
-//                     // Get last activity/message - add error handling
-//                     $last_activity = get_the_modified_date('c', $client_id);
-//                     if (!$last_activity) {
-//                         $last_activity = get_the_date('c', $client_id);
-//                     }
-//
-//                     $conversations[] = [
-//                         'client_id' => (int)$client_id,
-//                         'customer_name' => $fullName ?: 'Client #' . $client_id,
-//                         'ecommerce_conversation_post_id' => $ecomm_conversation_id,
-//                         'read_by_partner' => (bool)$read_by_partner,
-//                         'last_activity' => $last_activity ?: date('c'), // Fallback to current date
-//                         'permalink' => get_permalink($client_id) ?: '',
-//                         'status' => 'Active',
-//                         'last_message' => '',
-//                     ];
-//                 }
-//                 wp_reset_postdata();
-//             }
-//
-//             // Sort conversations by last activity (most recent first)
-//             if (!empty($conversations)) {
-//                 usort($conversations, function($a, $b) {
-//                     $timeA = strtotime($a['last_activity']);
-//                     $timeB = strtotime($b['last_activity']);
-//                     return $timeB - $timeA;
-//                 });
-//             }
-//
-//             error_log('Returning ' . count($conversations) . ' conversations');
-//             wp_send_json_success($conversations);
-//
-//         } catch (Exception $e) {
-//             error_log('Error in partner_conversations: ' . $e->getMessage());
-//             wp_send_json_error(['message' => 'An error occurred while fetching conversations.']);
-//         } catch (Error $e) {
-//             error_log('Fatal error in partner_conversations: ' . $e->getMessage());
-//             wp_send_json_error(['message' => 'A fatal error occurred.']);
-//         }
-//     }
 
     public function get_conversation_comments() {
         try {
@@ -285,7 +190,59 @@ class PartnerConversations {
         }
     }
 
-    function send_partner_message() {
+
+    public function upload_comment_image() {
+        check_ajax_referer('fpserver_nonce');
+
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => 'User not logged in.']);
+        }
+
+        if (empty($_FILES['file'])) {
+            wp_send_json_error(['message' => 'No file uploaded.']);
+        }
+
+        $basicAuth = get_field('frohub_ecommerce_basic_authentication', 'option');
+        if (!$basicAuth) {
+            wp_send_json_error(['message' => 'Authentication not configured.']);
+        }
+
+        $file = $_FILES['file'];
+        $upload = wp_upload_bits($file['name'], null, file_get_contents($file['tmp_name']));
+
+        if ($upload['error']) {
+            wp_send_json_error(['message' => 'Upload error: ' . $upload['error']]);
+        }
+
+        // Prepare external API request
+        $remote_api_url = 'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/upload-comment-image';
+
+        $response = wp_remote_post($remote_api_url, [
+            'method'    => 'POST',
+            'headers'   => [
+                'Authorization' => $basicAuth,
+            ],
+            'body'      => [
+                'file' => curl_file_create($file['tmp_name'], $file['type'], $file['name']),
+            ],
+            'timeout'   => 30,
+        ]);
+
+        if (is_wp_error($response)) {
+            wp_send_json_error(['message' => $response->get_error_message()]);
+        }
+
+        $response_body = json_decode(wp_remote_retrieve_body($response), true);
+        if (!empty($response_body['success']) && !empty($response_body['url'])) {
+            wp_send_json_success(['url' => $response_body['url']]);
+        } else {
+            wp_send_json_error(['message' => $response_body['error'] ?? 'Unknown error']);
+        }
+
+        wp_die();
+    }
+
+    public function send_partner_message() {
         // Security: Verify nonce
         check_ajax_referer('fpserver_nonce', '_ajax_nonce');
 

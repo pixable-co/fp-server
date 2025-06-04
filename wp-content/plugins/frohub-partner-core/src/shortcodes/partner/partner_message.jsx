@@ -14,6 +14,10 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     const [loading, setLoading] = useState({ conversations: false, comments: false, sending: false });
     const [error, setError] = useState(null);
 
+    const urlCustomerId = typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('customer_id')
+        : null;
+
     const conversationIntervalRef = useRef(null);
     const lastCommentTimestampRef = useRef(null);
 
@@ -71,9 +75,22 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
             if (response.success) {
                 const data = response.data || [];
                 setConversations(Array.isArray(data) ? data : []);
-                if (data.length > 0 && !activeConversation) {
-                    setActiveConversation(data[0]);
-                    setActiveConversationId(data[0].conversation_id);
+
+                if (data.length > 0) {
+                    let selected = null;
+
+                    if (urlCustomerId) {
+                        selected = data.find(c => String(c.customer_id) === String(urlCustomerId));
+                    }
+
+                    if (!selected && !activeConversation) {
+                        selected = data[0];
+                    }
+
+                    if (selected) {
+                        setActiveConversation(selected);
+                        setActiveConversationId(selected.conversation_id);
+                    }
                 }
             } else {
                 setError('Failed to load conversations: ' + (response.message || 'Unknown error'));
@@ -82,6 +99,26 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
             setLoading(prev => ({ ...prev, conversations: false }));
         });
     };
+
+    // const loadConversations = () => {
+    //     setLoading(prev => ({ ...prev, conversations: true }));
+    //     setError(null);
+    //
+    //     fetchData('fpserver/partner_conversations', (response) => {
+    //         if (response.success) {
+    //             const data = response.data || [];
+    //             setConversations(Array.isArray(data) ? data : []);
+    //             if (data.length > 0 && !activeConversation) {
+    //                 setActiveConversation(data[0]);
+    //                 setActiveConversationId(data[0].conversation_id);
+    //             }
+    //         } else {
+    //             setError('Failed to load conversations: ' + (response.message || 'Unknown error'));
+    //             setConversations([]);
+    //         }
+    //         setLoading(prev => ({ ...prev, conversations: false }));
+    //     });
+    // };
 
     const loadComments = (conversationPostId, showLoading = true) => {
         if (showLoading) setLoading(prev => ({ ...prev, comments: true }));

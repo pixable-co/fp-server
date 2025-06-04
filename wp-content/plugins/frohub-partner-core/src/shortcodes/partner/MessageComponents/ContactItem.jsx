@@ -24,6 +24,7 @@ const ContactItem = ({ conversation, isActive, onClick, isLoading = false }) => 
                         {conversation.customer_name || `Client #${conversation.client_id}`}
                     </h3>
                     <input type="hidden" value={conversation.conversation_id} />
+                    <input type="hidden" value={conversation.customer_id} />
                     {!conversation.read_by_partner && (
                         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     )}

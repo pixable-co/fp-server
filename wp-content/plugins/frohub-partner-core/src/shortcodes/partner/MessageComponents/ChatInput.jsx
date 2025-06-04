@@ -8,27 +8,6 @@ const ChatInput = ({ onSendMessage, isLoading = false, disabled = false }) => {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null); // Reference for hidden input
 
-    // const handleSubmit = async () => {
-    //     if ((message.trim() || imageFile) && !isLoading && !disabled) {
-    //         if (imageFile) {
-    //             setIsUploading(true);
-    //             uploadImageDirect(imageFile, (response) => {
-    //                 setIsUploading(false);
-    //                 if (response.success && response.data.url) {
-    //                     onSendMessage(message, response.data.url);
-    //                 } else {
-    //                     alert(response.data?.message || 'Upload failed');
-    //                 }
-    //                 setImageFile(null);
-    //                 setImagePreview(null);
-    //             });
-    //         } else {
-    //             await onSendMessage(message, '');
-    //         }
-    //         setMessage('');
-    //     }
-    // };
-
     const handleSubmit = async () => {
         if ((!message.trim() && !imageFile) || isLoading || disabled) {
             return;

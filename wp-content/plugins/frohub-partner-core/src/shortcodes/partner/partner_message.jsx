@@ -13,6 +13,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     const [userPartnerId, setUserPartnerId] = useState(currentUserPartnerPostId);
     const [loading, setLoading] = useState({ conversations: false, comments: false, sending: false });
     const [error, setError] = useState(null);
+    const autoReplyMessage = "Thanks, we’ll get back to you shortly."; // Set to null/'' to disable
+    const [autoReplySent, setAutoReplySent] = useState(false);
 
     const urlCustomerId = typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('customer_id')
@@ -49,6 +51,18 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     useEffect(() => {
         const chatContainer = document.getElementById('chat-messages-container');
         if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, [comments]);
+
+    useEffect(() => {
+        if (!autoReplyMessage || autoReplySent || comments.length === 0) return;
+
+        const lastComment = comments[comments.length - 1];
+        const sentFrom = lastComment?.meta_data?.sent_from?.[0] || '';
+
+        if (sentFrom !== 'partner') {
+            setAutoReplySent(true);
+            handleSendMessage(autoReplyMessage);
+        }
     }, [comments]);
 
     const startConversationPolling = () => {
@@ -100,26 +114,6 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         });
     };
 
-    // const loadConversations = () => {
-    //     setLoading(prev => ({ ...prev, conversations: true }));
-    //     setError(null);
-    //
-    //     fetchData('fpserver/partner_conversations', (response) => {
-    //         if (response.success) {
-    //             const data = response.data || [];
-    //             setConversations(Array.isArray(data) ? data : []);
-    //             if (data.length > 0 && !activeConversation) {
-    //                 setActiveConversation(data[0]);
-    //                 setActiveConversationId(data[0].conversation_id);
-    //             }
-    //         } else {
-    //             setError('Failed to load conversations: ' + (response.message || 'Unknown error'));
-    //             setConversations([]);
-    //         }
-    //         setLoading(prev => ({ ...prev, conversations: false }));
-    //     });
-    // };
-
     const loadComments = (conversationPostId, showLoading = true) => {
         if (showLoading) setLoading(prev => ({ ...prev, comments: true }));
         setError(null);
@@ -147,20 +141,27 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                         });
 
                         if (newComments.length > 0) {
+                            const latestNew = newComments[newComments.length - 1];
+                            lastCommentTimestampRef.current = new Date(latestNew.date).getTime();
+
                             setComments(prevComments => {
                                 const cleanedComments = prevComments.filter(c =>
                                     !c.comment_id.toString().startsWith('temp_') || c.status === 'failed'
                                 );
                                 const existingIds = new Set(cleanedComments.map(c => c.comment_id));
                                 const uniqueNewComments = newComments.filter(c => !existingIds.has(c.comment_id));
-
-                                if (uniqueNewComments.length > 0) {
-                                    const latestNew = uniqueNewComments[uniqueNewComments.length - 1];
-                                    lastCommentTimestampRef.current = new Date(latestNew.date).getTime();
-                                    return [...cleanedComments, ...uniqueNewComments];
-                                }
-                                return prevComments;
+                                return [...cleanedComments, ...uniqueNewComments];
                             });
+
+                            // ✅ Auto-reply check for new incoming message from customer
+                            const newIncoming = newComments.find(c =>
+                                c?.meta_data?.sent_from?.[0] !== 'partner'
+                            );
+
+                            if (newIncoming && autoReplyMessage && !autoReplySent) {
+                                setAutoReplySent(true);
+                                handleSendMessage(autoReplyMessage);
+                            }
                         }
                     }
                 }
@@ -182,10 +183,82 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         }, { post_id: postId });
     };
 
+    // const loadComments = (conversationPostId, showLoading = true) => {
+    //     if (showLoading) setLoading(prev => ({ ...prev, comments: true }));
+    //     setError(null);
+    //
+    //     const postId = activeConversationId || conversationPostId;
+    //
+    //     fetchData('fpserver/get_conversation_comments', (response) => {
+    //         if (response.success) {
+    //             const data = response.data || {};
+    //             const commentsData = data.comments || [];
+    //             const partnerIdFromResponse = data.user_partner_id;
+    //
+    //             if (Array.isArray(commentsData)) {
+    //                 if (showLoading || comments.length === 0) {
+    //                     setComments(commentsData);
+    //                     if (commentsData.length > 0) {
+    //                         const latestComment = commentsData[commentsData.length - 1];
+    //                         lastCommentTimestampRef.current = new Date(latestComment.date).getTime();
+    //                     }
+    //                 } else {
+    //                     const lastTimestamp = lastCommentTimestampRef.current;
+    //                     const newComments = commentsData.filter(comment => {
+    //                         const commentTimestamp = new Date(comment.date).getTime();
+    //                         return !lastTimestamp || commentTimestamp > lastTimestamp;
+    //                     });
+    //
+    //                     if (newComments.length > 0) {
+    //                         const latestNew = newComments[newComments.length - 1];
+    //                         lastCommentTimestampRef.current = new Date(latestNew.date).getTime();
+    //
+    //                         setComments(prevComments => {
+    //                             const cleanedComments = prevComments.filter(c =>
+    //                                 !c.comment_id.toString().startsWith('temp_') || c.status === 'failed'
+    //                             );
+    //                             const existingIds = new Set(cleanedComments.map(c => c.comment_id));
+    //                             const uniqueNewComments = newComments.filter(c => !existingIds.has(c.comment_id));
+    //                             return [...cleanedComments, ...uniqueNewComments];
+    //                         });
+    //
+    //                         // 👇 AUTO REPLY LOGIC
+    //                         const newIncomingMessages = newComments.filter(comment =>
+    //                             comment.author !== 'You' &&
+    //                             comment.partner_id !== currentUserPartnerPostId
+    //                         );
+    //
+    //                         if (newIncomingMessages.length > 0 && autoReplyMessage && !autoReplySent) {
+    //                             console.log("📩 Auto-reply triggered:", newIncomingMessages);
+    //                             setAutoReplySent(true);
+    //                             handleSendMessage(autoReplyMessage);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //
+    //             if (partnerIdFromResponse) setUserPartnerId(partnerIdFromResponse);
+    //             setConversations(prev => prev.map(conv =>
+    //                 conv.client_id === conversationPostId
+    //                     ? { ...conv, read_by_partner: true }
+    //                     : conv
+    //             ));
+    //         } else {
+    //             if (showLoading) {
+    //                 setError('Failed to load comments: ' + (response.data?.message || 'Unknown error'));
+    //                 setComments([]);
+    //             }
+    //         }
+    //
+    //         if (showLoading) setLoading(prev => ({ ...prev, comments: false }));
+    //     }, { post_id: postId });
+    // };
+
     const handleConversationSelect = (conversation, conversationId) => {
         setActiveConversation(conversation);
         setActiveConversationId(conversationId);
         setComments([]);
+        setAutoReplySent(false);
         lastCommentTimestampRef.current = null;
     };
 

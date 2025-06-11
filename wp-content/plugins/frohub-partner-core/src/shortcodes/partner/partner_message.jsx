@@ -14,7 +14,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     const [loading, setLoading] = useState({ conversations: false, comments: false, sending: false });
     const [error, setError] = useState(null);
     const autoReplyMessage = "Thanks, we’ll get back to you shortly."; // Set to null/'' to disable
-    const [autoReplySent, setAutoReplySent] = useState(false);
+    const [autoReplySent, setAutoReplySent] = useState(true);
 
     const urlCustomerId = typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('customer_id')

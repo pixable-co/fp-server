@@ -53,7 +53,11 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
             title: 'Name',
             dataIndex: 'customer_name',
             key: 'customer_name',
-            render: text => <span style={{ color: 'tomato' }}>{text}</span>
+            render: (text, record) => (
+                <a href={`/view-client/?id=${record.customer_id}`}>
+                    <span style={{ color: 'tomato' }}>{text}</span>
+                </a>
+            )
         },
         {
             title: 'Phone',

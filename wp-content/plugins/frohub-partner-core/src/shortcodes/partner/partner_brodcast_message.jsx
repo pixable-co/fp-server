@@ -61,14 +61,9 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         },
         {
             title: 'Phone',
-            dataIndex: 'phone',
-            key: 'phone'
+            dataIndex: 'customer_phone',
+            key: 'customer_phone'
         },
-        {
-            title: 'Email',
-            dataIndex: 'email',
-            key: 'email'
-        }
     ];
 
     const rowSelection = {

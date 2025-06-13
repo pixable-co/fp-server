@@ -11,7 +11,7 @@ const SubscriptionDetails = () => {
     const isLitePlan = !hasActiveSubscription || hasActiveSubscription === '';
 
     const handleUpgrade = () => {
-        window.location.href = `/checkout/?clear-cart&add-to-cart=4154`;
+        window.location.href = `/product/frohub/?switch-subscription=5479&item=659`;
     };
 
     return (

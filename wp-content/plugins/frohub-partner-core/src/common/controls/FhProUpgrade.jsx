@@ -20,8 +20,9 @@ const FhProUpgrade = ({ visible }) => {
     };
 
     const handleUpgrade = () => {
-        const productId = billingType === 'annual' ? 4154 : 4153;
-        window.location.href = `/checkout/?clear-cart&add-to-cart=${productId}`;
+        // const productId = billingType === 'annual' ? 4154 : 4153;
+        // https://frohubpartners.mystagingwebsite.com
+        window.location.href = `/product/frohub/?switch-subscription=5479&item=659`;
     };
 
     const isAnnual = billingType === 'annual';

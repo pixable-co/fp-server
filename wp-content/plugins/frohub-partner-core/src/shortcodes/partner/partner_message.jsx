@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Skeleton } from "antd";
 import { fetchData } from '../../services/fetchData';
 import ContactItem from "./MessageComponents/ContactItem.jsx";
 import ChatInput from './MessageComponents/ChatInput';
@@ -183,77 +184,6 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         }, { post_id: postId });
     };
 
-    // const loadComments = (conversationPostId, showLoading = true) => {
-    //     if (showLoading) setLoading(prev => ({ ...prev, comments: true }));
-    //     setError(null);
-    //
-    //     const postId = activeConversationId || conversationPostId;
-    //
-    //     fetchData('fpserver/get_conversation_comments', (response) => {
-    //         if (response.success) {
-    //             const data = response.data || {};
-    //             const commentsData = data.comments || [];
-    //             const partnerIdFromResponse = data.user_partner_id;
-    //
-    //             if (Array.isArray(commentsData)) {
-    //                 if (showLoading || comments.length === 0) {
-    //                     setComments(commentsData);
-    //                     if (commentsData.length > 0) {
-    //                         const latestComment = commentsData[commentsData.length - 1];
-    //                         lastCommentTimestampRef.current = new Date(latestComment.date).getTime();
-    //                     }
-    //                 } else {
-    //                     const lastTimestamp = lastCommentTimestampRef.current;
-    //                     const newComments = commentsData.filter(comment => {
-    //                         const commentTimestamp = new Date(comment.date).getTime();
-    //                         return !lastTimestamp || commentTimestamp > lastTimestamp;
-    //                     });
-    //
-    //                     if (newComments.length > 0) {
-    //                         const latestNew = newComments[newComments.length - 1];
-    //                         lastCommentTimestampRef.current = new Date(latestNew.date).getTime();
-    //
-    //                         setComments(prevComments => {
-    //                             const cleanedComments = prevComments.filter(c =>
-    //                                 !c.comment_id.toString().startsWith('temp_') || c.status === 'failed'
-    //                             );
-    //                             const existingIds = new Set(cleanedComments.map(c => c.comment_id));
-    //                             const uniqueNewComments = newComments.filter(c => !existingIds.has(c.comment_id));
-    //                             return [...cleanedComments, ...uniqueNewComments];
-    //                         });
-    //
-    //                         // 👇 AUTO REPLY LOGIC
-    //                         const newIncomingMessages = newComments.filter(comment =>
-    //                             comment.author !== 'You' &&
-    //                             comment.partner_id !== currentUserPartnerPostId
-    //                         );
-    //
-    //                         if (newIncomingMessages.length > 0 && autoReplyMessage && !autoReplySent) {
-    //                             console.log("📩 Auto-reply triggered:", newIncomingMessages);
-    //                             setAutoReplySent(true);
-    //                             handleSendMessage(autoReplyMessage);
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //
-    //             if (partnerIdFromResponse) setUserPartnerId(partnerIdFromResponse);
-    //             setConversations(prev => prev.map(conv =>
-    //                 conv.client_id === conversationPostId
-    //                     ? { ...conv, read_by_partner: true }
-    //                     : conv
-    //             ));
-    //         } else {
-    //             if (showLoading) {
-    //                 setError('Failed to load comments: ' + (response.data?.message || 'Unknown error'));
-    //                 setComments([]);
-    //             }
-    //         }
-    //
-    //         if (showLoading) setLoading(prev => ({ ...prev, comments: false }));
-    //     }, { post_id: postId });
-    // };
-
     const handleConversationSelect = (conversation, conversationId) => {
         setActiveConversation(conversation);
         setActiveConversationId(conversationId);
@@ -308,69 +238,32 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         });
     };
 
-    // const handleSendMessage = async (content) => {
-    //     if (!activeConversation || !content.trim()) return;
-    //
-    //     const tempMessage = {
-    //         comment_id: `temp_${Date.now()}`,
-    //         content,
-    //         author: 'You',
-    //         partner_id: currentUserPartnerPostId,
-    //         date: new Date().toISOString(),
-    //         status: 'pending'
-    //     };
-    //
-    //     setComments(prev => [...prev, tempMessage]);
-    //     setLoading(prev => ({ ...prev, sending: true }));
-    //     setError(null);
-    //
-    //     const postId = activeConversationId || activeConversation.client_id;
-    //
-    //     fetchData('fpserver/send_partner_message', (response) => {
-    //         if (response.success) {
-    //             setComments(prev => prev.filter(comment => comment.comment_id !== tempMessage.comment_id));
-    //             loadComments(activeConversation.client_id, false);
-    //             setConversations(prev => prev.map(conv =>
-    //                 conv.client_id === activeConversation.client_id
-    //                     ? {
-    //                         ...conv,
-    //                         last_message: content,
-    //                         last_activity: new Date().toISOString(),
-    //                         read_by_partner: true
-    //                     }
-    //                     : conv
-    //             ));
-    //         } else {
-    //             setComments(prev => prev.map(comment =>
-    //                 comment.comment_id === tempMessage.comment_id
-    //                     ? { ...comment, status: 'failed' }
-    //                     : comment
-    //             ));
-    //             setError('Failed to send message: ' + (response.message || 'Unknown error'));
-    //         }
-    //         setLoading(prev => ({ ...prev, sending: false }));
-    //     }, {
-    //         post_id: postId,
-    //         conversation_id: activeConversationId,
-    //         partner_id: currentUserPartnerPostId,
-    //         comment: content
-    //     });
-    // };
-
     return (
         <div className="flex h-screen bg-gray-50">
-            <div className="w-80 bg-white border-r border-gray-200">
-                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">Conversations</h2>
-                    <button onClick={loadConversations} disabled={loading.conversations} className="p-2 text-gray-500 hover:text-blue-600">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                    </button>
-                </div>
+            <div className="message-conversations w-80 bg-white">
                 <div className="overflow-y-auto">
                     {loading.conversations ? (
-                        <div className="text-sm text-gray-500 mt-1">Loading conversations...</div>
+                        <div className="text-sm text-gray-500 mt-1 flex flex-col space-y-4">
+                            <div className="contact-list-avatar p-4 flex space-x-2 justify-around">
+                                <Skeleton.Avatar size={"large"} active />
+                                <Skeleton.Input  size={"large"} active />
+                            </div>
+
+                            <div className="contact-list-avatar p-4 flex space-x-2 justify-around">
+                                <Skeleton.Avatar size={"large"} active />
+                                <Skeleton.Input  size={"large"} active />
+                            </div>
+
+                            <div className="contact-list-avatar p-4 flex space-x-2 justify-around">
+                                <Skeleton.Avatar size={"large"} active />
+                                <Skeleton.Input  size={"large"} active />
+                            </div>
+
+                            <div className="contact-list-avatar p-4 flex space-x-2 justify-around">
+                                <Skeleton.Avatar size={"large"} active />
+                                <Skeleton.Input  size={"large"} active />
+                            </div>
+                        </div>
                     ) : (
                         conversations.map(conversation => (
                             <ContactItem
@@ -387,17 +280,14 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col">
+            <div className="conversation-details flex-1 flex flex-col">
                 {activeConversation ? (
                     <>
-                        <div className="bg-white border-b border-gray-200 p-4 flex items-center">
+                        <div className="top-avatar bg-white p-4 flex items-center">
                             <Avatar name={activeConversation.customer_name || 'Customer'} />
                             <div className="ml-3">
                                 <h3 className="font-medium text-gray-900">{activeConversation.customer_name || `Client #${activeConversation.client_id}`}</h3>
-                                <p className="text-sm text-gray-500">
-                                    {activeConversation.status || 'Active conversation'}
-                                    {activeConversationId && ` • ID: ${activeConversationId}`}
-                                </p>
+
                             </div>
                         </div>
 

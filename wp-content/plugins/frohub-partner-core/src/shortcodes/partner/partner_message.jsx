@@ -15,7 +15,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     const [loading, setLoading] = useState({ conversations: false, comments: false, sending: false });
     const [error, setError] = useState(null);
     const autoReplyMessage = "Thanks, we’ll get back to you shortly."; // Set to null/'' to disable
-    const [autoReplySent, setAutoReplySent] = useState(true);
+    const [autoReplySent, setAutoReplySent] = useState(false);
 
     const urlCustomerId = typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('customer_id')
@@ -54,17 +54,17 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
     }, [comments]);
 
-    useEffect(() => {
-        if (!autoReplyMessage || autoReplySent || comments.length === 0) return;
-
-        const lastComment = comments[comments.length - 1];
-        const sentFrom = lastComment?.meta_data?.sent_from?.[0] || '';
-
-        if (sentFrom !== 'partner') {
-            setAutoReplySent(true);
-            handleSendMessage(autoReplyMessage);
-        }
-    }, [comments]);
+    // useEffect(() => {
+    //     if (!autoReplyMessage || autoReplySent || comments.length === 0) return;
+    //
+    //     const lastComment = comments[comments.length - 1];
+    //     const sentFrom = lastComment?.meta_data?.sent_from?.[0] || '';
+    //
+    //     if (sentFrom !== 'partner') {
+    //         setAutoReplySent(true);
+    //         handleSendMessage(autoReplyMessage);
+    //     }
+    // }, [comments]);
 
     const startConversationPolling = () => {
         stopConversationPolling();

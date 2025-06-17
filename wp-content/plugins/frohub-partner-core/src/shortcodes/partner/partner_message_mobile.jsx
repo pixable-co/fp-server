@@ -15,10 +15,8 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
     const [loading, setLoading] = useState({ conversations: false, comments: false, sending: false });
     const [error, setError] = useState(null);
     const autoReplyMessage = "Thanks, we'll get back to you shortly."; // Set to null/'' to disable
-    const [autoReplySent, setAutoReplySent] = useState(true);
-
-    // Mobile specific state
-    const [showConversations, setShowConversations] = useState(true);
+    const [autoReplySent, setAutoReplySent] = useState(false);
+    const [showConversationList, setShowConversationList] = useState(true);
 
     const urlCustomerId = typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('customer_id')
@@ -37,6 +35,7 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
             if (conversation) {
                 setActiveConversation(conversation);
                 setActiveConversationId(conversation.conversation_id);
+                setShowConversationList(false);
             }
         }
     }, [initialConversationId, conversations]);
@@ -53,21 +52,21 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
     }, [activeConversation]);
 
     useEffect(() => {
-        const chatContainer = document.getElementById('mobile-chat-messages-container');
+        const chatContainer = document.getElementById('chat-messages-container-mobile');
         if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
     }, [comments]);
 
-    useEffect(() => {
-        if (!autoReplyMessage || autoReplySent || comments.length === 0) return;
-
-        const lastComment = comments[comments.length - 1];
-        const sentFrom = lastComment?.meta_data?.sent_from?.[0] || '';
-
-        if (sentFrom !== 'partner') {
-            setAutoReplySent(true);
-            handleSendMessage(autoReplyMessage);
-        }
-    }, [comments]);
+    // useEffect(() => {
+    //     if (!autoReplyMessage || autoReplySent || comments.length === 0) return;
+    //
+    //     const lastComment = comments[comments.length - 1];
+    //     const sentFrom = lastComment?.meta_data?.sent_from?.[0] || '';
+    //
+    //     if (sentFrom !== 'partner') {
+    //         setAutoReplySent(true);
+    //         handleSendMessage(autoReplyMessage);
+    //     }
+    // }, [comments]);
 
     const startConversationPolling = () => {
         stopConversationPolling();
@@ -99,16 +98,13 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
 
                     if (urlCustomerId) {
                         selected = data.find(c => String(c.customer_id) === String(urlCustomerId));
+                        if (selected) {
+                            setActiveConversation(selected);
+                            setActiveConversationId(selected.conversation_id);
+                            setShowConversationList(false);
+                        }
                     }
-
-                    if (!selected && !activeConversation) {
-                        selected = data[0];
-                    }
-
-                    if (selected) {
-                        setActiveConversation(selected);
-                        setActiveConversationId(selected.conversation_id);
-                    }
+                    // Don't auto-select first conversation - let user choose
                 }
             } else {
                 setError('Failed to load conversations: ' + (response.message || 'Unknown error'));
@@ -193,12 +189,11 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
         setComments([]);
         setAutoReplySent(false);
         lastCommentTimestampRef.current = null;
-        // Switch to chat view on mobile
-        setShowConversations(false);
+        setShowConversationList(false);
     };
 
     const handleBackToConversations = () => {
-        setShowConversations(true);
+        setShowConversationList(true);
     };
 
     const handleSendMessage = async (content, imageUrl = '') => {
@@ -248,184 +243,94 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
     };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50 w-full max-w-full overflow-hidden">
-            {showConversations ? (
-                // Mobile Conversations List View
-                <div className="flex flex-col h-full w-full bg-white">
-                    <div className="flex-shrink-0 px-4 py-3 bg-white border-b border-gray-200">
-                        <h2 className="text-xl font-semibold text-gray-900">Messages</h2>
-                    </div>
+        <div className="flex flex-col h-screen bg-white">
+            {/* Conversation List View */}
+            {showConversationList && (
+                <div className="flex flex-col h-full">
+                    {/* Conversations List */}
                     <div className="flex-1 overflow-y-auto">
                         {loading.conversations ? (
-                            <div className="p-4 space-y-3">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div key={i} className="flex items-center space-x-3 p-3">
-                                        <Skeleton.Avatar size={48} active />
+                            <div className="flex flex-col space-y-4 p-4">
+                                {[...Array(4)].map((_, index) => (
+                                    <div key={index} className="flex items-center space-x-3 p-3">
+                                        <Skeleton.Avatar size="large" active />
                                         <div className="flex-1">
-                                            <Skeleton.Input style={{ width: '70%', height: '16px' }} active />
-                                            <Skeleton.Input style={{ width: '50%', height: '14px', marginTop: '8px' }} active />
+                                            <Skeleton.Input size="small" active style={{ width: '60%' }} />
+                                            <div className="mt-2">
+                                                <Skeleton.Input size="small" active style={{ width: '80%' }} />
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="divide-y divide-gray-100">
+                            <>
                                 {conversations.map(conversation => (
                                     <ContactItem
                                         key={conversation.client_id}
                                         conversation={conversation}
-                                        isActive={activeConversation?.client_id === conversation.client_id}
+                                        isActive={false}
                                         onClick={handleConversationSelect}
                                     />
                                 ))}
-                            </div>
-                        )}
-                        {!loading.conversations && conversations.length === 0 && (
-                            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                                <svg className="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                                <p className="text-lg font-medium">No conversations yet</p>
-                                <p className="text-sm text-gray-400 mt-1">Start messaging with your partners</p>
-                            </div>
+                                {!loading.conversations && conversations.length === 0 && (
+                                    <div className="p-4 text-center text-gray-500">No conversations found</div>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
-            ) : (
-                // Mobile Chat View
-                <div className="flex flex-col h-full w-full">
-                    {activeConversation ? (
-                        <>
-                            {/* Chat Header */}
-                            <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-3">
-                                <div className="flex items-center">
-                                    <button
-                                        onClick={handleBackToConversations}
-                                        className="mr-3 p-2 -ml-2 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-colors"
-                                    >
-                                        <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                        </svg>
-                                    </button>
-                                    <Avatar name={activeConversation.customer_name || 'Customer'} />
-                                    <div className="ml-3 flex-1 min-w-0">
-                                        <h3 className="font-semibold text-gray-900 truncate">
-                                            {activeConversation.customer_name || `Client #${activeConversation.client_id}`}
-                                        </h3>
-                                        <p className="text-sm text-gray-500">Active now</p>
-                                    </div>
-                                </div>
-                            </div>
+            )}
 
-                            {/* Messages Container */}
-                            <div id="mobile-chat-messages-container" className="flex-1 overflow-y-auto bg-gray-50 px-4 py-3">
-                                {loading.comments ? (
-                                    <div className="flex justify-center items-center h-full">
-                                        <div className="text-center">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                                            <p className="text-gray-500">Loading messages...</p>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {comments.map(comment => (
-                                            <Message key={comment.comment_id} comment={comment} />
-                                        ))}
-                                        {comments.length === 0 && (
-                                            <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-                                                <svg className="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                                </svg>
-                                                <p className="text-lg font-medium">No messages yet</p>
-                                                <p className="text-sm text-gray-400 mt-1">Start the conversation!</p>
-                                            </div>
-                                        )}
+            {/* Chat View */}
+            {!showConversationList && activeConversation && (
+                <div className="flex flex-col h-full">
+                    {/* Back Button */}
+                    <div className="flex items-center p-4 border-b border-gray-200 bg-white">
+                        <button
+                            onClick={handleBackToConversations}
+                            className="p-1 text-gray-600 hover:text-gray-800"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <span className="ml-3 text-gray-900 font-medium">Back to Messages</span>
+                    </div>
+
+                    {/* Messages */}
+                    <div id="chat-messages-container-mobile" className="flex-1 overflow-y-auto p-4 bg-gray-50">
+                        {loading.comments ? (
+                            <div className="flex justify-center items-center h-full text-gray-500">
+                                Loading messages...
+                            </div>
+                        ) : (
+                            <>
+                                {comments.map(comment => (
+                                    <Message key={comment.comment_id} comment={comment} />
+                                ))}
+                                {comments.length === 0 && (
+                                    <div className="text-center text-gray-500 mt-8">
+                                        No messages yet. Start a conversation!
                                     </div>
                                 )}
-                            </div>
+                            </>
+                        )}
+                    </div>
 
-                            {/* Chat Input - Fixed at bottom */}
-                            <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 pb-4">
-                                <div className="flex items-end space-x-3">
-                                    {/* Image/Attachment Button */}
-                                    <button className="flex-shrink-0 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                        </svg>
-                                    </button>
-
-                                    {/* Message Input */}
-                                    <div className="flex-1 relative">
-                                        <textarea
-                                            placeholder="Type a message..."
-                                            className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm leading-5 max-h-32"
-                                            rows="1"
-                                            style={{ minHeight: '44px' }}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && !e.shiftKey) {
-                                                    e.preventDefault();
-                                                    if (e.target.value.trim()) {
-                                                        handleSendMessage(e.target.value.trim());
-                                                        e.target.value = '';
-                                                    }
-                                                }
-                                            }}
-                                            onChange={(e) => {
-                                                // Auto-resize textarea
-                                                e.target.style.height = '44px';
-                                                e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
-                                            }}
-                                            disabled={loading.comments || loading.sending}
-                                        />
-                                    </div>
-
-                                    {/* Send Button */}
-                                    <button
-                                        onClick={() => {
-                                            const input = document.querySelector('textarea');
-                                            if (input && input.value.trim()) {
-                                                handleSendMessage(input.value.trim());
-                                                input.value = '';
-                                                input.style.height = '44px';
-                                            }
-                                        }}
-                                        disabled={loading.sending || loading.comments}
-                                        className="flex-shrink-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        {loading.sending ? (
-                                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-                                        ) : (
-                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                            </svg>
-                                        )}
-                                    </button>
-                                </div>
-
-                                {/* Loading indicator */}
-                                {loading.sending && (
-                                    <div className="mt-2 text-xs text-gray-500 text-center">
-                                        Sending message...
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    ) : (
-                        <div className="flex-1 flex items-center justify-center bg-white">
-                            <div className="text-center px-4">
-                                <svg className="w-20 h-20 mb-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-2">Select a conversation</h3>
-                                <p className="text-gray-500">Choose a conversation to start messaging</p>
-                            </div>
-                        </div>
-                    )}
+                    {/* Chat Input */}
+                    <ChatInput
+                        onSendMessage={handleSendMessage}
+                        isLoading={loading.sending}
+                        disabled={loading.comments}
+                        isMobile={true}
+                    />
                 </div>
             )}
 
+            {/* Error Toast */}
             {error && (
-                <div className="fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50 max-w-md">
+                <div className="fixed top-4 left-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
                     <div className="flex items-start">
                         <div className="flex-1">
                             <strong className="font-medium">Error:</strong>

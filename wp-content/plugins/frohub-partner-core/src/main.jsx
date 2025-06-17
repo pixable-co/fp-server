@@ -1,3 +1,4 @@
+import PartnerMessageMobile from './shortcodes/partner/partner_message_mobile';
 import PartnerBrodcastMessage from './shortcodes/partner/partner_brodcast_message';
 import PartnerMessage from './shortcodes/Partner/partner_message';
 import ValueOfBookingChart from './shortcodes/Dashboard/value_of_booking_chart';
@@ -181,5 +182,13 @@ partnerBrodcastMessageElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <PartnerBrodcastMessage dataKey={key} />
+    );
+});
+
+const partnerMessageMobileElements = document.querySelectorAll('.partner_message_mobile');
+partnerMessageMobileElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <PartnerMessageMobile dataKey={key} />
     );
 });

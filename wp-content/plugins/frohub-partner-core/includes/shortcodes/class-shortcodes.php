@@ -17,6 +17,7 @@ use FPServer\PartnerIntegrations;
 use FPServer\ValueOfBookingChart;
 use FPServer\PartnerProfileAutoMessage;
 use FPServer\PartnerMessage;
+use FPServer\PartnerMessageMobile;
 use FPServer\PartnerBrodcastMessage;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -48,6 +49,7 @@ class Shortcodes {
 		PartnerProfileAvailibility::init();
 		PartnerProfileAutoMessage::init();
 		PartnerMessage::init();
+		PartnerMessageMobile::init();
 		PartnerBrodcastMessage::init();
 	}
 }

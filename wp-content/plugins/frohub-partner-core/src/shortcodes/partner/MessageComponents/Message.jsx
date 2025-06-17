@@ -14,29 +14,22 @@ const Message = ({ comment }) => {
     const isFailed = comment.status === 'failed';
 
     return (
-        <div className={`flex mb-4 ${isPartnerMessage ? 'justify-end' : 'justify-start'}`}>
+        <div className={`flex gap-2 mb-4 ${isPartnerMessage ? 'justify-end' : 'justify-start'}`}>
             {!isPartnerMessage && <Avatar name={comment.author || 'User'} size="sm" />}
-            <div className={`flex flex-col ${isPartnerMessage ? 'items-end' : 'items-start'} max-w-xs`}>
-                <div className={`p-3 rounded-lg break-words ${
+
+            <div className={`max-w-sm ${isPartnerMessage ? 'text-right' : 'text-left'}`}>
+                <div className={`p-3 rounded-lg text-sm ${
                     isPartnerMessage
-                        ? isPending
-                            ? 'bg-gray-400 text-white opacity-70'
-                            : isFailed
-                                ? 'bg-red-500 text-white'
-                                : 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-900'
+                        ? 'bg-white text-gray-900 partner-message'
+                        : ' user-message'
                 }`}>
-                    <div className="font-medium text-sm mb-1">
-                        {isPartnerMessage ? 'You' : (comment.author || 'User')}
-                        {isPending && <span className="ml-1 text-xs">(Sending...)</span>}
-                        {isFailed && <span className="ml-1 text-xs">(Failed)</span>}
-                    </div>
                     <div dangerouslySetInnerHTML={createMarkup(comment.content)} className="prose prose-sm max-w-none" />
                 </div>
-                <div className={`text-xs text-gray-500 mt-1 ${isPartnerMessage ? 'text-right' : ''}`}>
+                <div className="text-xs text-gray-500 mt-1 text-right">
                     {isPending ? 'Sending...' : isFailed ? 'Failed to send' : formatTimestamp(comment.date)}
                 </div>
             </div>
+
             {isPartnerMessage && <Avatar name="You" size="sm" />}
         </div>
     );

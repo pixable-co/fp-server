@@ -309,3 +309,38 @@ a:hover {
 .message-input button {
     padding: 5px 10px;
 }
+
+.message-conversations {
+    border: solid 1px #D9D9D9;
+}
+.conversation-details {
+    border: solid 1px #D9D9D9;
+}
+
+.contact-list-avatar {
+    border-bottom: solid 1px #D9D9D9;
+}
+
+#chat-messages-container {
+    background: #ffffff;
+}
+
+.partner-message{
+    border: solid 1px #D9D9D9;
+}
+
+.user-message {
+    background: #C4C4C4;
+    border: solid 1px #D9D9D9;
+    color: #3D3D3D;
+}
+
+.top-avatar{
+    border: solid 1px #D9D9D9;
+}
+
+.send-button {
+    width: 150px;
+    height: 45px;
+    background: #9A9A9A;
+}

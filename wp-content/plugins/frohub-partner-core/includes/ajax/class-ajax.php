@@ -1,6 +1,8 @@
 <?php
 namespace FPServer;
 
+use FPServer\ReturnOrderDetails;
+
 use FPServer\PartnerConversations;
 
 use FPServer\ConnectCalender;
@@ -28,5 +30,6 @@ class Ajax {
 		ConnectCalender::init();
 		ForgotPassword::init();
 		PartnerConversations::init();
+		ReturnOrderDetails::init();
 	}
 }

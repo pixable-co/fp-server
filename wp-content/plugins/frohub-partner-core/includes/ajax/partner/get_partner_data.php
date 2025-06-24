@@ -67,7 +67,7 @@ class GetPartnerData {
             'headers' => array(
                 'Content-Type' => 'application/json'
             ),
-            'timeout' => 30
+            'timeout' => 60
         ));
 
         // Check if request was successful

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, serviceTypes = [] }) => {
+const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, serviceTypes = [], showStripeWarning = false }) => {
     const [isVacationVisible, setIsVacationVisible] = useState(true);
     const [isMobileFeeVisible, setIsMobileFeeVisible] = useState(true);
+    const [isStripeVisible, setIsStripeVisible] = useState(true);
 
     // Check if mobile service exists but mobileServiceFee is false
     const showMobileFeeWarning = !mobileServiceFee && serviceTypes.includes("Mobile");
@@ -16,8 +17,25 @@ const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, 
         setIsMobileFeeVisible(false);
     };
 
+    const handleStripeClose = () => {
+        setIsStripeVisible(false);
+    };
+
     return (
         <div className="notifications-wrapper" style={{ marginBottom: '20px' }}>
+            {/* Stripe Connection Notification */}
+            {showStripeWarning && isStripeVisible && (
+                <div className="notification-container" id="stripe-notification" style={{ marginBottom: '10px' }}>
+                    <span className="notification-close" onClick={handleStripeClose}>×</span>
+                    <i className="fas fa-exclamation-circle notification-icon"></i>
+                    <strong>
+                        <a href="/payouts" className="notification-link">
+                            Connect Stripe to Start Getting Paid.
+                        </a>
+                    </strong> Link your Stripe account to receive deposit payments automatically.
+                </div>
+            )}
+
             {/* Vacation Notification */}
             {isOnVacation && isVacationVisible && (
                 <div className="notification-container" id="vacation-notification" style={{ marginBottom: '10px' }}>

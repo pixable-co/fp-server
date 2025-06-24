@@ -89,6 +89,7 @@ const BookingStatsCard = () => {
     const isOnVacation = partnerData?.onVacation || false;
     const mobileServiceFee = partnerData?.mobileServiceFee !== undefined ? partnerData?.mobileServiceFee : true;
     const serviceTypes = partnerData?.serviceTypes || [];
+    const showStripeWarning = partnerData?.showStripeWarning || false;
     const averageRating = calculateAverageRating(reviews);
 
     return (
@@ -98,22 +99,11 @@ const BookingStatsCard = () => {
                 isOnVacation={isOnVacation}
                 mobileServiceFee={mobileServiceFee}
                 serviceTypes={serviceTypes}
+                showStripeWarning={showStripeWarning}
             />
 
             {/* Dashboard Stats Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
-                {/* Review Stats Component */}
-                <div className="review-stats dashboard-stats">
-                    <h2>Your Reviews</h2>
-                    <p className="booking-stats-value">{averageRating}</p>
-                </div>
-
-                {/* Pending Bookings Component */}
-                <div className="pending-bookings dashboard-stats">
-                    <h2>Pending Bookings</h2>
-                    <p className="booking-stats-value">{pendingOrdersCount}</p>
-                </div>
 
                 {/* Upcoming Order Component */}
                 <div className="upcoming-order-container dashboard-stats">
@@ -154,6 +144,18 @@ const BookingStatsCard = () => {
                     ) : (
                         <p>You have no upcoming bookings.</p>
                     )}
+                </div>
+
+                {/* Pending Bookings Component */}
+                <div className="pending-bookings dashboard-stats">
+                    <h2>Pending Bookings</h2>
+                    <p className="booking-stats-value">{pendingOrdersCount}</p>
+                </div>
+
+                {/* Review Stats Component */}
+                <div className="review-stats dashboard-stats">
+                    <h2>Your Reviews</h2>
+                    <p className="booking-stats-value">{averageRating}</p>
                 </div>
 
                 {/* Additional Stats Component */}

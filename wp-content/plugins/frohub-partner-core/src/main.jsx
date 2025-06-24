@@ -1,3 +1,5 @@
+import DashboardNotification from './shortcodes/dashboard/dashboard_notification';
+import BookingStatsCard from './shortcodes/dashboard/booking_stats_card';
 import PartnerMessageMobile from './shortcodes/partner/partner_message_mobile';
 import PartnerBrodcastMessage from './shortcodes/partner/partner_brodcast_message';
 import PartnerMessage from './shortcodes/Partner/partner_message';
@@ -190,5 +192,21 @@ partnerMessageMobileElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <PartnerMessageMobile dataKey={key} />
+    );
+});
+
+const bookingStatsCardElements = document.querySelectorAll('.booking_stats_card');
+bookingStatsCardElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <BookingStatsCard dataKey={key} />
+    );
+});
+
+const dashboardNotificationElements = document.querySelectorAll('.dashboard_notification');
+dashboardNotificationElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <DashboardNotification dataKey={key} />
     );
 });

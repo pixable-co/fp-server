@@ -1,6 +1,8 @@
 <?php
 namespace FPServer;
 
+use FPServer\GetPartnerData;
+
 use FPServer\ReturnOrderDetails;
 
 use FPServer\PartnerConversations;
@@ -31,5 +33,6 @@ class Ajax {
 		ForgotPassword::init();
 		PartnerConversations::init();
 		ReturnOrderDetails::init();
+		GetPartnerData::init();
 	}
 }

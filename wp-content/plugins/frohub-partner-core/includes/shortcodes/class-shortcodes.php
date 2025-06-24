@@ -9,6 +9,8 @@ use FPServer\PartnerBookings;
 use FPServer\GoogleCalender;
 use FPServer\BookingChart;
 use FPServer\BookingStats;
+use FPServer\BookingStatsCard;
+use FPServer\DashboardNotification;
 use FPServer\ReviewCount;
 use FPServer\UpcomingOrder;
 use FPServer\PendingBookings;
@@ -37,6 +39,8 @@ class Shortcodes {
 		GoogleCalender::init();
         BookingChart::init();
 		BookingStats::init();
+		BookingStatsCard::init();
+		DashboardNotification::init();
 		ReviewCount::init();
 		UpcomingOrder::init();
 		PendingBookings::init();

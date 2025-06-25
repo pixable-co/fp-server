@@ -89,7 +89,7 @@ class PartnerProfileForm
                 <input type="hidden" name="partnerPostId" value="<?php echo esc_attr($partner_post_id); ?>" />
 
                 <div class="form-group">
-                    <label class="form-label">Business Name</label>
+                    <label class="form-label" placeholder="The name of your business">Business Name</label>
                     <input type="text" name="title" class="form-input" value="<?php echo $title; ?>" />
                 </div>
 
@@ -120,15 +120,15 @@ class PartnerProfileForm
                 <div class="form-group">
                     <label class="form-label">Business Address</label>
                     <p>Enter your business address. If you’re mobile or home-based, please enter your home address - it will only be shown to clients after they’ve made a booking. Business addresses are only publicly visible if you select the option to display it.</p>
-                    <input type="text" name="addressLine1" class="form-input" value="<?php echo $address; ?>" />
-                    <input type="text" name="city" class="form-input" value="<?php echo $city; ?>" />
-                    <input type="text" name="postcode" class="form-input" value="<?php echo $postcode; ?>" />
-                    <input type="text" name="county" class="form-input" value="<?php echo $county; ?>" />
+                    <input type="text" name="addressLine1" class="form-input" value="<?php echo $address; ?>" placeholder="Street Address" />
+                    <input type="text" name="city" class="form-input" value="<?php echo $city; ?>" placeholder="City" />
+                    <input type="text" name="postcode" class="form-input" value="<?php echo $postcode; ?>" placeholder="Postcode" />
+                    <input type="text" name="county" class="form-input" value="<?php echo $county; ?>" placeholder="County"/>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Bio</label>
-                    <textarea name="bio" class="form-textarea"><?php echo $bio; ?></textarea>
+                    <textarea name="bio" class="form-textarea" placeholder="Tell us a bit about yourself."><?php echo $bio; ?></textarea>
                 </div>
 
 

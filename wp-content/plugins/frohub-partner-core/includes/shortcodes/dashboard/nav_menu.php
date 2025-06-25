@@ -18,7 +18,7 @@ class NavMenu {
         <!-- ✅ Topbar -->
         <div class="fp-topbar">
             <div class="fp-topbar-content">
-                <img src="<?php echo site_url('/wp-content/uploads/2025/03/FroHub-Partners-5.png'); ?>" alt="FroHub Logo" style="height: 28px; margin-right: 10px;">
+                <img src="<?php echo site_url('/wp-content/uploads/2025/03/FroHub-Partners.png'); ?>" alt="FroHub Logo" style="height: 28px; margin-right: 10px;">
             </div>
             <div class="fp-topbar-icons">
                 <i class="fas fa-link"></i>

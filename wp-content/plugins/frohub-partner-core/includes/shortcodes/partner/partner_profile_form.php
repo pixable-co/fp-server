@@ -152,7 +152,7 @@ class PartnerProfileForm
                 <input type="file" id="bannerImageInput" name="bannerImage" accept="image/*" onchange="previewImage(event, 'bannerPreview')">
                     </div>
 
-                <div class="form-group">
+                <div class="form-group" id="availability">
                     <label class="form-label">Availability</label>
                     <div id="availability-container">
                         <?php foreach ($availability as $slot): ?>
@@ -209,7 +209,7 @@ class PartnerProfileForm
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="terms-conditions">
                     <label class="form-label">Terms and Conditions</label>
                     <p>Set clear expectations for your clients with your service terms, payment preferences, and policies. These help protect both you and your clients and create a smoother booking experience.</p>
                     <textarea name="terms" class="form-textarea"><?php echo $terms; ?></textarea>

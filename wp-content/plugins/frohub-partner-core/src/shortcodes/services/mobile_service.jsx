@@ -24,7 +24,7 @@ const MobileService = () => {
 
     // Load Google Maps API
     const { isLoaded: isMapLoaded } = useJsApiLoader({
-        googleMapsApiKey: "AIzaSyDfCq6qG1IOH2aJtp44RPif8QeO6Samnzc",
+        googleMapsApiKey: fpserver_settings.google_api_key,
         libraries: ["places"],
     });
 

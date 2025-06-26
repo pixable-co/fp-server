@@ -67,7 +67,8 @@ class Enqueue {
                     'partner_post_id' => get_field('partner_post_id', 'user_' . $current_user_id),
                     'has_active_subscription'=> $has_valid_subscription,
                     'billing_history'=> $billing_history,
-                    'base_api_url' => FPSERVER_ECOM_BASE_API_URL
+                    'base_api_url' => FPSERVER_ECOM_BASE_API_URL,
+                    'google_api_key' => FPSERVER_GOOGLE_API_KEY
 				)
 			);
 

@@ -52,6 +52,7 @@ final class FrohubServer {
 		define( 'FPSERVER_INCLUDES_DIR_PATH', FPSERVER_ROOT_DIR_PATH . 'includes/' );
 		define( 'FPSERVER_PLUGIN_SLUG', 'fp-server' );
 		define( 'FPSERVER_ECOM_BASE_API_URL',untrailingslashit(get_field( 'frohub_ecom_base_api_url', 'option' )));
+		define( 'FPSERVER_GOOGLE_API_KEY',untrailingslashit(get_field( 'google_api_key', 'option' )));
 	}
 
 	public function on_plugins_loaded() {

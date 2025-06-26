@@ -44,7 +44,7 @@ class PartnerConversations {
             }
 
             // Prepare REST API request
-            $api_url = 'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/partner-conversations';
+            $api_url = FHCORE_PARTNER_BASE_API_URL . '/wp-json/frohub/v1/partner-conversations';
             $api_url = add_query_arg(['partner_id' => $partner_id], $api_url);
 
             // Optional: Add Basic Auth if your REST API requires it

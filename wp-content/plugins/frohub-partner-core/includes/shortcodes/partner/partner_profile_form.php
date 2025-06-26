@@ -364,7 +364,7 @@ class PartnerProfileForm
             "bufferPeriodHour"  => intval($_POST["bufferPeriodHour"]),
         ];
 
-        $ecommerce_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-partner";
+        $ecommerce_api_url = FHCORE_PARTNER_BASE_API_URL . "/wp-json/frohub/v1/update-partner";
 
         $response = wp_remote_post($ecommerce_api_url, [
             'body'    => json_encode($payload),

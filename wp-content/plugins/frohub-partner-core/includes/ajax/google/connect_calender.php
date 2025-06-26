@@ -39,7 +39,8 @@ class ConnectCalender {
     }
 
     public static function getClient() {
-        $secure_path = WP_CONTENT_DIR . '/uploads/credential/credentials.json';
+        $upload_dir = wp_upload_dir();
+        $secure_path = $upload_dir['basedir'] . '/credential/credentials.json';
         $client = new \Google_Client();
         $client->setAuthConfig($secure_path); // Google OAuth Credentials
         $client->setRedirectUri(admin_url('admin-ajax.php?action=fpserver/google_oauth_callback'));

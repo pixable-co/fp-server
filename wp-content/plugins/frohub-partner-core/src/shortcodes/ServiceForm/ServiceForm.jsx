@@ -80,7 +80,7 @@ export default function ServiceForm() {
         try {
             setIsSubmitting(true);
             const response = await fetch(
-                "https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/create-draft-service-product",
+                `${fpserver_settings.base_api_url}/wp-json/custom/v1/create-draft-service-product`,
                 {
                     method: "POST",
                     headers: {

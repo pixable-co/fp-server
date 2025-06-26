@@ -24,7 +24,7 @@ const ValueOfBookingChart = () => {
     useEffect(() => {
         const fetchChartData = async () => {
             try {
-                const response = await fetch("https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/return-order-details", {
+                const response = await fetch(`${fpserver_settings.base_api_url}/wp-json/frohub/v1/return-order-details`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ partner_id }),

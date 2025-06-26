@@ -28,7 +28,7 @@ class PartnerProfileForm
         }
 
         $basicAuth = get_field('frohub_ecommerce_basic_authentication', 'option');
-        $api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-partner-data";
+        $api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/get-partner-data";
 
         $response = wp_remote_post($api_url, [
             'headers' => [
@@ -364,7 +364,7 @@ class PartnerProfileForm
             "bufferPeriodHour"  => intval($_POST["bufferPeriodHour"]),
         ];
 
-        $ecommerce_api_url = FHCORE_PARTNER_BASE_API_URL . "/wp-json/frohub/v1/update-partner";
+        $ecommerce_api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/update-partner";
 
         $response = wp_remote_post($ecommerce_api_url, [
             'body'    => json_encode($payload),

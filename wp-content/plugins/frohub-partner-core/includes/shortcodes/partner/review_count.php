@@ -48,7 +48,7 @@ class ReviewCount {
      * @return array|null API response data
      */
     private function fetch_api_data($partner_id) {
-        $api_url = 'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-partner-data';
+        $api_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/get-partner-data';
 
         $response = wp_remote_post($api_url, [
             'body'    => json_encode(['partner_post_id' => $partner_id]),

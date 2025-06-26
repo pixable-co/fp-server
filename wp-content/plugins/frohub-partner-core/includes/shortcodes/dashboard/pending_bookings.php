@@ -37,7 +37,7 @@ class PendingBookings {
         }
 
         // Define API endpoint URL with the retrieved partner_id
-        $api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/partners_my_pending_orders_count/?partner_id=" . intval($partner_id);
+        $api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/partners_my_pending_orders_count/?partner_id=" . intval($partner_id);
 
         // Set up API request arguments
         $args = array(

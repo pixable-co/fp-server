@@ -26,7 +26,7 @@ class PartnerProfileAutoMessage {
         }
 
         $basicAuth = get_field('frohub_ecommerce_basic_authentication', 'option');
-        $api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-partner-data";
+        $api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/get-partner-data";
 
         $response = wp_remote_post($api_url, [
             'headers' => [
@@ -56,7 +56,7 @@ class PartnerProfileAutoMessage {
                 'auto_message_text' => $auto_message_text,
             ];
 
-            $update_api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-profile-auto-message";
+            $update_api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/update-profile-auto-message";
 
             $submit_response = wp_remote_post($update_api_url, [
                 'body'    => json_encode($payload),

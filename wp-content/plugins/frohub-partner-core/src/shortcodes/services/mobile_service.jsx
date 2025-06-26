@@ -31,7 +31,7 @@ const MobileService = () => {
     // Fetch partner data on mount
     useEffect(() => {
         if (partnerId) {
-            fetch("https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-partner-data", {
+            fetch(`${fpserver_settings.base_api_url}/wp-json/frohub/v1/get-partner-data`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -123,7 +123,7 @@ const MobileService = () => {
 
         try {
             const response = await fetch(
-                "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/update-location-data",
+                `${fpserver_settings.base_api_url}/wp-json/frohub/v1/update-location-data`,
                 {
                     method: "POST",
                     headers: {

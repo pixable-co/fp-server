@@ -60,7 +60,7 @@ class GetPartnerData {
      */
     private function fetch_partner_api_data($partner_post_id) {
         // Use the external API endpoint
-        $api_url = FHCORE_PARTNER_BASE_API_URL . '/wp-json/frohub/v1/get-partner-data';
+        $api_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/get-partner-data';
 
         $response = wp_remote_post($api_url, array(
             'body'    => json_encode(array('partner_post_id' => $partner_post_id)),

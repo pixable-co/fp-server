@@ -79,7 +79,7 @@ class UpcomingOrder {
      * @return array|null API response data
      */
     private function fetch_upcoming_booking($partner_id) {
-        $api_url = 'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-upcoming-booking';
+        $api_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/get-upcoming-booking';
 
         $response = wp_remote_get(add_query_arg(
             array('partner_id' => $partner_id),

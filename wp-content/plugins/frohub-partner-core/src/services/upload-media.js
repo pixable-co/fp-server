@@ -6,7 +6,7 @@ export const uploadMedia = async ({ file, onProgress }) => {
 
     try {
         const response = await axios.post(
-            'https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/upload-image',
+            `${fpserver_settings.base_api_url}/wp-json/custom/v1/upload-image`,
             formData,
             {
                 headers: {
@@ -35,7 +35,7 @@ export const uploadMedia = async ({ file, onProgress }) => {
 export const deleteMedia = async (id) => {
     try {
         const response = await axios.delete(
-            `https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/delete-media/${id}`,
+            `${fpserver_settings.base_api_url}/wp-json/custom/v1/delete-media/${id}`,
             {
                 headers: {
                     Authorization: `Basic ${btoa('Abir@pixable.co:UYoJ OSTu PlCq jByV vpjw VZyw')}`

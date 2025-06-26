@@ -256,7 +256,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 setModifyingEventIds(prev => [...prev, eventId]);
                 try {
                     const response = await axios.post(
-                        'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/custom-events/delete',
+                        `${fpserver_settings.base_api_url}/wp-json/frohub/v1/custom-events/delete`,
                         { partner_id: partner_id.toString(), event_index: eventIndex }
                     );
 
@@ -421,7 +421,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
         try {
             const response = await axios.post(
-                'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/custom-events/create',
+                `${fpserver_settings.base_api_url}/wp-json/frohub/v1/custom-events/create`,
                 payload
             );
             console.log("✅ API Response:", response.data);

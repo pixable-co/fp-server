@@ -23,7 +23,7 @@ class BookingStats {
            return '<p>No partner ID found for your account.</p>';
         }
 
-        $api_url = FHCORE_PARTNER_BASE_API_URL . "/wp-json/frohub/v1/return-order-details";
+        $api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/return-order-details";
 
         // Prepare API request
         $args = array(

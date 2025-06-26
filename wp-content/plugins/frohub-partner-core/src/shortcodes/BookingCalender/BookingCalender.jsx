@@ -25,7 +25,7 @@ export default function BookingCalender() {
     // Fetch order details
     const fetchOrderDetails = async () => {
         try {
-            const response = await fetch("https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/return-order-details", {
+            const response = await fetch(`${fpserver_settings.base_api_url}/wp-json/frohub/v1/return-order-details`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -74,54 +74,6 @@ export default function BookingCalender() {
             return [];
         }
     };
-    // const fetchOrderDetails = async () => {
-    //     try {
-    //         const response = await fetch("https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/return-order-details", {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify({ partner_id: partner_id }),
-    //         });
-    //
-    //         if (!response.ok) {
-    //             throw new Error(`Error: ${response.statusText}`);
-    //         }
-    //
-    //         const orders = await response.json();
-    //
-    //         // Only keep orders with status "processing" or "completed"
-    //         const filteredOrders = orders.filter(order =>
-    //             order.status === "processing" || order.status === "completed"
-    //         );
-    //
-    //         console.log("Filtered Orders:", filteredOrders);
-    //
-    //         return filteredOrders.data.map(order => {
-    //             const lineItem = order.line_items?.[0] ?? {};
-    //             const meta = lineItem.meta ?? {};
-    //
-    //             const bookingDateTime = meta.booking_date ? meta.booking_date.split(", ") : [];
-    //             const extractedTime = bookingDateTime.length > 0 ? bookingDateTime[0] : 'Unknown Time';
-    //             const extractedDate = bookingDateTime.length > 1 ? bookingDateTime[1] : 'Unknown Date';
-    //
-    //             return {
-    //                 id: `order-${order.id}`,
-    //                 title: lineItem.product_name ?? 'No Title',
-    //                 date: extractedDate,
-    //                 time: extractedTime,
-    //                 customer: `${order.billing.first_name} ${order.billing.last_name}`,
-    //                 email: order.billing.email ?? 'No Email',
-    //                 phone: order.billing.phone ?? 'No Phone',
-    //                 service: meta.service_type ?? 'Unknown Service',
-    //                 eventType: 'order',
-    //             };
-    //         });
-    //     } catch (error) {
-    //         console.error("Error fetching order details:", error);
-    //         return [];
-    //     }
-    // };
 
     // Fetch Google Calendar events
     const fetchAllCalendarEvents = async () => {
@@ -176,7 +128,7 @@ export default function BookingCalender() {
     const fetchUnavailableDates = async () => {
         try {
             const response = await axios.post(
-                'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/custom-events/fetch',
+                `${fpserver_settings.base_api_url}/wp-json/frohub/v1/custom-events/fetch`,
                 { partner_id }
             );
 

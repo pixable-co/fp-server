@@ -12,7 +12,7 @@ const FpBookingTable = () => {
             setLoading(true); // Start loading state
             try {
                 const response = await axios.post(
-                    "https://frohubecomm.mystagingwebsite.com/wp-json/custom/v1/orders",
+                    `${fpserver_settings.base_api_url}/wp-json/custom/v1/orders`,
                     {
                         partner_id: partner_id
                     }

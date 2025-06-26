@@ -44,7 +44,7 @@ class PartnerConversations {
             }
 
             // Prepare REST API request
-            $api_url = FHCORE_PARTNER_BASE_API_URL . '/wp-json/frohub/v1/partner-conversations';
+            $api_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/partner-conversations';
             $api_url = add_query_arg(['partner_id' => $partner_id], $api_url);
 
             // Optional: Add Basic Auth if your REST API requires it
@@ -111,7 +111,7 @@ class PartnerConversations {
                 return;
             }
 
-            $response = wp_remote_post('https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/get-conversation-comments', [
+            $response = wp_remote_post(FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/get-conversation-comments', [
                 'body' => json_encode(['conversation_post_id' => $post_id]),
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -215,7 +215,7 @@ class PartnerConversations {
         }
 
         // Prepare external API request
-        $remote_api_url = 'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/upload-comment-image';
+        $remote_api_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/upload-comment-image';
 
         $response = wp_remote_post($remote_api_url, [
             'method'    => 'POST',
@@ -280,7 +280,7 @@ class PartnerConversations {
         }
 
         // 🌐 Custom API URL (staging site)
-        $api_base_url = 'https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/create-comment';
+        $api_base_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/create-comment';
 
         // Send the request to the REST API
         $response = wp_remote_post($api_base_url, $args);

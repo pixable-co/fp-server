@@ -30,7 +30,7 @@ class ReturnOrderDetails {
         }
 
         // External API URL
-        $api_url = "https://frohubecomm.mystagingwebsite.com/wp-json/frohub/v1/return-order-details";
+        $api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/return-order-details";
 
         // Prepare API request
         $args = array(

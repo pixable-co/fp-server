@@ -81,7 +81,7 @@ class PartnerProfileAutoMessage {
         ?>
         <div class="auto-message-wrapper">
             <h2>Auto Message Settings</h2>
-            <p class="subtext">Enable and customize an automatic message that will be sent to clients after they complete a booking with you or send a message to you. Use this to thank them, confirm next steps, or share important information.</p>
+            <p class="subtext">Set a message to automatically reply when you're unavailable.<br><br>Whether you're busy with a client, on holiday, or need time to respond, this auto-message keeps clients informed and reassured.</p>
 
             <?php if (isset($_GET['updated']) && $_GET['updated'] === 'true') : ?>
                 <p style='color: green;'>✅ Auto message updated successfully!</p>
@@ -100,8 +100,8 @@ class PartnerProfileAutoMessage {
                 </div>
 
                 <div class="form-group" id="auto_message_text_group" style="display: <?php echo $isAutoMessage ? 'block' : 'none'; ?>;">
-                    <label class="form-label">Auto Message Content</label>
-                    <textarea name="auto_message_text" class="form-textarea"><?php echo $autoMessageContent; ?></textarea>
+                    <label class="form-label">Message</label>
+                    <textarea placeholder="I’m unavailable right now, but I’ll get back to you as soon as I can." name="auto_message_text" class="form-textarea"><?php echo $autoMessageContent; ?></textarea>
                 </div>
 
                 <button type="submit" name="auto_message_form_submit" class="save-btn">Save Auto Message</button>

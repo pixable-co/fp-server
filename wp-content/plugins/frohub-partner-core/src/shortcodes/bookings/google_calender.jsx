@@ -146,13 +146,6 @@ const GoogleCalendar = () => {
                             Disconnect Calendar
                         </button>
                     </div>
-
-                    {/* Show saved calendar info */}
-                    {savedCalendar && (
-                        <p style={{ color: "blue", marginTop: "10px" }}>
-                            ✅ Saved Calendar: {savedCalendar}
-                        </p>
-                    )}
                 </>
             ) : (
                 <div>

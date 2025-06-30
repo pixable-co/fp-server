@@ -117,9 +117,8 @@ const ValueOfBookingChart = () => {
                 <p>Loading chart...</p>
             ) : noOrders ? (
                 <div className="flex flex-col items-center justify-center h-64 bg-gray-100 rounded-lg p-6">
-                    <XCircle className="w-12 h-12 text-red-500 mb-4" />
-                    <p className="text-lg font-medium text-gray-700">No orders found</p>
-                    <p className="text-sm text-gray-500">Your booking data for this year will appear here when available.</p>
+                    <p className="text-lg font-medium text-gray-700">No data to show yet</p>
+                    <p className="text-sm text-gray-500">You don’t have any bookings yet. As they come in, your booking data for the year will show here.</p>
                 </div>
             ) : (
                 <FhChart data={chartData} goal={chartGoal} />

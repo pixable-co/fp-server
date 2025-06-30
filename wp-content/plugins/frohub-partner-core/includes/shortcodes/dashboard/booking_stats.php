@@ -49,7 +49,7 @@ class BookingStats {
         }
 
         if (!isset($orders[0]) || !is_array($orders[0])) {
-            return '<p>No orders found or invalid data format.</p>';
+            return '<p>Once you start getting bookings, your insights will appear here — helping you track your earnings and grow your business with confidence.</p>';
         }
 
         // Get current year

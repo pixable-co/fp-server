@@ -154,7 +154,7 @@ const GoogleCalendar = () => {
                     )}
                     {!isConnected && (
                         <div className="mt-8">
-                            <div className="bg-gray-100 p-6 rounded-md flex justify-between gap-6">
+                            <div className="bg-gray-100 p-6 rounded-md sm:block md:flex justify-between gap-6">
                                 <div>
                                     <h3 className="font-semibold text-gray-800 mb-2">Connect with Google</h3>
                                     <p className="text-sm text-gray-600 mb-4">

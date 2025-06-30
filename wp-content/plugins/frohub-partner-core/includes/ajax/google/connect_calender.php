@@ -236,7 +236,14 @@ class ConnectCalender {
             ];
         }
 
-        wp_send_json_success(['calendars' => $calendars]);
+        $saved_calendar_id = get_user_meta($user_id, 'google_calendar_id', true);
+
+        wp_send_json_success([
+                'calendars' => $calendars,
+                'saved_calendar_id' => $saved_calendar_id,
+        ]);
+
+//         wp_send_json_success(['calendars' => $calendars]);
     }
 
     public function save_user_calendar() {

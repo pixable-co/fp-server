@@ -34,32 +34,6 @@ const GoogleCalendar = () => {
         });
     }, []);
 
-    // useEffect(() => {
-    //     fetchData("fpserver/check_google_auth_status", (response) => {
-    //         console.log(response);
-    //         if (response.data.expired) {
-    //             console.log("Token expired, attempting refresh...");
-    //             refreshGoogleToken();
-    //         }
-    //         if (response.success) {
-    //             setIsConnected(response.data.authenticated);
-    //             setIsExpired(response.data.expired);
-    //
-    //             if (response.data.authenticated) {
-    //                 fetchAvailableCalendars();
-    //                 fetchSavedCalendar();
-    //                 // if (response.data.expired) {
-    //                 //     console.log("Token expired, attempting refresh...");
-    //                 //     refreshGoogleToken();
-    //                 // } else {
-    //                 //     fetchAvailableCalendars();
-    //                 //     fetchSavedCalendar();
-    //                 // }
-    //             }
-    //         }
-    //     });
-    // }, []);
-
     // ✅ Function to refresh token if expired
     const refreshGoogleToken = () => {
         fetchData("fpserver/refresh_google_token", (response) => {
@@ -80,6 +54,11 @@ const GoogleCalendar = () => {
         fetchData("fpserver/get_google_calendars", (response) => {
             if (response.success) {
                 setCalendars(response.data.calendars);
+
+                if (response.data.saved_calendar_id) {
+                    setSelectedCalendar(response.data.saved_calendar_id);
+                    setSavedCalendar(response.data.saved_calendar_id);
+                }
             } else {
                 console.error("Failed to fetch calendars:", response.message);
             }
@@ -160,10 +139,10 @@ const GoogleCalendar = () => {
                         ))}
                     </select>
                     <div className="flex justify-start gap-6 mt-6">
-                        <button onClick={handleSaveCalendar} className="btn btn-primary">
+                        <button onClick={handleSaveCalendar} className="w-btn us-btn-style_1 submit-btn">
                             Save Calendar
                         </button>
-                        <button onClick={handleDisconnect} className="btn btn-danger">
+                        <button onClick={handleDisconnect} className="w-btn us-btn-style_1 submit-btn">
                             Disconnect Calendar
                         </button>
                     </div>

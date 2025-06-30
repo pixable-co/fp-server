@@ -15,15 +15,14 @@ const getCookie = (name) => {
 const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, serviceTypes = [], showStripeWarning = false }) => {
     const [isVacationVisible, setIsVacationVisible] = useState(false);
     const [isMobileFeeVisible, setIsMobileFeeVisible] = useState(false);
-    const [isStripeVisible, setIsStripeVisible] = useState(false);
+    const [isStripeVisible, setIsStripeVisible] = useState(showStripeWarning);
 
     const showMobileFeeWarning = !mobileServiceFee && serviceTypes.includes("Mobile");
 
     useEffect(() => {
         setIsVacationVisible(isOnVacation && !getCookie("hide_vacation"));
         setIsMobileFeeVisible(showMobileFeeWarning && !getCookie("hide_mobile_fee"));
-        setIsStripeVisible(showStripeWarning && !getCookie("hide_stripe"));
-    }, [isOnVacation, showMobileFeeWarning, showStripeWarning]);
+    }, [isOnVacation, showMobileFeeWarning]);
 
     const handleVacationClose = () => {
         setIsVacationVisible(false);
@@ -37,14 +36,13 @@ const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, 
 
     const handleStripeClose = () => {
         setIsStripeVisible(false);
-        setCookie("hide_stripe", "1");
+        // ❌ No cookie stored — this resets on next page load
     };
 
     return (
         <div className="notifications-wrapper" style={{ marginBottom: '20px' }}>
             {showStripeWarning && isStripeVisible && (
                 <div className="notification-container" id="stripe-notification" style={{ marginBottom: '10px' }}>
-                    <span className="notification-close" onClick={handleStripeClose}>×</span>
                     <i className="fas fa-exclamation-circle notification-icon"></i>
                     <strong>
                         <a href="/payouts" className="notification-link">

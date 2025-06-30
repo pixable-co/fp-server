@@ -144,7 +144,10 @@ const GoogleCalendar = () => {
 
     return (
         <div>
-            <h1>Google Calendar Integration</h1>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Google Calendar</h2>
+            <p className="text-sm text-gray-600 mb-6">
+                Link your calendar to see everything in one place—no more switching tabs or missing appointments.
+            </p>
             {isConnected && !isExpired ? (
                 <>
                     <h2>Select a Calendar</h2>
@@ -178,9 +181,21 @@ const GoogleCalendar = () => {
                         <p style={{ color: "red" }}>⚠️ Your Google Calendar access has expired. Attempting to refresh...</p>
                     )}
                     {!isConnected && (
-                        <button onClick={handleConnect} className="btn btn-primary">
-                            Connect Google Calendar
-                        </button>
+                        <div className="mt-8">
+                            <div className="bg-gray-100 p-6 rounded-md flex justify-between gap-6">
+                                <div>
+                                    <h3 className="font-semibold text-gray-800 mb-2">Connect with Google</h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Log in with your existing Google account, or create a new one to see your google events in the FroHub Partner Calendar.
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    <button onClick={handleConnect} className="w-btn us-btn-style_1 submit-btn">
+                                        Connect Google Calendar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
             )}

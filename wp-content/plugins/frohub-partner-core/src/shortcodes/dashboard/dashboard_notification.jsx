@@ -68,7 +68,7 @@ const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, 
                         <a href="/mobile-travel-fees" className="notification-link">
                             Set your Mobile Travel Fees.
                         </a>
-                    </strong> You can now set custom travel fees for your mobile services.
+                    </strong> If you offer mobile services, you can now set custom travel fees.
                 </div>
             )}
         </div>

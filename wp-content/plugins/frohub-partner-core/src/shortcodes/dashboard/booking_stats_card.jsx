@@ -12,6 +12,7 @@ const BookingStatsCard = () => {
     useEffect(() => {
         fetchData('fpserver/get_partner_data', (response) => {
             if (response.success) {
+                console.log(response);
                 setPartnerData(response.data);
                 setError(null);
             } else {
@@ -117,6 +118,10 @@ const BookingStatsCard = () => {
 
                             <div className="booking-service">
                                 {upcomingBookings.service_name}
+                            </div>
+
+                            <div className="booking-service">
+                                Booking ID: {upcomingBookings.order_id}
                             </div>
 
                             <div className="booking-client-info">

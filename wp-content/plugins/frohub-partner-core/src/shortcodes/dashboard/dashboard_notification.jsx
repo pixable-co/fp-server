@@ -12,17 +12,31 @@ const getCookie = (name) => {
         ?.split('=')[1];
 };
 
-const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, serviceTypes = [], showStripeWarning = false }) => {
+const DashboardNotification = ({
+                                   isOnVacation = false,
+                                   mobileServiceFee = true,
+                                   serviceTypes = [],
+                                   showStripeWarning = false
+                               }) => {
     const [isVacationVisible, setIsVacationVisible] = useState(false);
     const [isMobileFeeVisible, setIsMobileFeeVisible] = useState(false);
     const [isStripeVisible, setIsStripeVisible] = useState(showStripeWarning);
+    const [isTipVisible, setIsTipVisible] = useState(() => {
+        return !showStripeWarning && !getCookie("hide_tip_notice");
+    });
 
     const showMobileFeeWarning = !mobileServiceFee && serviceTypes.includes("Mobile");
 
     useEffect(() => {
         setIsVacationVisible(isOnVacation && !getCookie("hide_vacation"));
         setIsMobileFeeVisible(showMobileFeeWarning && !getCookie("hide_mobile_fee"));
-    }, [isOnVacation, showMobileFeeWarning]);
+
+        if (!isStripeVisible && !getCookie("hide_tip_notice")) {
+            setIsTipVisible(true);
+        } else {
+            setIsTipVisible(false);
+        }
+    }, [isOnVacation, showMobileFeeWarning, isStripeVisible]);
 
     const handleVacationClose = () => {
         setIsVacationVisible(false);
@@ -36,12 +50,16 @@ const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, 
 
     const handleStripeClose = () => {
         setIsStripeVisible(false);
-        // ❌ No cookie stored — this resets on next page load
+    };
+
+    const handleTipClose = () => {
+        setIsTipVisible(false);
+        setCookie("hide_tip_notice", "1");
     };
 
     return (
         <div className="notifications-wrapper" style={{ marginBottom: '20px' }}>
-            {showStripeWarning && isStripeVisible && (
+            {isStripeVisible && (
                 <div className="notification-container" id="stripe-notification" style={{ marginBottom: '10px' }}>
                     <i className="fas fa-exclamation-circle notification-icon"></i>
                     <strong>
@@ -49,10 +67,36 @@ const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, 
                             Connect Stripe to Start Getting Paid.
                         </a>
                     </strong> Link your Stripe account to receive deposit payments automatically.
+                    <span className="notification-close" onClick={handleStripeClose}>×</span>
                 </div>
             )}
 
-            {isOnVacation && isVacationVisible && (
+            {isTipVisible && (
+                <div className="flex items-center justify-between bg-gray-100 border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-700 mb-2">
+                    <div className="flex items-center gap-3">
+                        <i className="fas fa-lightbulb text-gray-500 text-sm"></i>
+                        <span className="font-medium text-gray-600">Tip</span>
+                        <span className="text-gray-600">The more services you add, the better your marketing reach to new clients.</span>
+                    </div>
+
+                    <div className="flex items-center gap-4 shrink-0">
+                        <a
+                            href="/my-services/create-a-service/"
+                            className="text-gray-800 underline font-medium whitespace-nowrap"
+                        >
+                            Add Services
+                        </a>
+                        <span
+                            onClick={handleTipClose}
+                            className="cursor-pointer text-gray-500 font-bold text-base"
+                        >
+                ×
+            </span>
+                    </div>
+                </div>
+            )}
+
+            {isVacationVisible && (
                 <div className="notification-container" id="vacation-notification" style={{ marginBottom: '10px' }}>
                     <span className="notification-close" onClick={handleVacationClose}>×</span>
                     <i className="fas fa-exclamation-circle notification-icon"></i>
@@ -60,7 +104,7 @@ const DashboardNotification = ({ isOnVacation = false, mobileServiceFee = true, 
                 </div>
             )}
 
-            {showMobileFeeWarning && isMobileFeeVisible && (
+            {isMobileFeeVisible && (
                 <div className="notification-container" id="mobile-fee-notification" style={{ marginBottom: '10px' }}>
                     <span className="notification-close" onClick={handleMobileFeeClose}>×</span>
                     <i className="fas fa-exclamation-circle notification-icon"></i>

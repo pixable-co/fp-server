@@ -125,7 +125,7 @@ const BookingStatsCard = () => {
                                     <a
                                         href="#"
                                         className="client-email-icon"
-                                        title={`Conversation of ${upcomingBookings.client_name}`}
+                                        title={`Send a message to ${upcomingBookings.client_name}`}
                                     >
                                         <i className="fas fa-comment-alt"></i>
                                     </a>

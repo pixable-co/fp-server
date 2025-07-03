@@ -344,3 +344,15 @@ a:hover {
     height: 45px;
     background: #9A9A9A;
 }
+
+.order_details {
+    display: none !important;
+}
+
+.woocommerce-orders-table--orders {
+    display: none !important;
+}
+
+address {
+    display: none !important;
+}

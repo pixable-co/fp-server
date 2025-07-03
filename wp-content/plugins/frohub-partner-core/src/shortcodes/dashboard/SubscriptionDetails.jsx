@@ -1,7 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Skeleton } from 'antd';
 
 const SubscriptionDetails = () => {
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.innerHTML = 'h2 { display: none !important; }';
+        document.head.appendChild(style);
+
+        // Clean up on unmount
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+
     if (typeof fpserver_settings === 'undefined') {
         return <p>No subscription data found.</p>;
     }
@@ -79,35 +90,36 @@ const SubscriptionDetails = () => {
 
                     <div className="billing-history mt-6">
                         <h3 className="text-lg font-semibold mb-2">Billing History</h3>
-                        <table className="w-full text-sm border-collapse">
-                            <thead>
-                            <tr className="text-left border-b border-gray-300">
-                                <th className="py-2">Date</th>
-                                <th className="py-2">Total</th>
-                                <th className="py-2">Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {billingHistory.map((entry, index) => (
-                                <tr key={index} className="border-b border-gray-200">
-                                    <td className="py-2">{entry.start_date}</td>
-                                    <td className="py-2">{entry.total}</td>
-                                    <td className="py-2">
-                                        {entry.status === 'Failed' ? (
-                                            <button className="text-red-600 underline hover:text-red-800">
-                                                Pay
-                                            </button>
-                                        ) : (
-                                            <span className="text-green-700">{entry.status}</span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
-                        {/*<a href="/downgrade" className="inline-block mt-4 text-blue-600 underline hover:text-blue-800">*/}
-                        {/*    Downgrade to FroHub Lite*/}
-                        {/*</a>*/}
+                        <div className="w-3/6 text-sm">
+                            <div className="grid grid-cols-3 gap-0 font-semibold border-b border-gray-300 py-2">
+                                <span>Date</span>
+                                <span>Total</span>
+                                <span>Status</span>
+                            </div>
+
+                            {billingHistory.length > 0 ? (
+                                billingHistory.map((entry, index) => (
+                                    <div
+                                        key={index}
+                                        className="grid grid-cols-3 border-b border-gray-200 py-3 text-sm items-center"
+                                    >
+                                        <span>{entry.start_date}</span>
+                                        <span>{entry.total}</span>
+                                        <span>
+                        {entry.status.toLowerCase() === 'failed' ? (
+                            <button className="text-red-600 underline hover:text-red-800">
+                                Pay
+                            </button>
+                        ) : (
+                            <span className="text-green-700">{entry.status}</span>
+                        )}
+                    </span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="py-3 text-gray-500">No billing history found.</div>
+                            )}
+                        </div>
                     </div>
                 </>
             )}

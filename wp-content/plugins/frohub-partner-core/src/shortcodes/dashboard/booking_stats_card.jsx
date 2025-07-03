@@ -2,17 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Skeleton } from 'antd';
 import {fetchData} from "../../services/fetchData.js";
 import DashboardNotification from "./dashboard_notification.jsx";
+import usePartnerStore from "../../store.js";
 
 const BookingStatsCard = () => {
     const [partnerData, setPartnerData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const setPartnerProfileUrl = usePartnerStore((state) => state.setPartnerProfileUrl);
 
     // Fetch partner data on component mount
     useEffect(() => {
         fetchData('fpserver/get_partner_data', (response) => {
             if (response.success) {
-                console.log(response);
+                const profileUrl = response.data.partnerProfileUrl;
+                setPartnerProfileUrl(profileUrl);
                 setPartnerData(response.data);
                 setError(null);
             } else {

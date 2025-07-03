@@ -21,6 +21,8 @@ use FPServer\PartnerProfileAutoMessage;
 use FPServer\PartnerMessage;
 use FPServer\PartnerMessageMobile;
 use FPServer\PartnerBrodcastMessage;
+use FPServer\InviteList;
+use FPServer\MyBookingLink;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -55,5 +57,7 @@ class Shortcodes {
 		PartnerMessage::init();
 		PartnerMessageMobile::init();
 		PartnerBrodcastMessage::init();
+		InviteList::init();
+		MyBookingLink::init();
 	}
 }

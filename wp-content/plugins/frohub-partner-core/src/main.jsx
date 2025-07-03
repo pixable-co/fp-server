@@ -1,3 +1,4 @@
+import MyBookingLink from './shortcodes/dashboard/my_booking_link';
 import DashboardNotification from './shortcodes/dashboard/dashboard_notification';
 import BookingStatsCard from './shortcodes/dashboard/booking_stats_card';
 import PartnerMessageMobile from './shortcodes/partner/partner_message_mobile';
@@ -208,5 +209,13 @@ dashboardNotificationElements.forEach(element => {
     const key = element.getAttribute('data-key');
     createRoot(element).render(
         <DashboardNotification dataKey={key} />
+    );
+});
+
+const myBookingLinkElements = document.querySelectorAll('.my_booking_link');
+myBookingLinkElements.forEach(element => {
+    const key = element.getAttribute('data-key');
+    createRoot(element).render(
+        <MyBookingLink dataKey={key} />
     );
 });

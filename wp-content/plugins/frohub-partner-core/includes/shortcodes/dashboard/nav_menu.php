@@ -21,14 +21,13 @@ class NavMenu {
                 <img src="<?php echo site_url('/wp-content/uploads/2025/03/FroHub-Partners.png'); ?>" alt="FroHub Logo" style="height: 28px; margin-right: 10px;">
             </div>
             <div class="fp-topbar-icons">
-                <i class="fas fa-link"></i>
+                <?php echo do_shortcode('[my_booking_link]');?>
                 <i class="fas fa-envelope"></i>
                 <div class="fp-user-dropdown">
                     <i class="fas fa-user" id="fpUserToggle"></i>
                     <div class="fp-dropdown-menu" id="fpDropdownMenu">
                         <a href="/my-account">Account</a>
                         <a href="#">Help & FAQs</a>
-                        <a href="#">Business & Marketing</a>
                         <a href="#">Invite a Friend</a>
                         <hr>
                         <a href="<?php echo wp_logout_url(home_url()); ?>">Log out</a>

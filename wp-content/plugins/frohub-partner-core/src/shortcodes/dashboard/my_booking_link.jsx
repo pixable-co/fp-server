@@ -33,7 +33,7 @@ const MyBookingLink = () => {
         <div>
             {finalUrl ? (
                 <a
-                    href={`${fpserver_settings.base_api_url}/partner/${finalUrl}`}
+                    href={finalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                 >

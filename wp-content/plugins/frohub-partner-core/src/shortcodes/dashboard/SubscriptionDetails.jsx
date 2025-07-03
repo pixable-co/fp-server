@@ -1,14 +1,17 @@
+import React from 'react';
+import { Skeleton } from 'antd';
+
 const SubscriptionDetails = () => {
     if (typeof fpserver_settings === 'undefined') {
         return <p>No subscription data found.</p>;
     }
-    console.log(fpserver_settings)
 
     const hasActiveSubscription = fpserver_settings.has_active_subscription;
     const subscriptionData = fpserver_settings.subscription_data || {};
     const billingHistory = fpserver_settings.billing_history || [];
 
     const isLitePlan = !hasActiveSubscription || hasActiveSubscription === '';
+    const currentPlan = billingHistory[0]?.plan_name?.toLowerCase() || '';
 
     const handleUpgrade = () => {
         window.location.href = `/product/frohub/?switch-subscription=5479&item=659`;
@@ -51,12 +54,26 @@ const SubscriptionDetails = () => {
                 <>
                     <div className="subscription-card pro">
                         <div className="header">
-                            <h3>FroHub Pro</h3>
+                            <h3>
+                                {currentPlan.includes('yearly') ? 'FroHub Pro Yearly' : 'FroHub Pro Monthly'}
+                            </h3>
                             <span className="current-plan-badge">✔ Your Current Plan</span>
                         </div>
-                        <p>£16/month + 7% booking fee, paid Annually</p>
-                        {subscriptionData.renewal_date && (
-                            <p>Automatically renews on: {subscriptionData.renewal_date}</p>
+
+                        {currentPlan.includes('yearly') ? (
+                            <>
+                                <p>£192/year + 7% booking fee</p>
+                                {subscriptionData.renewal_date && (
+                                    <p>Automatically renews on: {subscriptionData.renewal_date}</p>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <p>£20/month + 7% booking fee</p>
+                                {subscriptionData.renewal_date && (
+                                    <p>Renews monthly on: {subscriptionData.renewal_date}</p>
+                                )}
+                            </>
                         )}
                     </div>
 

@@ -240,7 +240,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
 
     return (
         <div className="flex h-screen bg-gray-50">
-            <div className="message-conversations w-80 bg-white">
+            <div className="message-conversations w-80bg-white overflow-scroll">
                 <div className="overflow-y-auto">
                     {loading.conversations ? (
                         <div className="text-sm text-gray-500 mt-1 flex flex-col space-y-4">

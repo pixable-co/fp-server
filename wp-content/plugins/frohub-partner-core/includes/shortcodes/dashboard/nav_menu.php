@@ -28,7 +28,7 @@ class NavMenu {
                     <div class="fp-dropdown-menu" id="fpDropdownMenu">
                         <a href="/my-account">Account</a>
                         <a href="#">Help & FAQs</a>
-                        <a href="#">Invite a Friend</a>
+                        <a href="/invite-a-friend">Invite a Friend</a>
                         <hr>
                         <a href="<?php echo wp_logout_url(home_url()); ?>">Log out</a>
                     </div>

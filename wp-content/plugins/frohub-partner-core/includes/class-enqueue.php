@@ -66,25 +66,26 @@ class Enqueue {
             }
 
             foreach ($subscription->get_items() as $item) {
-                $plan_name = $item->get_name();
-                $clean_name = str_replace('Frohub - ', '', $plan_name);
+                $raw_plan_name = $item->get_name(); // e.g. FroHub - Pro Yearly
+                $clean_name = trim(str_replace(['FroHub - ', 'FroHub – '], '', $raw_plan_name)); // handle both dashes
 
                 if (stripos($clean_name, 'Pro') !== false) {
                     $has_valid_subscription = true;
 
                     $billing_history[] = [
-                        'subscription_id' => $subscription->get_id(),
-                        'plan_name'       => $clean_name,
-                        'status'          => $subscription->get_status(),
-                        'start_date'      => $subscription->get_date('start'),
-                        'next_payment'    => $subscription->get_date('next_payment'),
-                        'last_payment'    => $subscription->get_date('last_payment'),
-                        'end_date'        => $subscription->get_date('end'),
-                        'total'           => $subscription->get_total(),
-                        'payment_method'  => $subscription->get_payment_method_title(),
+                        'subscription_id'   => $subscription->get_id(),
+                        'plan_name'         => $clean_name, // 🔥 You now have "Pro" or "Pro Yearly"
+                        'status'            => $subscription->get_status(),
+                        'start_date'        => $subscription->get_date('start'),
+                        'next_payment'      => $subscription->get_date('next_payment'),
+                        'last_payment'      => $subscription->get_date('last_payment'),
+                        'end_date'          => $subscription->get_date('end'),
+                        'total'             => $subscription->get_total(),
+                        'payment_method'    => $subscription->get_payment_method_title(),
+                        'subscription_plan' => $clean_name, // ✅ explicitly duplicate to a dedicated field
                     ];
 
-                    break 2; // exit both loops
+                    break 2; // exit both loops after first valid plan found
                 }
             }
         }

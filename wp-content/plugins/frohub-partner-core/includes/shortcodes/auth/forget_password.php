@@ -30,6 +30,7 @@ class ForgotPasswordForm {
                 <input type="hidden" name="fp_nonce" value="<?php echo esc_attr($nonce); ?>">
                 <button type="submit">Send Reset Link</button>
             </p>
+            <a href="/partner-login">Back to Login</a>
         </form>
 
         <script>

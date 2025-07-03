@@ -175,11 +175,11 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                 )}
             </Modal>
 
-            <FhProUpgrade
+            {/* <FhProUpgrade
                 visible={showUpgradeModal}
                 onClose={() => setShowUpgradeModal(false)}
                 onUpgrade={() => console.log('Redirect to upgrade page')}
-            />
+            /> */}
         </div>
     );
 };

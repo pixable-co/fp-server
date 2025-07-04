@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import axios from 'axios';
-import { Dropdown, Skeleton ,Switch } from 'antd';
+import { Dropdown, Skeleton, Switch } from 'antd';
 import FhModal from './FhModal'; // Adjust path if needed
 import swal from 'sweetalert';
 
@@ -41,8 +41,24 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     };
 
     useEffect(() => {
+        console.log(events)
         if (events.length > 0) {
             setLoading(false);
+        } else {
+            // Set a 10-second timeout to stop loading even if no events
+            const timeout = setTimeout(() => {
+                setLoading(false);
+                // Show swal message when no events are found after 10 seconds
+                swal({
+                    title: "No Events Found",
+                    text: "No upcoming bookings or events found. Please add some and try again.",
+                    icon: "info",
+                    button: "OK"
+                });
+            }, 10000); // 10 seconds
+
+            // Cleanup timeout if component unmounts or events arrive
+            return () => clearTimeout(timeout);
         }
     }, [events]);
 
@@ -523,7 +539,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         const placeholderEvents = [];
 
         // Generate random placeholder events throughout the month
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 15; i++) {
             // Random day between start and end of month
             const randomDay = Math.floor(Math.random() * (endOfMonth.getDate() - 1)) + 1;
             const eventDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), randomDay);
@@ -542,12 +558,16 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
             placeholderEvents.push({
                 id: `placeholder-${i}`,
-                title: 'Loading...',
+                title: '',
                 start: start.toISOString(),
                 end: end.toISOString(),
                 allDay: false,
+                backgroundColor: '#f0f0f0',
+                borderColor: '#e0e0e0',
+                textColor: 'transparent',
                 extendedProps: {
-                    isPlaceholder: true
+                    isPlaceholder: true,
+                    eventType: 'skeleton'
                 }
             });
         }
@@ -566,122 +586,103 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
     return (
         <div>
-            {loading ? (
-                <div className="w-full">
-                    <div className="flex justify-between mb-4 gap-2">
-                        <Skeleton.Button active size="small" style={{ width: 100 }} />
-                        <Skeleton.Button active size="small" style={{ width: 100 }} />
-                        <Skeleton.Button active size="small" style={{ width: 100 }} />
-                    </div>
-                    <Skeleton.Button active size="small" style={{ width: '1150px', height: '500px' }} />
-                </div>
-            ) : (
-                <>
-                    <FullCalendar
-                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                        initialView={isDayView ? 'dayGridMonth' : 'timeGridWeek'}
-                        headerToolbar={{
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                        }}
-                        weekends={true}
-                        // events={transformedEvents}
-                        events={displayEvents}
-                        selectable={!loading}
-                        selectMirror={!loading}
-                        // selectable={true}
-                        // selectMirror={true}
-                        select={handleSelect}
-                        // eventClick={handleEventClick}
-                        eventClick={loading ? undefined : handleEventClick}
-                        eventContent={renderEventContent}
-                        eventTimeFormat={{
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            meridiem: false
-                        }}
-                        height="auto"
+            <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView={isDayView ? 'dayGridMonth' : 'timeGridWeek'}
+                headerToolbar={{
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }}
+                weekends={true}
+                events={displayEvents}
+                selectable={!loading}
+                selectMirror={!loading}
+                select={handleSelect}
+                eventClick={loading ? undefined : handleEventClick}
+                eventContent={renderEventContent}
+                eventTimeFormat={{
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: false
+                }}
+                height="auto"
+            />
 
+            <FhModal
+                actionType="create"
+                name="Event"
+                isOpen={isModalOpen}
+                isClose={handleModalClose}
+                width={500}
+            >
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold mb-2">Block Out Time</h2>
+                    <p className="text-gray-500 text-sm mb-4">Clients won't be able to book during this time.</p>
+
+                    {/* Event Title Input */}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+                    <input
+                        type="text"
+                        className="w-full border-gray-300 rounded-md p-2 mb-4"
+                        placeholder="(e.g. personal appointment, vacation, etc.)"
+                        value={eventTitle}
+                        onChange={(e) => setEventTitle(e.target.value)}
                     />
 
-                    <FhModal
-                        actionType="create"
-                        name="Event"
-                        isOpen={isModalOpen}
-                        isClose={handleModalClose}
-                        width={500}
+                    {/* Start Date & Time Selection */}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                    <div className="flex items-center gap-3 mb-4">
+                        <input
+                            type="date"
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.start?.split("T")[0] || ""}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, start: e.target.value })}
+                        />
+                        <select
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.startTime || "00:00"}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, startTime: e.target.value })}
+                        >
+                            {generateTimeOptions().map((time, index) => (
+                                <option key={index} value={time}>
+                                    {time}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* End Date & Time Selection */}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
+                    <div className="flex items-center gap-3 mb-4">
+                        <input
+                            type="date"
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.end?.split("T")[0] || ""}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, end: e.target.value })}
+                        />
+                        <select
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.endTime || "23:59"}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, endTime: e.target.value })}
+                        >
+                            {generateTimeOptions().map((time, index) => (
+                                <option key={index} value={time}>
+                                    {time}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Save Button */}
+                    <button
+                        className="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600"
+                        onClick={handleSaveEvent}
                     >
-                        <div className="p-4">
-                            <h2 className="text-lg font-semibold mb-2">Block Out Time</h2>
-                            <p className="text-gray-500 text-sm mb-4">Clients won’t be able to book during this time.</p>
-
-                            {/* Event Title Input */}
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
-                            <input
-                                type="text"
-                                className="w-full border-gray-300 rounded-md p-2 mb-4"
-                                placeholder="(e.g. personal appointment, vacation, etc.)"
-                                value={eventTitle}
-                                onChange={(e) => setEventTitle(e.target.value)}
-                            />
-
-                            {/* Start Date & Time Selection */}
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
-                            <div className="flex items-center gap-3 mb-4">
-                                <input
-                                    type="date"
-                                    className="border-gray-300 rounded-md p-2 w-full"
-                                    value={selectedSlot?.start?.split("T")[0] || ""}
-                                    onChange={(e) => setSelectedSlot({ ...selectedSlot, start: e.target.value })}
-                                />
-                                <select
-                                    className="border-gray-300 rounded-md p-2 w-full"
-                                    value={selectedSlot?.startTime || "00:00"}
-                                    onChange={(e) => setSelectedSlot({ ...selectedSlot, startTime: e.target.value })}
-                                >
-                                    {generateTimeOptions().map((time, index) => (
-                                        <option key={index} value={time}>
-                                            {time}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* End Date & Time Selection */}
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
-                            <div className="flex items-center gap-3 mb-4">
-                                <input
-                                    type="date"
-                                    className="border-gray-300 rounded-md p-2 w-full"
-                                    value={selectedSlot?.end?.split("T")[0] || ""}
-                                    onChange={(e) => setSelectedSlot({ ...selectedSlot, end: e.target.value })}
-                                />
-                                <select
-                                    className="border-gray-300 rounded-md p-2 w-full"
-                                    value={selectedSlot?.endTime || "23:59"}
-                                    onChange={(e) => setSelectedSlot({ ...selectedSlot, endTime: e.target.value })}
-                                >
-                                    {generateTimeOptions().map((time, index) => (
-                                        <option key={index} value={time}>
-                                            {time}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Save Button */}
-                            <button
-                                className="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600"
-                                onClick={handleSaveEvent}
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </FhModal>
-
-                </>
-            )}
+                        Save
+                    </button>
+                </div>
+            </FhModal>
         </div>
     );
 };

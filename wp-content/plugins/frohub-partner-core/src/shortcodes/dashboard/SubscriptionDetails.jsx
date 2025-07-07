@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, Radio, Button, message, Spin } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { fetchData } from '../../services/fetchData';
+import swal from 'sweetalert';
 
 const formId = 16;
 
@@ -14,6 +15,8 @@ const SubscriptionDetails = () => {
     const [loadingForm, setLoadingForm] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [form] = Form.useForm();
+    const [radioValues, setRadioValues] = useState({});
+
 
     useEffect(() => {
         const style = document.createElement('style');
@@ -53,6 +56,7 @@ const SubscriptionDetails = () => {
 
     const handleSubmit = async (values) => {
         setSubmitting(true);
+
         const payload = {};
         formSchema.forEach(field => {
             const key = `input_${field.id}`;
@@ -61,23 +65,24 @@ const SubscriptionDetails = () => {
 
         fetchData('fpserver/submit_gf_form', (res) => {
             if (res.success) {
-                message.success('Form submitted. Downgrading...');
-                handleDowngrade();
-                closeModal();
+                handleDowngrade(); // delegate success handling
             } else {
                 message.error(res.data?.message || 'Submission failed.');
+                setSubmitting(false);
             }
-            setSubmitting(false);
         }, payload, 'POST');
     };
 
     const handleDowngrade = () => {
         fetchData('fpserver/set_pending_cancellation', (res) => {
+            setSubmitting(false); // stop loader
+            closeModal();         // close modal first
+
             if (res.success) {
-                alert('Your subscription has been marked for cancellation.');
-                window.location.reload();
+                swal('Success', 'Your subscription has been marked for cancellation!', 'success')
+                    .then(() => window.location.reload());
             } else {
-                alert(res.data?.message || 'Failed to set pending cancellation.');
+                swal('Error', res.data?.message || 'Failed to set pending cancellation.', 'error')
             }
         }, {}, 'POST');
     };
@@ -87,12 +92,57 @@ const SubscriptionDetails = () => {
         const rules = field.isRequired ? [{ required: true, message: `${field.label} is required` }] : [];
 
         switch (field.type) {
-            case 'textarea':
+            case 'textarea': {
+                const relatedRadioValue = radioValues[field.id]; // link to matching radio field by ID
+                const isOtherSelected = relatedRadioValue === 'Other'; // adapt to your choice value
+
                 return (
-                    <Form.Item key={field.id} label={null} name={name} rules={rules} className="custom-textarea">
-                        <Input.TextArea rows={4} placeholder="Please share more context..." />
+                    <Form.Item
+                        key={field.id}
+                        label={null}
+                        name={name}
+                        rules={isOtherSelected ? rules : []}
+                        className="custom-textarea"
+                    >
+                        <Input.TextArea
+                            rows={4}
+                            placeholder="Please share more context..."
+                            disabled={!isOtherSelected}
+                        />
                     </Form.Item>
                 );
+            }
+
+            case 'radio': {
+                return (
+                    <div className="custom-radio-group" key={field.id}>
+                        <p className="font-semibold text-base mb-4">{field.label}</p>
+                        <Form.Item name={name} rules={rules} className="mb-0">
+                            <Radio.Group
+                                onChange={(e) =>
+                                    setRadioValues((prev) => ({
+                                        ...prev,
+                                        [field.id]: e.target.value,
+                                    }))
+                                }
+                            >
+                                <div className="flex flex-col gap-3">
+                                    {field.choices?.map((choice) => (
+                                        <Radio
+                                            key={choice.value}
+                                            value={choice.value}
+                                            className="border border-gray-300 rounded-md px-4 py-2 hover:border-black transition"
+                                        >
+                                            {choice.text}
+                                        </Radio>
+                                    ))}
+                                </div>
+                            </Radio.Group>
+                        </Form.Item>
+                    </div>
+                );
+            }
+
             case 'select':
                 return (
                     <Form.Item key={field.id} label={field.label} name={name} rules={rules} className="custom-select">
@@ -105,19 +155,7 @@ const SubscriptionDetails = () => {
                         </Select>
                     </Form.Item>
                 );
-            case 'radio':
-                return (
-                    <div className="custom-radio-group" key={field.id}>
-                        <p className="font-medium text-base mb-3">{field.label}</p>
-                        <Form.Item name={name} rules={rules} className="mb-0">
-                            <Radio.Group className="flex flex-col gap-3 text-sm text-black">
-                                {field.choices?.map(choice => (
-                                    <Radio key={choice.value} value={choice.value}>{choice.text}</Radio>
-                                ))}
-                            </Radio.Group>
-                        </Form.Item>
-                    </div>
-                );
+
             default:
                 return (
                     <Form.Item key={field.id} label={field.label} name={name} rules={rules} className="custom-input">
@@ -215,7 +253,23 @@ const SubscriptionDetails = () => {
                     <div className="subscription-card pro">
                         <div className="header">
                             <h3>{currentPlan.includes('yearly') ? 'FroHub Pro Yearly' : 'FroHub Pro Monthly'}</h3>
-                            <span className="current-plan-badge">✔ Your Current Plan{window.fpserver_settings?.has_pending_cancellation === '1' && ' (Pending Cancel)'}</span>
+                            <div>
+                            <span className="current-plan-badge">
+                                ✔ Your Current Plan
+                                {window.fpserver_settings?.has_pending_cancellation === '1' && ' (Pending Cancel)'}
+                            </span>
+                                {window.fpserver_settings?.has_pending_cancellation === '1' &&
+                                    window.fpserver_settings.billing_history?.[0]?.end_date && (
+                                        <p className="text-yellow-600 text-sm mt-2">
+                                            You will be moved to FroHub Lite on{' '}
+                                            {new Date(window.fpserver_settings.billing_history[0].end_date).toLocaleDateString('en-GB', {
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            })}
+                                        </p>
+                                    )}
+                            </div>
                         </div>
 
                         <p>{currentPlan.includes('yearly') ? '£192/year + 7% booking fee' : '£20/month + 7% booking fee'}</p>
@@ -292,9 +346,15 @@ const SubscriptionDetails = () => {
                             You’ll keep access until the end of your current billing period, after which you’ll automatically be downgraded.
                         </div>
                         <Form.Item className="text-right mt-6">
-                            <Button type="link" htmlType="submit" loading={submitting} className="font-semibold text-black">
-                                Confirm Downgrade
-                            </Button>
+                            <button
+                                type="submit"
+                                disabled={submitting}
+                                className={`mt-6 font-semibold text-white px-6 py-2 rounded ${
+                                    submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
+                                }`}
+                            >
+                                {submitting ? 'Submitting...' : 'Confirm Downgrade'}
+                            </button>
                         </Form.Item>
                     </Form>
                 )}

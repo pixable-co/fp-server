@@ -358,51 +358,12 @@ address {
 }
 
 
-.gf-downgrade-form {
-    padding-top: 10px;
+.ant-radio-inner {
+    width: 18px;
+    height: 18px;
 }
 
-.custom-input .ant-form-item-label > label,
-.custom-select .ant-form-item-label > label {
-    font-weight: 500;
-    font-size: 15px;
-    color: #000;
-}
-
-.custom-input .ant-input,
-.custom-textarea .ant-input,
-.custom-select .ant-select-selector {
-    background-color: #f9fafb;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    padding: 8px 12px;
-}
-
-.custom-textarea .ant-input {
-    min-height: 100px;
-}
-
-.custom-radio-group label.ant-radio-wrapper {
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background-color: #fff;
-    transition: all 0.2s;
-}
-
-.custom-radio-group label.ant-radio-wrapper:hover {
-    border-color: #888;
-}
-
-.custom-radio-group label.ant-radio-wrapper .ant-radio-inner {
-    width: 16px;
-    height: 16px;
-}
-
-.custom-radio-group .ant-radio-group {
-    gap: 12px;
-}
-
-.gf-downgrade-form .ant-form-item {
-    margin-bottom: 20px;
+.ant-radio-checked .ant-radio-inner {
+    border-color: black;
+    background-color: black;
 }

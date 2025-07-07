@@ -124,11 +124,11 @@ const ValueOfBookingChart = () => {
                 <FhChart data={chartData} goal={chartGoal} />
             )}
 
-            <FhProUpgrade
+            {/* <FhProUpgrade
                 visible={showUpgradeModal}
                 onClose={() => setShowUpgradeModal(false)}
                 onUpgrade={() => console.log('Redirect to upgrade page')}
-            />
+            /> */}
         </div>
     );
 };

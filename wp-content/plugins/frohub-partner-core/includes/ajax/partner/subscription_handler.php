@@ -45,9 +45,23 @@ class SubscriptionHandler {
         $subscriptions = wcs_get_users_subscriptions($user_id);
 
         foreach ($subscriptions as $subscription) {
-            if ($subscription->has_status('active')) {
-                $subscription->update_status('pending-cancel');
-                wp_send_json_success(['message' => 'Subscription marked for cancellation.']);
+            if (!$subscription->has_status('active')) {
+                continue;
+            }
+
+            foreach ($subscription->get_items() as $item) {
+                $product = $item->get_product();
+                if (!$product) {
+                    continue;
+                }
+
+                $product_name = strtolower($product->get_name());
+
+                // Allow cancel only for Pro plans (e.g. 'FroHub - Pro Yearly', 'FroHub - Pro Monthly')
+                if (strpos($product_name, 'pro') !== false) {
+                    $subscription->update_status('pending-cancel');
+                    wp_send_json_success(['message' => 'Pro subscription marked for cancellation.']);
+                }
             }
         }
 
@@ -91,10 +105,6 @@ class SubscriptionHandler {
 
         $form_id = 16;
         $data = json_decode(file_get_contents('php://input'), true);
-
-//         if (!class_exists('\GFAPI') || empty($data) || !is_array($data)) {
-//             wp_send_json_error(['message' => 'Invalid request.']);
-//         }
 
         $entry = [];
 

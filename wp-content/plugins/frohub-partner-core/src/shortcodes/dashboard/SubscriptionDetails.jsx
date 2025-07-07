@@ -6,6 +6,7 @@ import { fetchData } from '../../services/fetchData';
 const formId = 16;
 
 const SubscriptionDetails = () => {
+    console.log(fpserver_settings);
     const [showDowngradeForm, setShowDowngradeForm] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [formSchema, setFormSchema] = useState(null);
@@ -174,7 +175,7 @@ const SubscriptionDetails = () => {
                     <div className="subscription-card pro">
                         <div className="header">
                             <h3>{currentPlan.includes('yearly') ? 'FroHub Pro Yearly' : 'FroHub Pro Monthly'}</h3>
-                            <span className="current-plan-badge">✔ Your Current Plan</span>
+                            <span className="current-plan-badge">✔ Your Current Plan{window.fpserver_settings?.has_pending_cancellation === '1' && ' (Pending Cancel)'}</span>
                         </div>
 
                         <p>{currentPlan.includes('yearly') ? '£192/year + 7% booking fee' : '£20/month + 7% booking fee'}</p>

@@ -6,7 +6,8 @@ import { fetchData } from '../../services/fetchData';
 const formId = 16;
 
 const SubscriptionDetails = () => {
-    console.log(fpserver_settings);
+    const productIds = {annual: 4154, monthly: 4153};
+    const [billingCycle, setBillingCycle] = useState('annual');
     const [showDowngradeForm, setShowDowngradeForm] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [formSchema, setFormSchema] = useState(null);
@@ -133,8 +134,9 @@ const SubscriptionDetails = () => {
     const isLitePlan = !hasActiveSubscription || hasActiveSubscription === '';
     const currentPlan = billingHistory[0]?.plan_name?.toLowerCase() || '';
 
-    const handleUpgrade = () => {
-        window.location.href = `/product/frohub/?switch-subscription=5479&item=659`;
+    const handleUpgrade = (productId) => {
+        const upgradeUrl = `/upgrade-subscription?upgrade_sub=yes&new_product_id=${productId}`;
+        window.location.href = upgradeUrl;
     };
 
     return (
@@ -150,24 +152,62 @@ const SubscriptionDetails = () => {
                         <p>£0/month + 7% booking fee</p>
                     </div>
 
-                    <div className="subscription-card pro-offer">
+                    <div className="subscription-card pro-offer mt-6">
                         <h3>FroHub Pro</h3>
-                        <p>Advanced features to support serious professionals ready to grow their business.</p>
-                        <ul className="features">
-                            <li>✅ Everything in Lite</li>
-                            <li>✅ Sync your calendar for real-time availability</li>
-                            <li>✅ FroHub Mobile app for quick access</li>
-                            <li>✅ In-depth client insights</li>
-                            <li>✅ Client marketing tools</li>
-                            <li>✅ Advanced reporting and analytics</li>
-                            <li>✅ Set and track growth goals</li>
-                            <li>✅ Verified Partner Badge</li>
+                        <p className="text-sm mb-4">Advanced features to support serious professionals ready to grow their business.</p>
+                        <ul className="features list-disc list-inside text-sm mb-4">
+                            <li>✔ Everything in Lite</li>
+                            <li>✔ Sync your calendar for real-time availability</li>
+                            <li>✔ FroHub Mobile app for quick and easy access</li>
+                            <li>✔ In-depth client insights</li>
+                            <li>✔ Client marketing tools</li>
+                            <li>✔ Advanced reporting and analytics</li>
+                            <li>✔ Set and track growth goals</li>
+                            <li>✔ Verified Partner Badge for boosted trust and visibility</li>
                         </ul>
-                        <div className="pricing">
-                            <p><strong>£16/month + 7% per booking</strong></p>
-                            <p>Save 20% when paid annually</p>
+
+                        <div className="flex items-center justify-between gap-6 mb-4">
+                            <div className="flex gap-4 items-center text-sm">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="billing"
+                                        value="annual"
+                                        checked={billingCycle === 'annual'}
+                                        onChange={() => setBillingCycle('annual')}
+                                    />{' '}
+                                    Pay Annually
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="billing"
+                                        value="monthly"
+                                        checked={billingCycle === 'monthly'}
+                                        onChange={() => setBillingCycle('monthly')}
+                                    />{' '}
+                                    Pay Monthly
+                                </label>
+                            </div>
                         </div>
-                        <button onClick={handleUpgrade} className="mt-4 upgrade-button">Upgrade</button>
+
+                        <div className="mb-4">
+                            {billingCycle === 'annual' ? (
+                                <>
+                                    <p className="text-lg font-bold">£16 <span className="text-sm text-gray-600">/month + 7% per booking</span></p>
+                                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs inline-block mt-1">Save 20%</span>
+                                </>
+                            ) : (
+                                <p className="text-lg font-bold">£20 <span className="text-sm text-gray-600">/month + 7% per booking</span></p>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => handleUpgrade(productIds[billingCycle])}
+                            className="upgrade-button bg-yellow-400 hover:bg-orange-500 text-black px-6 py-2 rounded"
+                        >
+                            Upgrade
+                        </button>
                     </div>
                 </>
             ) : (

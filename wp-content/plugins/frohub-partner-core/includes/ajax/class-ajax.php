@@ -1,6 +1,8 @@
 <?php
 namespace FPServer;
 
+use FPServer\SubscriptionHandeler;
+
 use FPServer\GetPartnerData;
 
 use FPServer\ReturnOrderDetails;
@@ -16,6 +18,7 @@ use FPServer\Xero;
 
 use FPServer\MediaUpload;
 use FPServer\ForgotPassword;
+use FPServer\SubscriptionHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -34,5 +37,6 @@ class Ajax {
 		PartnerConversations::init();
 		ReturnOrderDetails::init();
 		GetPartnerData::init();
+		SubscriptionHandler::init();
 	}
 }

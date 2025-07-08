@@ -160,16 +160,16 @@ const BookingStatsCard = () => {
                     <p className="booking-stats-value">{pendingOrdersCount}</p>
                 </div>
 
-                {/* Review Stats Component */}
-                <div className="review-stats dashboard-stats">
-                    <h2>Your Reviews</h2>
-                    <p className="booking-stats-value">{averageRating}</p>
-                </div>
-
                 {/* Unread Conversations Component */}
                 <div className="dashboard-stats">
                     <h2>Unread Messages</h2>
                     <p className="booking-stats-value">{partnerData?.unreadConversations || 0}</p>
+                </div>
+
+                {/* Review Stats Component */}
+                <div className="review-stats dashboard-stats">
+                    <h2>Your Reviews</h2>
+                    <p className="booking-stats-value">{averageRating}</p>
                 </div>
 
             </div>

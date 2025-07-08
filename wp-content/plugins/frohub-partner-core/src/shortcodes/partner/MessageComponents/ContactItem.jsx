@@ -1,8 +1,7 @@
-// ContactItem.jsx
 import React from 'react';
 import Avatar from './Avatar';
 
-const ContactItem = ({ conversation, isActive, onClick, isLoading = false }) => {
+const ContactItem = ({ conversation, unreadConversation, isActive, onClick, isLoading = false }) => {
     const handleClick = (event) => {
         if (!isLoading) {
             const hiddenInput = event.currentTarget.querySelector('input[type="hidden"]');
@@ -31,8 +30,14 @@ const ContactItem = ({ conversation, isActive, onClick, isLoading = false }) => 
             <div className="flex items-center gap-3">
                 <Avatar name={conversation.customer_name || 'Customer'} />
                 <div className="flex flex-col">
-                    <h3 className="font-semibold text-gray-900 leading-tight">
-                        {(conversation.customer_name || `Client #${conversation.client_id}`)}
+                    <h3 className="font-semibold text-gray-900 leading-tight flex items-center gap-2">
+                        {conversation.customer_name || `Client #${conversation.client_id}`}
+
+                        {/*{unreadConversation > 0 && (*/}
+                        {/*    <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">*/}
+                        {/*        {unreadConversation}*/}
+                        {/*    </span>*/}
+                        {/*)}*/}
                     </h3>
                 </div>
             </div>

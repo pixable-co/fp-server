@@ -29,7 +29,7 @@ const BookingStatsCard = () => {
     // Calculate average rating
     const calculateAverageRating = (reviews) => {
         if (!reviews || reviews.length === 0) {
-            return "No reviews (yet) 👀";
+            return "No reviews (yet) 🙈";
         }
 
         const validReviews = reviews.filter(review => review.rating);
@@ -166,10 +166,10 @@ const BookingStatsCard = () => {
                     <p className="booking-stats-value">{averageRating}</p>
                 </div>
 
-                {/* Additional Stats Component */}
+                {/* Unread Conversations Component */}
                 <div className="dashboard-stats">
-                    <h2>Total Reviews</h2>
-                    <p className="booking-stats-value">{reviews.length}</p>
+                    <h2>Unread Messages</h2>
+                    <p className="booking-stats-value">{partnerData?.unreadConversations || 0}</p>
                 </div>
 
             </div>

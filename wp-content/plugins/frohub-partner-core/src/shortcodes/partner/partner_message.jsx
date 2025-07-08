@@ -16,6 +16,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     const [error, setError] = useState(null);
     const autoReplyMessage = "Thanks, we’ll get back to you shortly."; // Set to null/'' to disable
     const [autoReplySent, setAutoReplySent] = useState(false);
+    const [unreadConversation, setUnreadConversation] = useState(0);
 
     const urlCustomerId = typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('customer_id')
@@ -126,6 +127,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                 const data = response.data || {};
                 const commentsData = data.comments || [];
                 const partnerIdFromResponse = data.user_partner_id;
+                setUnreadConversation(data.unread_count_partner);
 
                 if (Array.isArray(commentsData)) {
                     if (showLoading || comments.length === 0) {
@@ -269,6 +271,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                             <ContactItem
                                 key={conversation.client_id}
                                 conversation={conversation}
+                                unreadConversation={unreadConversation}
                                 isActive={activeConversation?.client_id === conversation.client_id}
                                 onClick={handleConversationSelect}
                             />
@@ -296,8 +299,16 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                                 <div className="flex justify-center items-center h-full text-gray-500">Loading messages...</div>
                             ) : (
                                 <div className="space-y-4">
-                                    {comments.map(comment => (
-                                        <Message key={comment.comment_id} comment={comment} />
+                                    {comments.map((comment, index) => (
+                                        <Message
+                                            key={comment.comment_id}
+                                            comment={comment}
+                                            conversationId={activeConversation?.conversation_id}
+                                            isLastCustomerMessage={
+                                                comment?.meta_data?.sent_from?.[0] !== 'partner' &&
+                                                index === comments.length - 1
+                                            }
+                                        />
                                     ))}
                                     {comments.length === 0 && (
                                         <div className="text-center text-gray-500 mt-8">No messages yet. Start a conversation!</div>

@@ -15,12 +15,14 @@ class PartnerConversations {
         add_action('wp_ajax_fpserver/get_conversation_comments', array($self, 'get_conversation_comments'));
         add_action('wp_ajax_fpserver/send_partner_message', array($self, 'send_partner_message'));
         add_action('wp_ajax_fpserver/upload_comment_image', array($self, 'upload_comment_image'));
+        add_action('wp_ajax_fpserver/read_by_partner', array($self, 'read_by_partner'));
 
         // AJAX for non-logged-in users
         add_action('wp_ajax_nopriv_fpserver/partner_conversations', array($self, 'partner_conversations'));
         add_action('wp_ajax_nopriv_fpserver/get_conversation_comments', array($self, 'get_conversation_comments'));
         add_action('wp_ajax_nopriv_fpserver/send_partner_message', array($self, 'send_partner_message'));
         add_action('wp_ajax_nopriv_fpserver/upload_comment_image', array($self, 'upload_comment_image'));
+        add_action('wp_ajax_nopriv_fpserver/read_by_partner', array($self, 'read_by_partner'));
     }
 
     public function partner_conversations() {
@@ -137,6 +139,8 @@ class PartnerConversations {
             $profile_picture = $decoded['profile_picture'] ?? '';
             $partner_profile_picture = $decoded['partner_profile_picture'] ?? '';
             $comments_data = $decoded['comments'] ?? [];
+            $read_by_partner = isset($decoded['read_by_partner']) ? (bool) $decoded['read_by_partner'] : false;
+            $unread_count_partner = isset($decoded['unread_count_partner']) ? (int) $decoded['unread_count_partner'] : 0;
 
             // Get user partner id from either $decoded['user_partner_id'] or WordPress user meta
             $currentUserId = get_current_user_id();
@@ -177,10 +181,12 @@ class PartnerConversations {
             }
 
             wp_send_json_success([
-                'profile_picture' => $profile_picture,
+                'profile_picture'         => $profile_picture,
                 'partner_profile_picture' => $partner_profile_picture,
-                'comments' => $allComments,
-                'user_partner_id' => $userPartnerPostId
+                'comments'                => $allComments,
+                'user_partner_id'         => $userPartnerPostId,
+                'read_by_partner'         => $read_by_partner,
+                'unread_count_partner'    => $unread_count_partner
             ]);
 
         } catch (Exception $e) {
@@ -302,6 +308,57 @@ class PartnerConversations {
 
         // Always end with wp_die()
         wp_die();
+    }
+
+    public function read_by_partner() {
+        check_ajax_referer('fpserver_nonce');
+
+        if (!is_user_logged_in()) {
+            wp_send_json_error(['message' => 'User not logged in.'], 403);
+        }
+
+        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+
+        if (!$post_id) {
+            wp_send_json_error(['message' => 'Invalid or missing post_id.'], 400);
+        }
+
+        $basicAuth = get_field('frohub_ecommerce_basic_authentication', 'option');
+        if (!$basicAuth) {
+            wp_send_json_error(['message' => 'Authentication not configured.']);
+        }
+
+        // Call the external API endpoint
+        $api_url = FPSERVER_ECOM_BASE_API_URL . '/wp-json/frohub/v1/read-by-partner';
+
+        $response = wp_remote_post($api_url, [
+            'method'    => 'POST',
+            'headers'   => [
+                'Content-Type'  => 'application/json',
+                'Authorization' => $basicAuth
+            ],
+            'body'      => json_encode([
+                'conversation_post_id' => $post_id,
+            ]),
+            'timeout' => 20,
+        ]);
+
+        if (is_wp_error($response)) {
+            wp_send_json_error(['message' => 'API request failed: ' . $response->get_error_message()]);
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        $status = wp_remote_retrieve_response_code($response);
+
+        if ($status !== 200 || empty($body['success'])) {
+            $error_message = $body['message'] ?? 'Unknown API error.';
+            wp_send_json_error(['message' => 'Failed to update read status: ' . $error_message]);
+        }
+
+        wp_send_json_success([
+            'message' => $body['message'] ?? 'Marked as read successfully',
+            'post_id' => $post_id,
+        ]);
     }
 
 }

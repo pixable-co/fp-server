@@ -93,7 +93,7 @@ class InviteList {
             <div class="invite-icons">
                 <a href="https://wa.me/?text=Hey%2C+I%E2%80%99ve+been+using+FroHub+to+book+Afro+hairdressers%2C+and+it%E2%80%99s+amazing!+I+think+you%E2%80%99d+be+a+great+addition+to+their+community.+Check+it+out+if+you%E2%80%99d+like+to+join%3A+https%3A%2F%2Ffrohub.com%2Fpartners%2F+x+%F0%9F%98%8A%E2%9D%A4%EF%B8%8F" target="_blank"><i class="fab fa-whatsapp"></i></a>
                 <a href="https://www.messenger.com/" target="_blank"><i class="fab fa-facebook-messenger"></i></a>
-                <a href="" target="_blank"><i class="fas fa-envelope"></i></a>
+                <a href="/messages" target="_blank"><i class="fas fa-comments-alt"></i></a>
                 <a href="sms:?body=Join+this+amazing+community!" target="_blank"><i class="fas fa-sms"></i></a>
                 <a href="#" onclick="copyInviteLink(event)" id="copyLink"><i class="fas fa-link"></i></a>
                 <div class="copy-popover" id="copyPopover">Link copied!</div>

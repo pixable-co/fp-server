@@ -14,20 +14,35 @@ const MyBookingLink = () => {
         return null;
     };
 
+    // Load from cookie or Zustand
     useEffect(() => {
-        // First try cookie
         const cookieUrl = getCookie('partner_profile_url');
         if (cookieUrl) {
             setFinalUrl(cookieUrl);
             return;
         }
 
-        // If not in cookie, wait for Zustand
         if (zustandUrl) {
             document.cookie = `partner_profile_url=${encodeURIComponent(zustandUrl)}; path=/`;
             setFinalUrl(zustandUrl);
         }
     }, [zustandUrl]);
+
+    // Replace attributes of existing <a> tag (not content)
+    useEffect(() => {
+        if (!finalUrl) return;
+
+        const icons = document.querySelectorAll('i.fas.fa-link');
+        icons.forEach((icon) => {
+            const parentLink = icon.closest('a');
+            if (parentLink) {
+                parentLink.href = finalUrl;
+                parentLink.target = '_blank';
+                parentLink.rel = 'noopener noreferrer';
+                // Leave innerHTML untouched
+            }
+        });
+    }, [finalUrl]);
 
     return (
         <div>

@@ -22,7 +22,7 @@ class NavMenu {
             </div>
             <div class="fp-topbar-icons">
                 <?php echo do_shortcode('[my_booking_link]');?>
-                <i class="fas fa-envelope"></i>
+                <a href="/messages"><i class="fas fa-comments-alt"></i></a>
                 <div class="fp-user-dropdown">
                     <i class="fas fa-user" id="fpUserToggle"></i>
                     <div class="fp-dropdown-menu" id="fpDropdownMenu">

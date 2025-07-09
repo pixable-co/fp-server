@@ -289,7 +289,7 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                 {activeConversation ? (
                     <>
                         <div className="top-avatar bg-white p-4 flex items-center">
-                            <Avatar name={activeConversation.customer_name || 'Customer'} />
+                            <Avatar name={activeConversation.customer_name || 'Customer'} image={activeConversation.customer_image} />
                             <div className="ml-3">
                                 <h3 className="font-medium text-gray-900">{activeConversation.customer_name || `Client #${activeConversation.client_id}`}</h3>
 
@@ -310,6 +310,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                                                 comment?.meta_data?.sent_from?.[0] !== 'partner' &&
                                                 index === comments.length - 1
                                             }
+                                            customerImage={activeConversation?.customer_image}
+                                            partnerImage={activeConversation?.partner_image}
                                         />
                                     ))}
                                     {comments.length === 0 && (

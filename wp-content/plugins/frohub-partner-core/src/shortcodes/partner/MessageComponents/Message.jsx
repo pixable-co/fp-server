@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Avatar from './Avatar';
 import { fetchData } from '../../../services/fetchData';
 
-const Message = ({ comment, conversationId, isLastCustomerMessage = false }) => {
+const Message = ({ comment, conversationId, customerImage, partnerImage, isLastCustomerMessage = false }) => {
     console.log(conversationId)
     const sentFrom = comment?.meta_data?.sent_from?.[0] || '';
     const isPartnerMessage = sentFrom === 'partner';
@@ -39,7 +39,7 @@ const Message = ({ comment, conversationId, isLastCustomerMessage = false }) => 
 
     return (
         <div className={`flex gap-2 mb-4 ${isPartnerMessage ? 'justify-end' : 'justify-start'}`}>
-            {!isPartnerMessage && <Avatar name={comment.author || 'User'} size="sm" />}
+            {!isPartnerMessage && <Avatar name={comment.author || 'User'} size="sm" image={customerImage} />}
 
             <div className={`max-w-sm ${isPartnerMessage ? 'text-right' : 'text-left'}`}>
                 <div
@@ -63,7 +63,7 @@ const Message = ({ comment, conversationId, isLastCustomerMessage = false }) => 
                 </div>
             </div>
 
-            {isPartnerMessage && <Avatar name="You" size="sm" />}
+            {isPartnerMessage && <Avatar name="You" size="sm" image={partnerImage} />}
         </div>
     );
 };

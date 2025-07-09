@@ -321,9 +321,18 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                     </>
                 ) : (
                     <div className="flex-1 flex items-center justify-center text-gray-500">
-                        <div className="text-center">
-                            <h3 className="text-lg font-medium mb-2">Select a conversation</h3>
-                            <p>Choose a conversation from the sidebar to start messaging</p>
+                        <div className="text-center px-4 py-10">
+                            <div className="flex justify-center mb-4">
+                                <img
+                                    src={`${fpserver_settings.base_api_url}/wp-content/uploads/2025/03/Asset-10.svg`}
+                                    alt="frohub logo"
+                                    className="h-10"
+                                />
+                            </div>
+                            <h3 className="text-2xl font-bold mb-3 text-gray-800">Welcome to your inbox!</h3>
+                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">
+                                Select a conversation from the left to start chatting. If you don’t see any conversations, it means you haven’t connected with any clients yet.
+                            </p>
                         </div>
                     </div>
                 )}

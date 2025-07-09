@@ -240,3 +240,122 @@
 /*.woocommerce-MyAccount-content h2 {*/
 /*    display: none !important;*/
 /*}*/
+
+.availability-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 40px 1.2fr 1.2fr 50px 50px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.availability-row input,
+.availability-row select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.availability-row span {
+    text-align: center;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+}
+
+.availability-row button {
+    padding: 10px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: #eee;
+    cursor: pointer;
+}
+
+.availability-row button:hover {
+    background-color: #ddd;
+}
+
+.availability-header {
+    display: grid;
+    grid-template-columns: 1.2fr 1.3fr 0px 1.2fr 1.6fr 0px 0px;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+
+/* Tooltip styles */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+.tooltip-container .tooltip {
+    display: none;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
+}
+.tooltip-container:hover .tooltip {
+    display: block;
+}
+.tooltip-icon {
+    color: #666;
+    font-size: 14px;
+}
+
+
+.deposit-policy-box {
+    border: 1px solid #eee;
+    border-left: 6px solid #e84d4d;
+    border-radius: 4px;
+    padding: 20px 24px;
+    background-color: #fefefe;
+    position: relative;
+    margin-bottom: 50px;
+}
+
+.deposit-policy-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fef0f0;
+    padding: 12px 16px;
+    margin: -20px -24px 20px -24px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+    font-size: 16px;
+    color: #cc2b2b;
+}
+
+.deposit-policy-header .close-icon {
+    color: #999;
+    font-size: 18px;
+    cursor: default;
+    pointer-events: none; /* disable interactions (view only) */
+}
+
+.deposit-policy-content p {
+    margin-bottom: 14px;
+    font-size: 15px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.deposit-policy-content b {
+    font-weight: 600;
+}

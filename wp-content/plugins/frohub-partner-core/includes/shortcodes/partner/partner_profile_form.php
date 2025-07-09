@@ -134,9 +134,9 @@ class PartnerProfileForm
 
                 <!-- Profile Image Upload -->
                 <div class="image-upload">
-                <label for="profile-image">Profile Image:</label>
+                <label for="profile-image">Profile Picture:</label>
                 <div class="image-upload-container profile-upload-container" onclick="document.getElementById('profileImageInput').click();">
-                    <img id="profilePreview" src="<?php echo esc_url($partner_data['featuredImage'] ?? 'https://via.placeholder.com/120'); ?>" alt="Profile Image">
+                    <img id="profilePreview" src="<?php echo esc_url($partner_data['featuredImage'] ?? 'https://via.placeholder.com/120'); ?>" alt="Edit">
                     <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
                 </div>
                 <input type="file" id="profileImageInput" name="profileImage" accept="image/*" onchange="previewImage(event, 'profilePreview')">
@@ -146,14 +146,38 @@ class PartnerProfileForm
                 <div class="image-upload">
                 <label for="banner-image">Cover Image:</label>
                 <div class="image-upload-container banner-upload-container" onclick="document.getElementById('bannerImageInput').click();">
-                    <img id="bannerPreview" src="<?php echo esc_url($partner_data['bannerImage'] ?? 'https://via.placeholder.com/1200x250'); ?>" alt="Banner Image">
+                    <img id="bannerPreview" src="<?php echo esc_url($partner_data['bannerImage'] ?? 'https://via.placeholder.com/1200x250'); ?>" alt="Edit">
                     <div class="image-edit-overlay"><i class="fas fa-edit"></i></div>
                 </div>
                 <input type="file" id="bannerImageInput" name="bannerImage" accept="image/*" onchange="previewImage(event, 'bannerPreview')">
                     </div>
 
+
                 <div class="form-group" id="availability">
                     <label class="form-label">Availability</label>
+                    <p>
+                        Set your working hours—either weekly or for specific dates—add premium charges for out-of-hours appointments,
+                        define your booking notice period and advance scheduling. You can also add time for breaks between appointments.
+                    </p>
+
+                    <!-- Header -->
+                    <div class="availability-header">
+                        <div>Day</div>
+                        <div>Start</div>
+                        <div></div> <!-- to -->
+                        <div>End</div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            Premium Time Fee (optional)
+                            <span class="tooltip-container">
+                                <i class="fas fa-info-circle tooltip-icon"></i>
+                                <span class="tooltip">Optional fee for premium or out-of-hours appointments. Leave blank if not needed.</span>
+                            </span>
+                        </div>
+                        <div></div> <!-- + -->
+                        <div></div> <!-- − -->
+                    </div>
+
+                    <!-- Rows -->
                     <div id="availability-container">
                         <?php foreach ($availability as $slot): ?>
                             <div class="availability-row">
@@ -166,19 +190,57 @@ class PartnerProfileForm
                                 <span>to</span>
                                 <input type="time" name="availabilityEnd[]" value="<?php echo esc_attr($slot['to']); ?>">
                                 <input type="text" name="extraCharge[]" value="<?php echo esc_attr($slot['extra_charge']); ?>" placeholder="£0">
-                                <button type="button" class="add-row">+</button>
-                                <button type="button" class="remove-row">−</button>
+                                <button type="button" class="add-row availability-add">+</button>
+                                <button type="button" class="remove-row availability-remove">−</button>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
+
+                <!-- 🔵 DATE-SPECIFIC AVAILABILITY SECTION -->
+                <div class="form-group mt-5 pt-4">
+                    <label class="form-label">Date-specific hours</label>
+                    <div class="availability-header">
+                                            <div>Day</div>
+                                            <div>Start</div>
+                                            <div></div> <!-- to -->
+                                            <div>End</div>
+                                            <div style="display: flex; align-items: center; gap: 4px;">
+                                                Premium Time Fee (optional)
+                                                <span class="tooltip-container">
+                                                    <i class="fas fa-info-circle tooltip-icon"></i>
+                                                    <span class="tooltip">Optional fee for premium or out-of-hours appointments. Leave blank if not needed.</span>
+                                                </span>
+                                            </div>
+                                            <div></div> <!-- + -->
+                                            <div></div> <!-- − -->
+                                        </div>
+
+                    <div id="date-specific-container">
+                        <div class="availability-row">
+                            <input type="date" name="specificDate[]">
+                            <input type="time" name="specificStart[]">
+                            <span>to</span>
+                            <input type="time" name="specificEnd[]">
+                            <input type="text" name="specificExtraCharge[]" placeholder="£0">
+                            <button type="button" class="add-row date-add">+</button>
+                            <button type="button" class="remove-row date-remove">−</button>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div class="form-group">
                     <label class="form-label">Notice Period</label>
 
                     <div class="notice-fields">
                         <div class="notice-item">
-                            <label>How much notice do you need before a client can book an appointment?</label>
+                            <div>
+                                <label>How much notice do you need before a client can book an appointment?</label>
+                                <span class="tooltip-container">
+                                <i class="fas fa-info-circle tooltip-icon"></i>
+                                <span class="tooltip">dd a break between appointments — for mobile travel, clean-up, or a quick breather.</span></span>
+                            </div>
                             <div class="inline-input-suffix">
                                 <input type="number" name="bookingNotice" class="form-input" value="<?php echo esc_attr($bookingNotice); ?>" />
                                 <span class="suffix-label">Day(s)</span>
@@ -226,6 +288,17 @@ class PartnerProfileForm
                     <p>Specify how you wish to receive the remainder of the payment after the deposit has been collected. Choose from options such as cash, card, or other payment methods.</p>
                     <textarea name="payments" class="form-textarea"><?php echo $payments; ?></textarea>
                 </div>
+
+                <div class="deposit-policy-box">
+                    <div class="deposit-policy-header"><span>Deposit Refund Policy</span><i class="fas fa-times close-icon"></i></div>
+                        <div class="deposit-policy-content">
+                            <p>At FroHub, we have a deposit refund policy in place to protect both our stylists and clients, ensuring a fair experience for everyone.</p>
+                            <p><b>Cancellations up to 7 Days Before Appointment:</b> If a client cancels their booking at least 7 days before the scheduled appointment, they will receive a full refund of their deposit. However, the booking fee is non-refundable.</p>
+                            <p><b>Cancellations Within 7 Days:</b> If a client cancels their booking within 7 days of the scheduled appointment, or if the booking was made less than 7 days in advance, the client is not eligible for a refund of either the deposit or the booking fee.</p>
+                            <p><b>If the Stylist Cancels:</b> If the stylist cancels the appointment for any reason, the client will be refunded all payments made, including both the deposit and the booking fee.</p>
+                            <p><b>Why the 7-Day Notice?</b><br />The 7-day cancellation policy allows our stylists to fill their time slot with another client, reducing the financial impact of last-minute cancellations. We ask that clients keep this in mind when making bookings, as it helps stylists manage their schedules and maintain availability for all clients.</p>
+                            </div>
+                    </div>
 
                 <div class="profile-form-footer">
                     <div class="btn-group">
@@ -318,6 +391,26 @@ class PartnerProfileForm
                         checkbox.addEventListener('change', function () {
                             messageGroup.style.display = this.checked ? 'block' : 'none';
                         });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("date-specific-container").addEventListener("click", function (e) {
+                if (e.target.classList.contains("date-add")) {
+                     const row = e.target.closest(".availability-row");
+                     const clone = row.cloneNode(true);
+                     clone.querySelectorAll("input").forEach(el => {
+                         if (el.type !== 'button') el.value = '';
+                    });
+                        this.appendChild(clone);
+                }
+
+                if (e.target.classList.contains("date-remove")) {
+                    const rows = this.querySelectorAll(".availability-row");
+                        if (rows.length > 1) {
+                            e.target.closest(".availability-row").remove();
+                        }
+                    }
+                });
         });
         </script>
         <?php

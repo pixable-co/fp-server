@@ -271,7 +271,9 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                             <ContactItem
                                 key={conversation.client_id}
                                 conversation={conversation}
-                                unreadConversation={unreadConversation}
+                                // unreadConversation={unreadConversation}
+                                unreadConversation={conversation.unread_count_partner}
+                                customerImage={conversation.customer_image}
                                 isActive={activeConversation?.client_id === conversation.client_id}
                                 onClick={handleConversationSelect}
                             />
@@ -322,17 +324,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                 ) : (
                     <div className="flex-1 flex items-center justify-center text-gray-500">
                         <div className="text-center px-4 py-10">
-                            <div className="flex justify-center mb-4">
-                                <img
-                                    src={`${fpserver_settings.base_api_url}/wp-content/uploads/2025/03/Asset-10.svg`}
-                                    alt="frohub logo"
-                                    className="h-10"
-                                />
-                            </div>
-                            <h3 className="text-2xl font-bold mb-3 text-gray-800">Welcome to your inbox!</h3>
-                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">
-                                Select a conversation from the left to start chatting. If you don’t see any conversations, it means you haven’t connected with any clients yet.
-                            </p>
+                            <h3 className="text-2xl font-bold mb-3 text-gray-800">👋🏾 Welcome to your inbox!</h3>
+                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">When a client books or sends an enquiry, their messages will appear here for you to respond to. Need to share anything ahead of the appointment? Send them a quick message here.</p>
                         </div>
                     </div>
                 )}

@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { uploadImageDirect } from "../../../services/uploadImage.js";
 
-const ChatInput = ({ onSendMessage, isLoading = false, disabled = false }) => {
+const ChatInput = ({ onSendMessage, autoReplyEnabled, isLoading = false, disabled = false }) => {
+    console.log(autoReplyEnabled)
     const [message, setMessage] = useState('');
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);

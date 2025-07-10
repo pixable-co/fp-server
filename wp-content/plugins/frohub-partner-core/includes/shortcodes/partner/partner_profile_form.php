@@ -289,6 +289,44 @@ class PartnerProfileForm
                     <textarea name="payments" class="form-textarea"><?php echo $payments; ?></textarea>
                 </div>
 
+                <div class="form-group auto-reply-group">
+                    <div class="auto-reply-header">
+                        <div class="auto-reply-title">
+                            <i class="fas fa-umbrella-beach"></i>
+                            <label class="form-label reply-label">Auto Reply Message</label>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="auto_message" name="auto_message" <?php echo !empty($partner_data['auto_message']) ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <p class="auto-reply-description">
+                        You may be busy with another appointment or away on holiday. Let your clients know.
+                    </p>
+
+                    <div class="form-group" id="auto_message_text_group">
+                        <label class="form-label">Message</label>
+                        <?php
+                        $auto_message_text = $partner_data['auto_message_text'] ?? '';
+                        $auto_message_enabled = !empty($partner_data['auto_message']);
+                        wp_editor(
+                            $auto_message_text,
+                            'auto_message_text',
+                            [
+                                'textarea_name' => 'auto_message_text',
+                                'textarea_rows' => 8,
+                                'teeny'         => true,
+                                'media_buttons' => false,
+                                'quicktags'     => false,
+                                'editor_class'  => 'auto-reply-editor' . ($auto_message_enabled ? '' : ' is-disabled'),
+                            ]
+                        );
+                        ?>
+
+                    </div>
+                </div>
+
                 <div class="deposit-policy-box">
                     <div class="deposit-policy-header"><span>Deposit Refund Policy</span><i class="fas fa-times close-icon"></i></div>
                         <div class="deposit-policy-content">
@@ -356,6 +394,12 @@ class PartnerProfileForm
                 position: absolute;
                 right:10rem;
             }
+
+            textarea:disabled {
+                background-color: #f5f5f5;
+                color: #999;
+                cursor: not-allowed;
+            }
         </style>
 
         <script>
@@ -386,11 +430,47 @@ class PartnerProfileForm
         });
 
         document.addEventListener('DOMContentLoaded', function () {
-                        const checkbox = document.getElementById('auto_message');
-                        const messageGroup = document.getElementById('auto_message_text_group');
-                        checkbox.addEventListener('change', function () {
-                            messageGroup.style.display = this.checked ? 'block' : 'none';
-                        });
+            const checkbox = document.getElementById('auto_message');
+            const editorId = 'auto_message_text'; // TinyMCE ID
+            const wrapper = document.querySelector('.auto-reply-editor');
+
+            // Function to disable editor UI
+            function setEditorDisabledState(disabled) {
+                if (!wrapper) return;
+
+                wrapper.classList.toggle('is-disabled', disabled);
+
+                if (typeof tinymce !== 'undefined') {
+                    const editor = tinymce.get(editorId);
+                    if (editor) {
+                        editor.setMode(disabled ? 'readonly' : 'design');
+                    }
+                }
+            }
+
+            // Handle toggle interaction
+            if (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    setEditorDisabledState(!this.checked);
+                });
+            }
+
+            // Wait for TinyMCE to fully load
+            function waitForEditorReady(callback) {
+                const interval = setInterval(() => {
+                    if (typeof tinymce !== 'undefined') {
+                        const editor = tinymce.get(editorId);
+                        if (editor && editor.initialized) {
+                            clearInterval(interval);
+                            callback(editor);
+                        }
+                    }
+                }, 100);
+            }
+
+            waitForEditorReady(() => {
+                setEditorDisabledState(!checkbox.checked);
+            });
         });
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -455,6 +535,8 @@ class PartnerProfileForm
             "bookingScope"  => intval($_POST["bookingScope"]),
             "bufferPeriodMin"  => intval($_POST["bufferPeriodMin"]),
             "bufferPeriodHour"  => intval($_POST["bufferPeriodHour"]),
+            "auto_message" => isset($_POST["auto_message"]),
+            "auto_message_text" => sanitize_textarea_field($_POST["auto_message_text"] ?? ''),
         ];
 
         $ecommerce_api_url = FPSERVER_ECOM_BASE_API_URL . "/wp-json/frohub/v1/update-partner";

@@ -5,6 +5,7 @@ import ContactItem from "./MessageComponents/ContactItem.jsx";
 import ChatInput from './MessageComponents/ChatInput';
 import Message from './MessageComponents/Message';
 import Avatar from './MessageComponents/Avatar';
+import AutoReply from "./MessageComponents/AutoReply.jsx";
 
 const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversationId = null }) => {
     const [conversations, setConversations] = useState([]);
@@ -320,6 +321,10 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                                 </div>
                             )}
                         </div>
+
+                        {activeConversation && (
+                            <AutoReply enabled={!!activeConversation.auto_message} />
+                        )}
 
                         <ChatInput onSendMessage={handleSendMessage} isLoading={loading.sending} disabled={loading.comments} />
                     </>

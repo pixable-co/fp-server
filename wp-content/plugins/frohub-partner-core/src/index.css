@@ -367,3 +367,18 @@ address {
     border-color: black;
     background-color: black;
 }
+
+
+.auto-reply-banner {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    background-color: #f3f3f3;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    font-weight: 500;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}

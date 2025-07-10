@@ -13,7 +13,7 @@ const ContactItem = ({ conversation, unreadConversation, customerImage, isActive
     const formatTimestamp = (timestamp) => {
         try {
             return new Date(timestamp).toLocaleString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                day: '2-digit', month: 'short', year: 'numeric'
             });
         } catch {
             return '';
@@ -40,6 +40,10 @@ const ContactItem = ({ conversation, unreadConversation, customerImage, isActive
                         )}
                     </h3>
                 </div>
+            </div>
+
+            <div className="flex flex-col items-end text-xs text-gray-500">
+                <span>{formatTimestamp(conversation.last_activity)}</span>
             </div>
 
             <input type="hidden" value={conversation.conversation_id} />

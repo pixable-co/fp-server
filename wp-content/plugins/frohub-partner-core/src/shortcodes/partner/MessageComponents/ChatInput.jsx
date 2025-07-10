@@ -60,7 +60,7 @@ const ChatInput = ({ onSendMessage, autoReplyEnabled, isLoading = false, disable
     return (
         <div className="bg-white border-t p-3 sticky bottom-0">
             <div className="auto-reply-banner">
-                <span><i class="fas fa-exclamation-triangle"></i> Only deposits paid through FroHub are protected. <a href={`${fpserver_settings.base_api_url}/help-centre`}>Learn more.</a></span>
+                <span><i class="fas fa-exclamation-triangle"></i> Only deposits paid through FroHub are protected. <a target="_blank" href={`${fpserver_settings.base_api_url}/help-centre`}>Learn more.</a></span>
             </div>
             <div className="flex items-center">
                 <input

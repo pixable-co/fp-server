@@ -28,6 +28,7 @@ const Message = ({ comment, conversationId, customerImage, partnerImage, isLastC
                 (res) => {
                     if (res.success) {
                         setHasMarkedRead(true);
+                        document.cookie = "unreadConversations=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                     } else {
                         console.warn('Failed to mark as read:', res.message);
                     }

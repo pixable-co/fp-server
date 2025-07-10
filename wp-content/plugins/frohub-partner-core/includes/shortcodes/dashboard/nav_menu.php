@@ -22,7 +22,10 @@ class NavMenu {
             </div>
             <div class="fp-topbar-icons">
                 <?php echo do_shortcode('[my_booking_link]');?>
-                <a href="/messages"><i class="fas fa-comments-alt"></i></a>
+                <a href="/messages" id="unread-message-link">
+                    <i class="fas fa-comments-alt"></i>
+                    <span id="unread-count-badge" style="margin-left: 4px; color: #000000;"></span>
+                </a>
                 <div class="fp-user-dropdown">
                     <i class="fas fa-user" id="fpUserToggle"></i>
                     <div class="fp-dropdown-menu" id="fpDropdownMenu">
@@ -480,7 +483,18 @@ class NavMenu {
                 }
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const cookieMatch = document.cookie.match(/(?:^|; )unreadConversations=([^;]*)/);
+            const unreadCount = cookieMatch ? parseInt(cookieMatch[1], 10) : 0;
+            const badge = document.getElementById('unread-count-badge');
+
+            if (badge && unreadCount > 0) {
+                 badge.textContent = `(${unreadCount})`;
+            }
+        });
         </script>
+
         <?php
         return ob_get_clean();
     }

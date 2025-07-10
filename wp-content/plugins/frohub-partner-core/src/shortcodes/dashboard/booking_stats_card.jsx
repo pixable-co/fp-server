@@ -17,6 +17,13 @@ const BookingStatsCard = () => {
                 const profileUrl = response.data.partnerProfileUrl;
                 setPartnerProfileUrl(profileUrl);
                 setPartnerData(response.data);
+
+                // Set session cookie for unreadConversations
+                if (typeof response.data.unreadConversations !== 'undefined') {
+                    const unreadCount = response.data.unreadConversations;
+                    document.cookie = `unreadConversations=${unreadCount}; path=/`;
+                }
+
                 setError(null);
             } else {
                 setError(response.data?.message || 'Failed to fetch partner data.');

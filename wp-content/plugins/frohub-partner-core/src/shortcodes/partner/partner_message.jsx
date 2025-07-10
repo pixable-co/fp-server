@@ -290,6 +290,10 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                             </div>
                         </div>
 
+                        {activeConversation && (
+                            <AutoReply enabled={!!activeConversation.auto_message} />
+                        )}
+
                         <div id="chat-messages-container" className="flex-1 overflow-y-auto p-4">
                             {loading.comments ? (
                                 <div className="flex justify-center items-center h-full text-gray-500">Loading messages...</div>
@@ -314,10 +318,6 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                                 </div>
                             )}
                         </div>
-
-                        {activeConversation && (
-                            <AutoReply enabled={!!activeConversation.auto_message} />
-                        )}
 
                         <ChatInput onSendMessage={handleSendMessage} isLoading={loading.sending} disabled={loading.comments} />
                     </>

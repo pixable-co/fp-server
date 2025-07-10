@@ -301,14 +301,15 @@ class PartnerProfileForm
                         </label>
                     </div>
 
-                    <p class="auto-reply-description">
-                        You may be busy with another appointment or away on holiday. Let your clients know.
+                    <p>
+                        Set a message to automatically reply when you're unavailable.
+                        Whether you're busy with a client, on holiday, or need time to respond, this auto-message keeps clients informed and reassured.
                     </p>
 
                     <div class="form-group" id="auto_message_text_group">
                         <label class="form-label">Message</label>
                         <?php
-                        $auto_message_text = $partner_data['auto_message_text'] ?? '';
+                        $auto_message_text = $partner_data['auto_message_text'] ?? 'This is an automatic reply. I am on holiday.';
                         $auto_message_enabled = !empty($partner_data['auto_message']);
                         wp_editor(
                             $auto_message_text,

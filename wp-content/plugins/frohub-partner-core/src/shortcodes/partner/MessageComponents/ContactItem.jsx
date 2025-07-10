@@ -34,16 +34,12 @@ const ContactItem = ({ conversation, unreadConversation, customerImage, isActive
                         {conversation.customer_name || `Client #${conversation.client_id}`}
 
                         {unreadConversation > 0 && (
-                            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
+                            <span className="ml-2 mr-4 bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
                                 {unreadConversation}
                             </span>
                         )}
                     </h3>
                 </div>
-            </div>
-
-            <div className="flex flex-col items-end text-xs text-gray-500">
-                <span>{formatTimestamp(conversation.last_activity)}</span>
             </div>
 
             <input type="hidden" value={conversation.conversation_id} />

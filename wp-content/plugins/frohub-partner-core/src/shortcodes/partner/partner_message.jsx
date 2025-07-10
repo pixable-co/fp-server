@@ -56,18 +56,6 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
         if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
     }, [comments]);
 
-    // useEffect(() => {
-    //     if (!autoReplyMessage || autoReplySent || comments.length === 0) return;
-    //
-    //     const lastComment = comments[comments.length - 1];
-    //     const sentFrom = lastComment?.meta_data?.sent_from?.[0] || '';
-    //
-    //     if (sentFrom !== 'partner') {
-    //         setAutoReplySent(true);
-    //         handleSendMessage(autoReplyMessage);
-    //     }
-    // }, [comments]);
-
     const startConversationPolling = () => {
         stopConversationPolling();
         conversationIntervalRef.current = setInterval(() => {
@@ -281,7 +269,12 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                         ))
                     )}
                     {!loading.conversations && conversations.length === 0 && (
-                        <div className="p-4 text-center text-gray-500">No conversations found</div>
+                        <div className="flex-1 flex items-center justify-center text-gray-500">
+                            <div className="text-center px-4 py-10">
+                                <h3 className="text-2xl font-bold mb-3 text-gray-800">👋🏾 Welcome to your inbox!</h3>
+                                <p className="text-gray-600 text-base text-center max-w-xl mx-auto">When a client books or sends an enquiry, their messages will appear here for you to respond to. Need to share anything ahead of the appointment? Send them a quick message here.</p>
+                            </div>
+                        </div>
                     )}
                 </div>
             </div>

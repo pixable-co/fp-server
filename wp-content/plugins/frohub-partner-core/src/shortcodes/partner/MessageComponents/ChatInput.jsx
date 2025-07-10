@@ -124,6 +124,7 @@ const ChatInput = ({ onSendMessage, autoReplyEnabled, isLoading = false, disable
                     Uploading image...
                 </div>
             )}
+            <p className="p-2 text-gray-400">Please be respectful: Keep your messages kind and considerate. Treat others as you would like to be treated. Report any abusive messages here.</p>
         </div>
     );
 };

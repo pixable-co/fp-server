@@ -416,26 +416,25 @@ class PartnerProfileForm
             const mobileServiceFee = <?php echo json_encode($partner_data['mobileServiceFee']); ?>;
 
             document.querySelectorAll('.type-option').forEach(function (el) {
-                el.addEventListener('click', function () {
+                el.addEventListener('click', function (e) {
                     const checkbox = el.querySelector('input[type="checkbox"]');
                     const label = el.querySelector('.type-title')?.textContent?.trim();
 
-                    // Check if the clicked type is "Mobile" and mobileServiceFee is either false or empty
-                    const isMobileType = label === 'Mobile';
+                    const isMobile = label === 'Mobile';
                     const isFeeMissing = mobileServiceFee === false || (Array.isArray(mobileServiceFee) && mobileServiceFee.length === 0);
+                    const isAlreadyChecked = checkbox.checked;
 
-                    if (isMobileType && isFeeMissing && !checkbox.checked) {
+                    // If selecting (not unselecting) Mobile and no fee set, block it
+                    if (isMobile && isFeeMissing && !isAlreadyChecked) {
                         alert('Set Mobile travel fee first');
                         return;
                     }
 
-                    // Toggle selection
+                    // Toggle checked state
                     checkbox.checked = !checkbox.checked;
                     el.classList.toggle('selected', checkbox.checked);
                 });
             });
-
-
 
             document.querySelectorAll('.type-option').forEach(function (el) {
                 el.addEventListener('click', function () {

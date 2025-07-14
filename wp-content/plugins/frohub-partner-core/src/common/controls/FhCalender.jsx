@@ -600,7 +600,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 selectMirror={!loading}
                 select={handleSelect}
                 eventClick={loading ? undefined : handleEventClick}
-                selectLongPressDelay={10} // 100ms is short enough to feel responsive
+                selectLongPressDelay={100} // 100ms is short enough to feel responsive
                 eventContent={renderEventContent}
                 eventTimeFormat={{
                     hour: '2-digit',

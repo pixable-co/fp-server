@@ -200,6 +200,14 @@ class PartnerProfileForm
                 <!-- 🔵 DATE-SPECIFIC AVAILABILITY SECTION -->
                 <div class="form-group mt-5 pt-4">
                     <label class="form-label">Date-specific hours</label>
+                    <p>
+                        Set your working hours—either weekly or for specific dates—add premium charges for out-of-hours appointments,
+                        define your booking notice period and advance scheduling. You can also add time for breaks between appointments.
+                        <span class="tooltip-container">
+                            <i class="fas fa-info-circle tooltip-icon"></i>
+                            <span class="tooltip">Only work occasionally? Use this to set availability for specific days without creating a regular weekly schedule.</span>
+                        </span>
+                    </p>
                     <div class="availability-header">
                                             <div>Day</div>
                                             <div>Start</div>

@@ -51,7 +51,6 @@ class Shortcodes {
 		PartnerIntegrations::init();
 		ValueOfBookingChart::init();
 		ForgotPasswordForm::init();
-		PartnerProfileForm::init();
 		PartnerProfileAvailibility::init();
 		PartnerProfileAutoMessage::init();
 		PartnerMessage::init();

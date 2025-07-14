@@ -269,8 +269,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                         ))
                     )}
                     {!loading.conversations && conversations.length === 0 && (
-                        <div className="flex-1 flex items-center justify-center text-gray-500">
-                            <div className="text-center px-4 py-10">
+                        <div className="flex-1 flex items-start justify-center text-gray-500">
+                            <div className="text-center p-16 mt-8">
                                 <h3 className="text-2xl font-bold mb-3 text-gray-800">👋🏾 Welcome to your inbox!</h3>
                                 <p className="text-gray-600 text-base text-center max-w-xl mx-auto">When a client books or sends an enquiry, their messages will appear here for you to respond to. Need to share anything ahead of the appointment? Send them a quick message here.</p>
                             </div>
@@ -322,8 +322,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                         <ChatInput onSendMessage={handleSendMessage} isLoading={loading.sending} disabled={loading.comments} />
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center text-gray-500">
-                        <div className="text-center px-4 py-10">
+                    <div className="flex-1 flex items-start justify-center text-gray-500">
+                        <div className="text-center p-16 mt-8">
                             <h3 className="text-2xl font-bold mb-3 text-gray-800">👋🏾 Welcome to your inbox!</h3>
                             <p className="text-gray-600 text-base text-center max-w-xl mx-auto">When a client books or sends an enquiry, their messages will appear here for you to respond to. Need to share anything ahead of the appointment? Send them a quick message here.</p>
                         </div>

@@ -119,7 +119,7 @@ class PartnerProfileForm
 
                 <div class="form-group">
                     <label class="form-label">Business Address</label>
-                    <p>Enter your business address. If you’re mobile or home-based, please enter your home address - it will only be shown to clients after they’ve made a booking. Business addresses are only publicly visible if you select the option to display it.</p>
+                    <p>Enter your business address. If you’re mobile or home-based, enter your home address. For home-based services, the address is only shared with clients after a booking is made. For mobile services, your address stays hidden and is only used to check whether a client’s location is within your travel area.</p>
                     <input type="text" name="addressLine1" class="form-input" value="<?php echo $address; ?>" placeholder="Street Address" />
                     <input type="text" name="city" class="form-input" value="<?php echo $city; ?>" placeholder="City" />
                     <input type="text" name="postcode" class="form-input" value="<?php echo $postcode; ?>" placeholder="Postcode" />
@@ -413,6 +413,30 @@ class PartnerProfileForm
 
         <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const mobileServiceFee = <?php echo json_encode($partner_data['mobileServiceFee']); ?>;
+
+            document.querySelectorAll('.type-option').forEach(function (el) {
+                el.addEventListener('click', function () {
+                    const checkbox = el.querySelector('input[type="checkbox"]');
+                    const label = el.querySelector('.type-title')?.textContent?.trim();
+
+                    // Check if the clicked type is "Mobile" and mobileServiceFee is either false or empty
+                    const isMobileType = label === 'Mobile';
+                    const isFeeMissing = mobileServiceFee === false || (Array.isArray(mobileServiceFee) && mobileServiceFee.length === 0);
+
+                    if (isMobileType && isFeeMissing && !checkbox.checked) {
+                        alert('Set Mobile travel fee first');
+                        return;
+                    }
+
+                    // Toggle selection
+                    checkbox.checked = !checkbox.checked;
+                    el.classList.toggle('selected', checkbox.checked);
+                });
+            });
+
+
+
             document.querySelectorAll('.type-option').forEach(function (el) {
                 el.addEventListener('click', function () {
                     const checkbox = el.querySelector('input[type=\"checkbox\"]');

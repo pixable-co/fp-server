@@ -147,36 +147,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             return null; // Skip invalid events
         }
 
-        if (event.eventType === 'google-calendar') {
-            const startISO = event.start;
-            const endISO = event.end;
-
-            const startDate = new Date(startISO);
-            const endDate = new Date(endISO);
-
-            const isMultiDay = startDate.toDateString() !== endDate.toDateString();
-            const adjustedEndDate = new Date(endDate);
-
-            // Fix FullCalendar's exclusive end behavior for timed events
-            if (isMultiDay && startDate.getHours() !== 0 && endDate.getHours() !== 0) {
-                adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
-            }
-
-            return {
-                id: event.id,
-                title: event.title,
-                start: startISO,
-                end: adjustedEndDate.toISOString(),
-                allDay: false,
-                backgroundColor: '#0F9D58',
-                borderColor: '#0F9D58',
-                textColor: '#fff',
-                extendedProps: {
-                    eventType: 'google-calendar'
-                }
-            };
-        }
-
         if (event.eventType === 'unavailable') {
             const startISO = parseDateString(event.date);
             const endISO = event.end ? parseDateString(event.end) : null;

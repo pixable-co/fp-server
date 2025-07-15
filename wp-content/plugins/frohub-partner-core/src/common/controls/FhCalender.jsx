@@ -45,7 +45,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     };
 
     useEffect(() => {
-        console.log(events)
         if (events.length > 0) {
             setLoading(false);
         } else {

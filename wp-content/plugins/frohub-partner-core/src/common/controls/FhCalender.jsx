@@ -142,28 +142,54 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     };
 
     const transformedEvents = events.map(event => {
-        console.log(event);
-        if (!event.date) {
-            console.error("Invalid event date:", event);
-            return null; // Skip invalid events
+        // ✅ Detect Google Calendar event
+        const isGoogle = event.eventType === 'google-calendar' || event.extendedProps?.eventType === 'google-calendar';
+
+        if (isGoogle) {
+            const startISO = event.start;
+            const endISO = event.end;
+
+            if (!startISO || !endISO) return null;
+
+            const startDate = new Date(startISO);
+            const endDate = new Date(endISO);
+            const isMultiDay = startDate.toDateString() !== endDate.toDateString();
+            const adjustedEndDate = new Date(endDate);
+
+            // Adjust end date for proper multi-day rendering
+            if (isMultiDay && startDate.getHours() !== 0 && endDate.getHours() !== 0) {
+                adjustedEndDate.setDate(adjustedEndDate.getDate() + 1);
+            }
+
+            return {
+                id: event.id,
+                title: event.title,
+                start: startISO,
+                end: adjustedEndDate.toISOString(),
+                allDay: false,
+                backgroundColor: '#0F9D58', // Google green
+                borderColor: '#0F9D58',
+                textColor: '#fff',
+                extendedProps: {
+                    eventType: 'google-calendar'
+                }
+            };
         }
 
+        // ✅ Unavailable Events
         if (event.eventType === 'unavailable') {
             const startISO = parseDateString(event.date);
             const endISO = event.end ? parseDateString(event.end) : null;
 
-            if (!startISO) {
-                console.error("❌ Invalid start date:", event);
-                return null;
-            }
+            if (!startISO) return null;
 
             let finalEnd = endISO;
 
-            // 👇 If end is missing or same as start date, add +1 hour
+            // If no end or same day, add 1 hour
             if (!endISO || startISO.split("T")[0] === endISO.split("T")[0]) {
                 const startDateObj = new Date(startISO);
                 const endDateObj = new Date(startDateObj);
-                endDateObj.setHours(startDateObj.getHours() + 1); // add 1 hour
+                endDateObj.setHours(startDateObj.getHours() + 1);
                 finalEnd = endDateObj.toISOString();
             }
 
@@ -177,7 +203,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 borderColor: '#7D8793',
                 textColor: '#fff',
                 extendedProps: {
-                    eventType: event.eventType,
+                    eventType: 'unavailable',
                     booking_time: event.time,
                     customer: event.customer,
                     email: event.email,
@@ -188,12 +214,12 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             };
         }
 
-        // 🔹 Fallback for other event types
+        // ✅ Other Events (e.g., orders)
+        if (!event.date) return null;
+
         const eventDate = new Date(event.date);
-        if (isNaN(eventDate.getTime())) {
-            console.error("Skipping event due to invalid date format:", event);
-            return null;
-        }
+        if (isNaN(eventDate.getTime())) return null;
+
         const eventTime = event.time || '00:00';
         const [hours, minutes] = eventTime.split(':');
         eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
@@ -225,6 +251,90 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             }
         };
     }).filter(event => event !== null);
+
+    // const transformedEvents = events.map(event => {
+    //     if (!event.date) {
+    //         console.error("Invalid event date:", event);
+    //         return null; // Skip invalid events
+    //     }
+    //
+    //     if (event.eventType === 'unavailable') {
+    //         const startISO = parseDateString(event.date);
+    //         const endISO = event.end ? parseDateString(event.end) : null;
+    //
+    //         if (!startISO) {
+    //             console.error("❌ Invalid start date:", event);
+    //             return null;
+    //         }
+    //
+    //         let finalEnd = endISO;
+    //
+    //         // 👇 If end is missing or same as start date, add +1 hour
+    //         if (!endISO || startISO.split("T")[0] === endISO.split("T")[0]) {
+    //             const startDateObj = new Date(startISO);
+    //             const endDateObj = new Date(startDateObj);
+    //             endDateObj.setHours(startDateObj.getHours() + 1); // add 1 hour
+    //             finalEnd = endDateObj.toISOString();
+    //         }
+    //
+    //         return {
+    //             id: event.id,
+    //             title: event.title,
+    //             start: startISO,
+    //             end: finalEnd,
+    //             allDay: false,
+    //             backgroundColor: '#7D8793',
+    //             borderColor: '#7D8793',
+    //             textColor: '#fff',
+    //             extendedProps: {
+    //                 eventType: event.eventType,
+    //                 booking_time: event.time,
+    //                 customer: event.customer,
+    //                 email: event.email,
+    //                 phone: event.phone,
+    //                 service: event.service,
+    //                 eventIndex: event.event_index,
+    //             }
+    //         };
+    //     }
+    //
+    //     // 🔹 Fallback for other event types
+    //     const eventDate = new Date(event.date);
+    //     if (isNaN(eventDate.getTime())) {
+    //         console.error("Skipping event due to invalid date format:", event);
+    //         return null;
+    //     }
+    //     const eventTime = event.time || '00:00';
+    //     const [hours, minutes] = eventTime.split(':');
+    //     eventDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0);
+    //
+    //     const durationStr = event.duration;
+    //     const durationInMinutes = parseDurationString(durationStr);
+    //
+    //     const endDate = new Date(eventDate);
+    //     endDate.setMinutes(endDate.getMinutes() + durationInMinutes);
+    //
+    //     return {
+    //         id: event.id,
+    //         title: event.title,
+    //         start: eventDate.toISOString(),
+    //         end: endDate.toISOString(),
+    //         allDay: false,
+    //         backgroundColor: '#4285f4',
+    //         borderColor: '#4285f4',
+    //         textColor: '#fff',
+    //         extendedProps: {
+    //             eventType: event.eventType,
+    //             booking_time: event.time,
+    //             customer: event.customer,
+    //             email: event.email,
+    //             phone: event.phone,
+    //             service: event.service,
+    //             eventIndex: event.event_index,
+    //             duration: durationStr,
+    //         }
+    //     };
+    // }).filter(event => event !== null);
 
     const handleEventClick = (clickInfo) => {
         if (clickInfo.event.extendedProps.eventType === 'google-calendar') {

@@ -142,6 +142,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     };
 
     const transformedEvents = events.map(event => {
+        console.log(event);
         if (!event.date) {
             console.error("Invalid event date:", event);
             return null; // Skip invalid events

@@ -3,6 +3,8 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { Calendar } from '@fullcalendar/core';
+import enGbLocale from '@fullcalendar/core/locales/en-gb';
 import axios from 'axios';
 import { Dropdown, Skeleton, Switch } from 'antd';
 import FhModal from './FhModal'; // Adjust path if needed
@@ -11,7 +13,6 @@ import swal from 'sweetalert';
 import MobileCalendarGrid from "./CustomMobileCalendar";
 
 const FhCalender = ({ type, events, setEvents, fetchData }) => {
-    console.log(events);
     const partner_id = fpserver_settings.partner_post_id;
     const isDayView = type === 'day';
     const [loading, setLoading] = useState(true);
@@ -51,13 +52,12 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             // Set a 10-second timeout to stop loading even if no events
             const timeout = setTimeout(() => {
                 setLoading(false);
-                // Show swal message when no events are found after 10 seconds
-                swal({
-                    title: "No Events Found",
-                    text: "No upcoming bookings or events found. Please add some and try again.",
-                    icon: "info",
-                    button: "OK"
-                });
+                // swal({
+                //     title: "No Events Found",
+                //     text: "No upcoming bookings or events found. Please add some and try again.",
+                //     icon: "info",
+                //     button: "OK"
+                // });
             }, 10000); // 10 seconds
 
             // Cleanup timeout if component unmounts or events arrive
@@ -200,7 +200,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         const durationStr = event.duration;
         const durationInMinutes = parseDurationString(durationStr);
 
-        const endDate = new Date(eventDate);
+        const endDate = new Date(event.end);
         endDate.setMinutes(endDate.getMinutes() + durationInMinutes);
 
         return {
@@ -597,19 +597,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                   fetchData={fetchData}
                   partner_id={partner_id}
               />
-              // <MobileCalendarGrid
-              //     events={displayEvents}
-              //     loading={loading}
-              //     select={handleSelect}
-              //     eventClick={handleEventClick}
-              //     renderEventContent={renderEventContent}  // Add this
-              //     getEventContent={getEventContent}        // Add this
-              //     modifyingEventIds={modifyingEventIds}    // Add this
-              //     fetchData={fetchData}                    // Add this
-              //     partner_id={partner_id}                  // Add this
-              //     setModifyingEventIds={setModifyingEventIds} // Add this
-              //     setEvents={setEvents}                    // Add this
-              // />
           ) : (
               <FullCalendar
                   plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -619,6 +606,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                       center: 'title',
                       right: 'dayGridMonth,timeGridWeek,timeGridDay'
                   }}
+                  locale={enGbLocale}
                   weekends={true}
                   events={displayEvents}
                   selectable={!loading}

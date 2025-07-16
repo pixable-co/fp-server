@@ -102,6 +102,17 @@ const MobileService = () => {
             return;
         }
 
+        // 🔍 Validate all travel fee prices
+        const hasInvalidFee = travelFees.some(fee => {
+            const parsedFee = parseFloat(fee.fee);
+            return isNaN(parsedFee) || parsedFee <= 0;
+        });
+
+        if (hasInvalidFee) {
+            swal("Required", "Please set a minimum price (greater than £0) for all travel fees.", "warning");
+            return;
+        }
+
         setSaving(true);
 
         // Make sure to parse values before sending to API

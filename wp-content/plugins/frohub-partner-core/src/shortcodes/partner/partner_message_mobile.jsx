@@ -17,6 +17,7 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
     const autoReplyMessage = "Thanks, we'll get back to you shortly."; // Set to null/'' to disable
     const [autoReplySent, setAutoReplySent] = useState(false);
     const [showConversationList, setShowConversationList] = useState(true);
+    const [unreadConversation, setUnreadConversation] = useState(0);
 
     const urlCustomerId = typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search).get('customer_id')
@@ -265,14 +266,19 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
                             </div>
                         ) : (
                             <>
-                                {conversations.map(conversation => (
-                                    <ContactItem
-                                        key={conversation.client_id}
-                                        conversation={conversation}
-                                        isActive={false}
-                                        onClick={handleConversationSelect}
-                                    />
-                                ))}
+                                {
+                                    conversations.map(conversation => (
+                                        <ContactItem
+                                            key={conversation.client_id}
+                                            conversation={conversation}
+                                            // unreadConversation={unreadConversation}
+                                            unreadConversation={conversation.unread_count_partner}
+                                            customerImage={conversation.customer_image}
+                                            isActive={activeConversation?.client_id === conversation.client_id}
+                                            onClick={handleConversationSelect}
+                                        />
+                                    ))
+                                }
                                 {!loading.conversations && conversations.length === 0 && (
                                     <div className="p-4 text-center text-gray-500">No conversations found</div>
                                 )}
@@ -306,8 +312,18 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
                             </div>
                         ) : (
                             <>
-                                {comments.map(comment => (
-                                    <Message key={comment.comment_id} comment={comment} />
+                                {comments.map((comment, index) => (
+                                    <Message
+                                        key={comment.comment_id}
+                                        comment={comment}
+                                        conversationId={activeConversation?.conversation_id}
+                                        isLastCustomerMessage={
+                                            comment?.meta_data?.sent_from?.[0] !== 'partner' &&
+                                            index === comments.length - 1
+                                        }
+                                        customerImage={activeConversation?.customer_image}
+                                        partnerImage={activeConversation?.partner_image}
+                                    />
                                 ))}
                                 {comments.length === 0 && (
                                     <div className="text-center text-gray-500 mt-8">

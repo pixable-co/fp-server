@@ -5,6 +5,7 @@ import ContactItem from "./MessageComponents/ContactItem.jsx";
 import ChatInput from './MessageComponents/ChatInput';
 import Message from './MessageComponents/Message';
 import Avatar from './MessageComponents/Avatar';
+import AutoReply from "./MessageComponents/AutoReply.jsx";
 
 const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConversationId = null }) => {
     const [conversations, setConversations] = useState([]);
@@ -303,6 +304,10 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
                         </button>
                         <span className="ml-3 text-gray-900 font-medium">Back to Messages</span>
                     </div>
+
+                    {activeConversation && (
+                        <AutoReply enabled={!!activeConversation.auto_message} />
+                    )}
 
                     {/* Messages */}
                     <div id="chat-messages-container-mobile" className="flex-1 overflow-y-auto p-4 bg-gray-50">

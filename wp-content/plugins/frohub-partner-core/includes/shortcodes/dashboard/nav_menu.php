@@ -33,7 +33,7 @@ class NavMenu {
                         <a href="/help-centre">Help & FAQs</a>
                         <a href="/invite-a-friend">Invite a Friend</a>
                         <hr>
-                        <a href="<?php echo wp_logout_url(home_url()); ?>">Log out</a>
+                        <a href="<?php echo wp_logout_url(home_url()); ?>" onclick="document.cookie='partner_profile_url=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'">Log out</a>
                     </div>
                 </div>
             </div>

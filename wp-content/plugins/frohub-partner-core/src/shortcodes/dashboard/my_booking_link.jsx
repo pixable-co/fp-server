@@ -4,10 +4,9 @@ import usePartnerStore from "../../store.js";
 import {fetchData} from "../../services/fetchData.js";
 
 const MyBookingLink = () => {
-    const zustandUrl = usePartnerStore((state) => state.partnerProfileUrl); // only used as fallback
+    const zustandUrl = usePartnerStore((state) => state.partnerProfileUrl);
     const [finalUrl, setFinalUrl] = useState(null);
 
-    // Utility: Read cookie by name
     const getCookie = (name) => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -15,34 +14,44 @@ const MyBookingLink = () => {
         return null;
     };
 
-    // Load URL from API if on /my-account/, otherwise use cookie or Zustand
+    const validateUrl = (url) => {
+        if (!url) return null;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            return `https://${url}`;
+        }
+        return url;
+    };
+
+    const handleLinkClick = (e) => {
+        e.preventDefault();
+        if (finalUrl) {
+            window.open(finalUrl, '_blank', 'noopener,noreferrer');
+        }
+    };
+
     useEffect(() => {
         const isOnMyAccount = window.location.pathname === '/my-account/';
 
         if (isOnMyAccount) {
             fetchData('fpserver/get_partner_data', (response) => {
                 if (response.success) {
-                    const profileUrl = response.data.partnerProfileUrl;
-
-                    // Set cookie for reuse elsewhere
+                    const profileUrl = validateUrl(response.data.partnerProfileUrl);
                     document.cookie = `partner_profile_url=${encodeURIComponent(profileUrl)}; path=/`;
-
-                    // Set local final URL
                     setFinalUrl(profileUrl);
                 }
             });
         } else {
             const cookieUrl = getCookie('partner_profile_url');
             if (cookieUrl) {
-                setFinalUrl(cookieUrl);
+                setFinalUrl(validateUrl(cookieUrl));
             } else if (zustandUrl) {
-                document.cookie = `partner_profile_url=${encodeURIComponent(zustandUrl)}; path=/`;
-                setFinalUrl(zustandUrl);
+                const validatedUrl = validateUrl(zustandUrl);
+                document.cookie = `partner_profile_url=${encodeURIComponent(validatedUrl)}; path=/`;
+                setFinalUrl(validatedUrl);
             }
         }
     }, [zustandUrl]);
 
-    // Update any existing <a><i class="fas fa-link"></i></a> links in DOM
     useEffect(() => {
         if (!finalUrl) return;
 
@@ -53,6 +62,10 @@ const MyBookingLink = () => {
                 parentLink.href = finalUrl;
                 parentLink.target = '_blank';
                 parentLink.rel = 'noopener noreferrer';
+                parentLink.onclick = (e) => {
+                    e.preventDefault();
+                    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+                };
             }
         });
     }, [finalUrl]);
@@ -60,7 +73,12 @@ const MyBookingLink = () => {
     return (
         <div>
             {finalUrl ? (
-                <a href={finalUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                    href={finalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleLinkClick}
+                >
                     <i className="fas fa-link"></i>
                 </a>
             ) : (

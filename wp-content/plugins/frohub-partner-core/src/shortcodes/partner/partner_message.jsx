@@ -269,8 +269,8 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                         ))
                     )}
                     {!loading.conversations && conversations.length === 0 && (
-                        <div>
-                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">No Conversation Found</p>
+                        <div className="flex justify-center items-center">
+                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">No messages yet</p>
                         </div>
                     )}
                 </div>

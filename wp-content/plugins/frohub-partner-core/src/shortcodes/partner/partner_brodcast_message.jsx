@@ -55,14 +55,24 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
             key: 'customer_name',
             render: (text, record) => (
                 <a href={`/view-client/?id=${record.customer_id}`}>
-                    <span style={{ color: 'tomato' }}>{text}</span>
+                    <span>{text} <i class="fas fa-envelope"></i></span>
                 </a>
             )
         },
         {
-            title: 'Phone',
-            dataIndex: 'customer_phone',
-            key: 'customer_phone'
+            title: 'Total Completed Bookings',
+            dataIndex: 'total_completed_bookings',
+            key: 'total_completed_bookings'
+        },
+        {
+            title: 'Total Spend',
+            dataIndex: 'total_spend',
+            key: 'total_spend'
+        },
+        {
+            title: 'Last Booking Date',
+            dataIndex: 'last_booking_date',
+            key: 'last_booking_date'
         },
     ];
 

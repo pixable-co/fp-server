@@ -6,11 +6,14 @@ import {
     Form,
     Input,
     Progress,
-    Skeleton
+    Skeleton,
+    Collapse,
 } from 'antd';
 import { fetchData } from '../../services/fetchData';
 import swal from 'sweetalert';
 import FhProUpgrade from '../../common/controls/FhProUpgrade';
+
+const { Panel } = Collapse;
 
 const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
     const [clients, setClients] = useState([]);
@@ -21,7 +24,19 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
     const [progress, setProgress] = useState(0);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [loadingClients, setLoadingClients] = useState(true);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
+    // Watch screen width
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Fetch clients on mount
     useEffect(() => {
         fetchData('fpserver/partner_conversations', (response) => {
             if (response.success && Array.isArray(response.data)) {
@@ -38,6 +53,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         });
     }, []);
 
+    // Upgrade modal based on subscription
     useEffect(() => {
         if (
             typeof fpserver_settings !== 'undefined' &&
@@ -47,15 +63,15 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         }
     }, []);
 
+    // Table columns for desktop
     const columns = [
-        // Conversation ID column removed
         {
             title: 'Name',
             dataIndex: 'customer_name',
             key: 'customer_name',
             render: (text, record) => (
                 <a href={`/view-client/?id=${record.customer_id}`}>
-                    <span>{text} <i class="fas fa-envelope"></i></span>
+                    <span>{text} <i className="fas fa-envelope"></i></span>
                 </a>
             )
         },
@@ -76,11 +92,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         },
     ];
 
-    const rowSelection = {
-        selectedRowKeys,
-        onChange: setSelectedRowKeys
-    };
-
+    // Handle opening modal
     const handleBroadcastClick = () => {
         if (selectedRowKeys.length === 0) {
             swal('Warning', 'Please select at least one client.', 'warning');
@@ -89,6 +101,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         setIsModalOpen(true);
     };
 
+    // Handle send
     const handleSend = () => {
         form.validateFields().then(values => {
             const { message } = values;
@@ -135,19 +148,63 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         });
     };
 
+    // Accordion (mobile)
+    const renderMobileAccordion = () => (
+        <Collapse accordion>
+            {clients.map(client => (
+                <Panel
+                    key={client.client_id}
+                    header={
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>{client.customer_name}</span>
+                            <i className="fas fa-envelope" />
+                        </div>
+                    }
+                >
+                    <p><strong>Total Completed Bookings:</strong> {client.total_completed_bookings}</p>
+                    <p><strong>Total Spend:</strong> {client.total_spend}</p>
+                    <p><strong>Last Booking Date:</strong> {client.last_booking_date}</p>
+
+                    <Button
+                        size="small"
+                        type={selectedRowKeys.includes(client.client_id) ? 'primary' : 'default'}
+                        onClick={() => {
+                            const alreadySelected = selectedRowKeys.includes(client.client_id);
+                            setSelectedRowKeys(alreadySelected
+                                ? selectedRowKeys.filter(k => k !== client.client_id)
+                                : [...selectedRowKeys, client.client_id]);
+                        }}
+                        style={{ marginTop: 8 }}
+                    >
+                        {selectedRowKeys.includes(client.client_id) ? 'Selected' : 'Select'}
+                    </Button>
+                </Panel>
+            ))}
+        </Collapse>
+    );
+
     return (
         <div>
             {loadingClients ? (
                 <Skeleton active paragraph={{ rows: 8 }} />
             ) : (
-                <Table
-                    rowKey="client_id"
-                    dataSource={clients}
-                    columns={columns}
-                    rowSelection={rowSelection}
-                    pagination={false}
-                    bordered
-                />
+                <>
+                    {isMobile ? (
+                        renderMobileAccordion()
+                    ) : (
+                        <Table
+                            rowKey="client_id"
+                            dataSource={clients}
+                            columns={columns}
+                            rowSelection={{
+                                selectedRowKeys,
+                                onChange: setSelectedRowKeys
+                            }}
+                            pagination={false}
+                            bordered
+                        />
+                    )}
+                </>
             )}
 
             <Button

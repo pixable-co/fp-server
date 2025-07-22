@@ -105,11 +105,11 @@ const MobileService = () => {
         // 🔍 Validate all travel fee prices
         const hasInvalidFee = travelFees.some(fee => {
             const parsedFee = parseFloat(fee.fee);
-            return isNaN(parsedFee) || parsedFee <= 0;
+            return isNaN(parsedFee);
         });
 
         if (hasInvalidFee) {
-            swal("Required", "Please set a minimum price (greater than £0) for all travel fees.", "warning");
+            swal("Required", "Please set a minimum price for travel fees (e.g. £0 or more)", "warning");
             return;
         }
 

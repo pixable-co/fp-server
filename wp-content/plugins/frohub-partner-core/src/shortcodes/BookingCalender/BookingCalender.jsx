@@ -16,7 +16,18 @@ export default function BookingCalender() {
                 fetchUnavailableDates()
             ]);
 
-            setEvents([...orderEvents, ...allCalendarEvents, ...unavailableDates]);
+            const merged = [...orderEvents, ...allCalendarEvents, ...unavailableDates];
+
+// ✅ Sanitize merged event list to prevent invalid dates
+            const sanitized = merged.filter(event => {
+                if (!event || !event.date || !event.time) return false;
+                const startDate = new Date(`${event.date}T${event.time || '00:00'}`);
+                return !isNaN(startDate.getTime());
+            });
+
+            setEvents(sanitized);
+
+            // setEvents([...orderEvents, ...allCalendarEvents, ...unavailableDates]);
         } catch (error) {
             console.error("Error fetching data:", error);
         }

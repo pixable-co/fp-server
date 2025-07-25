@@ -138,7 +138,7 @@ const BookingStatsCard = () => {
                                 <div className="client-name-email">
                                     <span className="client-name">{upcomingBookings.client_name}</span>
                                     <a
-                                        href="#"
+                                        href={`/messages?customer_id=${upcomingBookings.customer_id}`}
                                         className="client-email-icon"
                                         title={`Send a message to ${upcomingBookings.client_name}`}
                                     >

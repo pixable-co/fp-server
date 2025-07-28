@@ -146,7 +146,7 @@ const MobileService = () => {
 
             const data = await response.json();
             if (data.success) {
-                swal("Success", "Location data saved successfully!", "success");
+                swal("Travel Fees Updated", "Mobile radius and fees saved successfully!", "success");
             } else {
                 swal("Oops", "Failed to save location data.", "error");
             }

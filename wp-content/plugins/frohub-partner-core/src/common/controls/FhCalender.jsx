@@ -66,56 +66,99 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     }, [events]);
 
     const parseDateString = (dateStr, timeStr = "00:00") => {
-        if (!dateStr) {
-            console.error("❌ Missing date string:", dateStr);
+        if (!dateStr) return null;
+
+        // Check for format like "29 Jul 2025"
+        const textMonthMatch = dateStr.match(/^(\d{1,2}) (\w{3,}) (\d{4})$/);
+        if (textMonthMatch) {
+            const [_, day, monthText, year] = textMonthMatch;
+            const month = getMonthIndex(monthText); // from earlier helper
+            const formatted = `${year}-${padZero(month)}-${padZero(day)}T${timeStr}:00`;
+            if (!isNaN(new Date(formatted).getTime())) return formatted;
             return null;
         }
 
-        // ✅ Handle API format: "YYYY-MM-DD"
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-            return `${dateStr}T${timeStr}:00`; // Ensure "HH:MM" format
-        }
-
-        // ✅ Handle ACF format: "21/03/2025 3:54 pm"
+        // Fallback for "DD/MM/YYYY HH:mm am/pm"
         const dateTimeParts = dateStr.split(" ");
-        if (dateTimeParts.length < 3) {
-            console.error("❌ Invalid date format, missing time:", dateStr);
-            return null;
-        }
+        if (dateTimeParts.length < 3) return null;
 
         const [datePart, timePart, amPm] = dateTimeParts;
         const dateParts = datePart.split("/");
-
-        if (dateParts.length !== 3) {
-            console.error("❌ Invalid date format:", dateStr);
-            return null;
-        }
+        if (dateParts.length !== 3) return null;
 
         const [day, month, year] = dateParts;
         let [hours, minutes] = timePart.split(":");
-
-        // ✅ Convert hours and minutes to two-digit format
         hours = hours.padStart(2, "0");
         minutes = (minutes || "00").padStart(2, "0");
 
-        // ✅ Convert 12-hour AM/PM format to 24-hour format
-        if (amPm.toLowerCase() === "pm" && parseInt(hours, 10) < 12) {
-            hours = (parseInt(hours, 10) + 12).toString();
-        }
-        if (amPm.toLowerCase() === "am" && parseInt(hours, 10) === 12) {
-            hours = "00"; // 12 AM should be 00 in 24-hour format
+        if (amPm.toLowerCase() === "pm" && parseInt(hours) < 12) {
+            hours = (parseInt(hours) + 12).toString();
+        } else if (amPm.toLowerCase() === "am" && parseInt(hours) === 12) {
+            hours = "00";
         }
 
-        // ✅ Ensure valid ISO 8601 format
-        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:00`;
-
-        if (isNaN(new Date(formattedDate).getTime())) {
-            console.error("❌ Invalid formatted date:", formattedDate);
-            return null;
-        }
-
-        return formattedDate;
+        const formatted = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+        if (!isNaN(new Date(formatted).getTime())) return formatted;
+        return null;
     };
+
+    const padZero = (n) => String(n).padStart(2, "0");
+    const getMonthIndex = (monthText) => {
+        const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+        return months.findIndex(m => m === monthText.toLowerCase().slice(0,3)) + 1;
+    };
+
+    // const parseDateString = (dateStr, timeStr = "00:00") => {
+    //     if (!dateStr) {
+    //         console.error("❌ Missing date string:", dateStr);
+    //         return null;
+    //     }
+    //
+    //     // ✅ Handle API format: "YYYY-MM-DD"
+    //     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    //         return `${dateStr}T${timeStr}:00`; // Ensure "HH:MM" format
+    //     }
+    //
+    //     // ✅ Handle ACF format: "21/03/2025 3:54 pm"
+    //     const dateTimeParts = dateStr.split(" ");
+    //     if (dateTimeParts.length < 3) {
+    //         console.error("❌ Invalid date format, missing time:", dateStr);
+    //         return null;
+    //     }
+    //
+    //     const [datePart, timePart, amPm] = dateTimeParts;
+    //     const dateParts = datePart.split("/");
+    //
+    //     if (dateParts.length !== 3) {
+    //         console.error("❌ Invalid date format:", dateStr);
+    //         return null;
+    //     }
+    //
+    //     const [day, month, year] = dateParts;
+    //     let [hours, minutes] = timePart.split(":");
+    //
+    //     // ✅ Convert hours and minutes to two-digit format
+    //     hours = hours.padStart(2, "0");
+    //     minutes = (minutes || "00").padStart(2, "0");
+    //
+    //     // ✅ Convert 12-hour AM/PM format to 24-hour format
+    //     if (amPm.toLowerCase() === "pm" && parseInt(hours, 10) < 12) {
+    //         hours = (parseInt(hours, 10) + 12).toString();
+    //     }
+    //     if (amPm.toLowerCase() === "am" && parseInt(hours, 10) === 12) {
+    //         hours = "00"; // 12 AM should be 00 in 24-hour format
+    //     }
+    //
+    //     // ✅ Ensure valid ISO 8601 format
+    //     const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+    //
+    //     if (isNaN(new Date(formattedDate).getTime())) {
+    //         console.error("❌ Invalid formatted date:", formattedDate);
+    //         return null;
+    //     }
+    //
+    //     return formattedDate;
+    // };
 
     const parseDurationString = (durationStr) => {
         if (!durationStr || typeof durationStr !== "string") return 60;
@@ -188,7 +231,9 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         }
 
         // 🔹 Fallback for other event types
-        const eventDate = new Date(event.date);
+        // const eventDate = new Date(event.date);
+        const formatted = parseDateString(event.date, event.time || '00:00');
+        const eventDate = formatted ? new Date(formatted) : null;
         if (isNaN(eventDate.getTime())) {
             console.error("Skipping event due to invalid date format:", event);
             return null;
@@ -200,7 +245,9 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         const durationStr = event.duration;
         const durationInMinutes = parseDurationString(durationStr);
 
-        const endDate = new Date(event.end);
+        // const endDate = new Date(event.end);
+        const endDate = new Date(eventDate);
+        endDate.setMinutes(endDate.getMinutes() + durationInMinutes);
         endDate.setMinutes(endDate.getMinutes() + durationInMinutes);
 
         return {
@@ -606,7 +653,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                       center: 'title',
                       right: 'dayGridMonth,timeGridWeek,timeGridDay'
                   }}
-                  locale={enGbLocale}
+                  // locale={enGbLocale}
                   weekends={true}
                   events={displayEvents}
                   selectable={!loading}

@@ -17,6 +17,7 @@ export default function BookingCalender() {
             ]);
 
             const merged = [...orderEvents, ...allCalendarEvents, ...unavailableDates];
+            console.log(merged);
 
 // ✅ Sanitize merged event list to prevent invalid dates
             const sanitized = merged.filter(event => {
@@ -25,7 +26,7 @@ export default function BookingCalender() {
                 return !isNaN(startDate.getTime());
             });
 
-            setEvents(sanitized);
+            setEvents(merged);
 
             // setEvents([...orderEvents, ...allCalendarEvents, ...unavailableDates]);
         } catch (error) {
@@ -50,8 +51,8 @@ export default function BookingCalender() {
 
             const result = await response.json();
 
-            // If the response has a `data` key, access it
-            const orders = Array.isArray(result.data) ? result.data : result;
+            // ✅ result is already the array of orders
+            const orders = Array.isArray(result) ? result : [];  // safer check
 
             // Filter orders with status "processing" or "completed"
             const filteredOrders = orders.filter(order =>

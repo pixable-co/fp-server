@@ -290,7 +290,7 @@ const SubscriptionDetails = () => {
                             {billingHistory.length > 0 ? (
                                 billingHistory.map((entry, index) => (
                                     <div key={index} className="grid grid-cols-3 border-b border-gray-200 py-3 text-sm items-center">
-                                        <span>{entry.start_date}</span>
+                                        <span>{entry.start_date.split(' ')[0]}</span>
                                         <span>{entry.total}</span>
                                         <span>
                                             {entry.status.toLowerCase() === 'failed' ? (

@@ -70,8 +70,8 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
             dataIndex: 'customer_name',
             key: 'customer_name',
             render: (text, record) => (
-                <a href={`/view-client/?id=${record.customer_id}`}>
-                    <span>{text} <i className="fas fa-envelope"></i></span>
+                <a href={`/messages?customer_id=${record.customer_id}`}>
+                    <span>{text} <i className="fas fa-comments-alt" /></span>
                 </a>
             )
         },
@@ -83,7 +83,10 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         {
             title: 'Total Spend',
             dataIndex: 'total_spend',
-            key: 'total_spend'
+            key: 'total_spend',
+            render: (value) => (
+                <span>£{value}</span>
+            )
         },
         {
             title: 'Last Booking Date',
@@ -157,12 +160,12 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                     header={
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span>{client.customer_name}</span>
-                            <i className="fas fa-envelope" />
+                            <i className="fas fa-comments-alt" />
                         </div>
                     }
                 >
                     <p><strong>Total Completed Bookings:</strong> {client.total_completed_bookings}</p>
-                    <p><strong>Total Spend:</strong> {client.total_spend}</p>
+                    <p><strong>Total Spend:</strong> £{client.total_spend}</p>
                     <p><strong>Last Booking Date:</strong> {client.last_booking_date}</p>
 
                     <Button

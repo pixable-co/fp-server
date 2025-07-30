@@ -126,12 +126,20 @@ const BookingStatsCard = () => {
                                 {formatDateTime(upcomingBookings.start_date, upcomingBookings.start_time)}
                             </div>
 
-                            <div className="booking-service">
-                                {upcomingBookings.service_name}
-                            </div>
+                            {/*<div className="booking-service">*/}
+                            {/*    {upcomingBookings.service_name}*/}
+                            {/*</div>*/}
 
                             <div className="booking-service">
-                                Booking ID: {upcomingBookings.order_id}
+                            <span>{upcomingBookings.service_name.replace(/&#8211;/g, '–')}</span>
+                                {upcomingBookings.status && (
+                                    <span className="inline-block ml-4 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700 capitalize">{upcomingBookings.status}</span>
+                                )}
+                            </div>
+
+
+                            <div className="booking-service">
+                                Booking Ref: {upcomingBookings.order_id}
                             </div>
 
                             <div className="booking-client-info">

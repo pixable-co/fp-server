@@ -70,10 +70,16 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
             dataIndex: 'customer_name',
             key: 'customer_name',
             render: (text, record) => (
-                <a href={`/messages?customer_id=${record.customer_id}`}>
-                    <span>{text} <i className="fas fa-comments-alt" /></span>
-                </a>
+                <div>
+                    <a href={`/view-client/?id=${record.customer_id}`}>
+                        {text}
+                    </a>
+                    <a href={`/messages?customer_id=${record.customer_id}`} style={{ marginLeft: 8 }}>
+                        <span><i className="fas fa-comments-alt" /></span>
+                    </a>
+                </div>
             )
+
         },
         {
             title: 'Total Completed Bookings',

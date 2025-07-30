@@ -72,10 +72,12 @@ const DashboardNotification = ({
             )}
 
             {isTipVisible && (
-                <div className="flex items-center justify-between bg-gray-100 border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-700 mb-2">
-                    <div className="flex items-center gap-3">
-                        <i className="fas fa-lightbulb text-gray-500 text-sm"></i>
-                        <span className="font-medium text-gray-600">Tip</span>
+                <div className="sm:block md:flex items-center justify-between bg-gray-100 border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-700 mb-2">
+                    <div className="sm:block md:flex items-center gap-2 mb-4 md:mb-0">
+                        <div className="flex sm:justify-start md:justify-center items-center gap-3">
+                            <i className="fas fa-lightbulb text-gray-500 text-sm"></i>
+                            <span className="font-medium text-gray-600">Tip</span>
+                        </div>
                         <span className="text-gray-600">The more services you add, the better your marketing reach to new clients.</span>
                     </div>
 

@@ -184,6 +184,20 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         return totalMinutes > 0 ? totalMinutes : 60;
     };
 
+    function normalizeToLocalISOString(isoStr) {
+        const date = new Date(isoStr);
+        if (isNaN(date.getTime())) return null;
+
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0");
+        const day = `${date.getDate()}`.padStart(2, "0");
+        const hours = `${date.getHours()}`.padStart(2, "0");
+        const minutes = `${date.getMinutes()}`.padStart(2, "0");
+        const seconds = `${date.getSeconds()}`.padStart(2, "0");
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`; // ⚠️ No Z
+    }
+
     const transformedEvents = events.map(event => {
         if (!event.date) {
             console.error("Invalid event date:", event);
@@ -192,8 +206,11 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
         // Handle Google Calendar events directly
         if (event.eventType === 'google-calendar') {
-            const start = event.date.includes('T') ? event.date : `${event.date}T${event.time || '00:00'}`;
-            const end = event.end || start;
+            const startRaw = event.date.includes('T') ? event.date : `${event.date}T${event.time || '00:00:00'}`;
+            const endRaw = event.end || startRaw;
+
+            const start = normalizeToLocalISOString(startRaw);
+            const end = normalizeToLocalISOString(endRaw);
 
             return {
                 id: event.id,
@@ -209,6 +226,24 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 }
             };
         }
+        // if (event.eventType === 'google-calendar') {
+        //     const start = event.date.includes('T') ? event.date : `${event.date}T${event.time || '00:00'}`;
+        //     const end = event.end || start;
+        //
+        //     return {
+        //         id: event.id,
+        //         title: event.title,
+        //         start,
+        //         end,
+        //         allDay: false,
+        //         backgroundColor: '#34a853',
+        //         borderColor: '#34a853',
+        //         textColor: '#fff',
+        //         extendedProps: {
+        //             eventType: 'google-calendar'
+        //         }
+        //     };
+        // }
 
         // Unavailable event logic stays the same
         if (event.eventType === 'unavailable') {

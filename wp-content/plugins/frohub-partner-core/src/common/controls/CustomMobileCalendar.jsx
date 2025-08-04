@@ -140,7 +140,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         const isUnavailable = event.extendedProps?.eventType === 'unavailable';
         const isPlaceholder = event.extendedProps?.isPlaceholder;
 
-        const bgColor = isGoogle ? 'bg-green-500' : isUnavailable ? 'bg-gray-500' : isPlaceholder ? 'bg-gray-300 animate-pulse' : 'bg-blue-500';
+        const bgColor = isGoogle ? 'bg-green-500' : isUnavailable ? 'bg-gray-500' : isPlaceholder ? 'bg-gray-300 animate-pulse' : 'bg-orange-400';
 
         if (isPlaceholder) {
             return <div key={event.id} className="p-2"><Skeleton.Button active size="small" style={{ width: '100%', height: 48, borderRadius: 8 }} /></div>;
@@ -177,7 +177,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
                         <div key={dateKey} className="flex items-start gap-4">
                             <div className="w-14 text-center">
                                 <div className="text-sm text-gray-500 font-medium">{weekday}</div>
-                                <div className="text-2xl font-bold text-blue-600">{dayNum}</div>
+                                <div className="text-2xl font-bold text-orange-600">{dayNum}</div>
                                 <div className="text-xs text-gray-400 -mt-1">{month}</div>
                             </div>
 
@@ -217,10 +217,10 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
                     return (
                         <div key={dateKey} className="border-l-4 border-blue-200 pl-4">
                             <div className={`flex items-center gap-2 mb-2 ${isToday ? 'bg-blue-50 p-2 rounded' : ''}`}>
-                                <div className={`text-lg font-semibold ${isToday ? 'text-blue-600' : 'text-gray-700'}`}>
+                                <div className={`text-lg font-semibold ${isToday ? 'text-orange-600' : 'text-gray-700'}`}>
                                     {weekday}, {dayNum} {month}
                                 </div>
-                                {isToday && <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">Today</span>}
+                                {isToday && <span className="text-xs bg-orange-500 text-white px-2 py-1 rounded">Today</span>}
                             </div>
 
                             <div className="ml-4">
@@ -284,12 +284,12 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
 
         return (
             <div className="space-y-4">
-                <div className={`p-4 rounded-lg ${isToday ? 'bg-blue-50 border-l-4 border-blue-500' : 'bg-gray-50'}`}>
+                <div className={`p-4 rounded-lg ${isToday ? 'bg-blue-50 border-l-4 border-orange-500' : 'bg-gray-50'}`}>
                     <div className="flex items-center gap-2">
                         <h2 className="text-xl font-semibold text-gray-800">
                             {dayDate.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
                         </h2>
-                        {isToday && <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">Today</span>}
+                        {isToday && <span className="text-xs bg-orange-500 text-white px-2 py-1 rounded">Today</span>}
                     </div>
                 </div>
 
@@ -309,10 +309,10 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
                                 <div key={hour} className="flex">
                                     {/* Hour label */}
                                     <div className="w-16 flex-shrink-0 text-right pr-3 pt-1">
-                                        <div className={`text-xs font-medium ${isCurrentHour ? 'text-blue-600' : 'text-gray-500'}`}>
+                                        <div className={`text-xs font-medium ${isCurrentHour ? 'text-orange-500' : 'text-gray-500'}`}>
                                             {display}:00
                                         </div>
-                                        <div className={`text-xs ${isCurrentHour ? 'text-blue-600' : 'text-gray-400'}`}>
+                                        <div className={`text-xs ${isCurrentHour ? 'text-orange-600' : 'text-gray-400'}`}>
                                             {period}
                                         </div>
                                     </div>
@@ -320,7 +320,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
                                     {/* Hour content */}
                                     <div className="flex-1 border-l-2 border-gray-100 pl-4 min-h-[50px] relative">
                                         {isCurrentHour && isToday && (
-                                            <div className="absolute top-0 left-0 w-full h-0.5 bg-blue-500 z-10"></div>
+                                            <div className="absolute top-0 left-0 w-full h-0.5 bg-orange-500 z-10"></div>
                                         )}
 
                                         {hourEvents.length > 0 ? (
@@ -368,8 +368,8 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         <div className="relative bg-[#f4fbff] min-h-screen pb-24 pt-4 px-4">
             <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                    <button onClick={handlePrevious} className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm hover:bg-blue-600">←</button>
-                    <button onClick={handleNext} className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-sm hover:bg-blue-600">→</button>
+                    <button onClick={handlePrevious} className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-sm hover:bg-orange-600">←</button>
+                    <button onClick={handleNext} className="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-sm hover:bg-orange-600">→</button>
                     <span className="text-lg font-semibold text-gray-700 ml-2 flex-1">{getCurrentPeriodLabel()}</span>
                 </div>
 
@@ -377,19 +377,19 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
                 <div className="flex bg-white rounded-lg shadow-sm border overflow-hidden w-full">
                     <button
                         onClick={() => setViewType('month')}
-                        className={`flex-1 px-3 py-2 text-sm font-medium ${viewType === 'month' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                        className={`flex-1 px-3 py-2 text-sm font-medium ${viewType === 'month' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
                     >
                         Month
                     </button>
                     <button
                         onClick={() => setViewType('week')}
-                        className={`flex-1 px-3 py-2 text-sm font-medium ${viewType === 'week' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                        className={`flex-1 px-3 py-2 text-sm font-medium ${viewType === 'week' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
                     >
                         Week
                     </button>
                     <button
                         onClick={() => setViewType('day')}
-                        className={`flex-1 px-3 py-2 text-sm font-medium ${viewType === 'day' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                        className={`flex-1 px-3 py-2 text-sm font-medium ${viewType === 'day' ? 'bg-orange-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
                     >
                         Day
                     </button>

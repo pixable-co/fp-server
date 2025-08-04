@@ -166,7 +166,6 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                     header={
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <span>{client.customer_name}</span>
-                            <i className="fas fa-comments-alt" />
                         </div>
                     }
                 >
@@ -186,6 +185,22 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                         style={{ marginTop: 8 }}
                     >
                         {selectedRowKeys.includes(client.client_id) ? 'Selected' : 'Select'}
+                    </Button>
+
+                    <Button
+                    size="small"
+                    type="default"
+                    onClick={() => window.location.href = `/view-client/?id=${client.customer_id}`}
+                    style={{ marginTop: 8 }}
+                >
+                    View
+                </Button>
+                               <Button
+                        size="small"
+                        type="default"
+                        onClick={() => window.open(`/messages?customer_id=${client.customer_id}`, '_blank')}
+                    >
+                        Message
                     </Button>
                 </Panel>
             ))}

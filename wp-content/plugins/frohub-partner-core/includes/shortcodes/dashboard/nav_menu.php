@@ -31,7 +31,7 @@ class NavMenu {
                     <div class="fp-dropdown-menu" id="fpDropdownMenu">
                         <a href="/my-account">Account</a>
                         <a href="/help-centre">Help & FAQs</a>
-                        <a href="/invite-a-friend">Invite a Friend</a>
+                        <!-- <a href="/invite-a-friend">Invite a Friend</a> -->
                         <hr>
                         <a href="<?php echo wp_logout_url(home_url()); ?>" onclick="document.cookie='partner_profile_url=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'">Log out</a>
                     </div>

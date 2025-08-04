@@ -182,7 +182,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                                 ? selectedRowKeys.filter(k => k !== client.client_id)
                                 : [...selectedRowKeys, client.client_id]);
                         }}
-                        style={{ marginTop: 8 }}
+                        style={{  marginTop: 8, marginRight: 8  }}
                     >
                         {selectedRowKeys.includes(client.client_id) ? 'Selected' : 'Select'}
                     </Button>
@@ -191,7 +191,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                     size="small"
                     type="default"
                     onClick={() => window.location.href = `/view-client/?id=${client.customer_id}`}
-                    style={{ marginTop: 8 }}
+                    style={{  marginTop: 8, marginRight: 8  }}
                 >
                     View
                 </Button>
@@ -199,6 +199,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                         size="small"
                         type="default"
                         onClick={() => window.open(`/messages?customer_id=${client.customer_id}`, '_blank')}
+                        style={{  marginTop: 8, marginRight: 8 }}
                     >
                         Message
                     </Button>

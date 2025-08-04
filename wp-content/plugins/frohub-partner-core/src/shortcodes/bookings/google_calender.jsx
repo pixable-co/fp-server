@@ -12,7 +12,6 @@ const GoogleCalendar = () => {
     // ✅ Check if user is authenticated with Google Calendar & token status
     useEffect(() => {
         fetchData("fpserver/check_google_auth_status", (response) => {
-            console.log("Auth Status Response:", response);
             if (response.data.authenticated === false) {
                 console.log("Token expired, attempting refresh...");
                 refreshGoogleToken();
@@ -44,7 +43,7 @@ const GoogleCalendar = () => {
                 fetchSavedCalendar();
             } else {
                 console.error("Failed to refresh token:", response.message);
-                toastNotification('info', 'Google Calendar Disconnected','Google Calendar session expired. Please reconnect.')
+                // toastNotification('info', 'Google Calendar Disconnected','Google Calendar session expired. Please reconnect.')
             }
         });
     };

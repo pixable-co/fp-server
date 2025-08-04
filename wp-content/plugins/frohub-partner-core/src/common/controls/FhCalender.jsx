@@ -525,16 +525,32 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         return `${hours.toString().padStart(2, "0")}:${minutes}`;
     };
 
+    function combineDateAndTimeUK(dateStr, timeStr = "00:00") {
+        if (!dateStr || !timeStr) {
+            console.error("❌ Missing date or time in combineDateAndTimeUK()");
+            return null;
+        }
+
+        // Combine date and time directly without converting to UTC
+        // Output format: "YYYY-MM-DDTHH:mm:ss" (local time)
+        const combined = `${dateStr}T${timeStr}:00`;
+        const testDate = new Date(combined);
+
+        if (isNaN(testDate.getTime())) {
+            console.error("❌ Invalid local datetime:", combined);
+            return null;
+        }
+
+        return combined;
+    }
+
     const handleSaveEvent = async () => {
         if (!eventTitle || !selectedSlot.start) {
             console.error("❌ Missing required fields.");
             return;
         }
 
-        // Create a temporary ID for the new event
         const tempId = `temp-${Date.now()}`;
-
-        // Add a placeholder event to the display while saving
         const tempEvent = {
             id: tempId,
             title: eventTitle,
@@ -550,33 +566,28 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             }
         };
 
-        // Add the temp event to events and mark it as being modified
         setEvents(prev => [...prev, tempEvent]);
         setModifyingEventIds(prev => [...prev, tempId]);
-
-        // Close the modal
         handleModalClose();
 
-        // Ensure default values for end_date and end_time
-        const defaultEndDate = selectedSlot.start.split('T')[0]; // Same day as start_date
-        const endDate = selectedSlot.end || defaultEndDate;
-        const endTime = selectedSlot.endTime || "23:59";
+        const startDate = selectedSlot.start;
+        const startTime = convertTo24Hour(selectedSlot.startTime || "00:00");
+        const endDate = selectedSlot.end || selectedSlot.start;
+        const endTime = convertTo24Hour(selectedSlot.endTime || "23:59");
 
-        const formattedStart = parseDateString(selectedSlot.start, convertTo24Hour(selectedSlot.startTime));
-        const formattedEnd = parseDateString(endDate, convertTo24Hour(endTime));
+        const formattedStart = combineDateAndTimeUK(startDate, startTime);
+        const formattedEnd = combineDateAndTimeUK(endDate, endTime);
 
         if (!formattedStart || !formattedEnd) {
             console.error("❌ Error formatting event start/end dates.");
             return;
         }
 
-        // Log the formatted dates for debugging
-        console.log("Formatted Start Date:", formattedStart);
-        console.log("Formatted End Date:", formattedEnd);
+        console.log("Formatted Start Date (UK):", formattedStart);
+        console.log("Formatted End Date (UK):", formattedEnd);
 
-        // Ensure API request payload matches expected format
         const payload = {
-            partner_id: partner_id.toString(), // Ensure it's a string
+            partner_id: partner_id.toString(),
             event_title: eventTitle,
             start_date: formattedStart,
             end_date: formattedEnd
@@ -590,15 +601,15 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 payload
             );
             console.log("✅ API Response:", response.data);
-            if (response.data.success) {
-                await fetchData(); // Trigger fetchData to refresh the data in the parent
 
+            if (response.data.success) {
+                await fetchData();
                 setTimeout(() => {
-                    // Remove the temp event after the fetch completes and new data is rendered
                     setEvents(prev => prev.filter(e => e.id !== tempId));
                     setModifyingEventIds(prev => prev.filter(id => id !== tempId));
                 }, 1000);
             }
+
             handleModalClose();
         } catch (error) {
             console.error("❌ Error creating unavailable event:", error);
@@ -606,6 +617,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             setModifyingEventIds(prev => prev.filter(id => id !== tempId));
         }
     };
+
 
     const renderEventContent = (arg) => {
         // Show skeleton for global loading or for specific events being modified
@@ -752,7 +764,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                       center: 'title',
                       right: 'dayGridMonth,timeGridWeek,timeGridDay'
                   }}
-                  // locale={enGbLocale}
+                  locale={enGbLocale}
                   weekends={true}
                   events={displayEvents}
                   selectable={!loading}
@@ -799,6 +811,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                           type="date"
                           className="border-gray-300 rounded-md p-2 w-full"
                           value={selectedSlot?.start?.split("T")[0] || ""}
+                          min={new Date().toISOString().split("T")[0]}
                           onChange={(e) => setSelectedSlot({ ...selectedSlot, start: e.target.value })}
                       />
                       <select

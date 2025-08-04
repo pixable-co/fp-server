@@ -198,6 +198,22 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`; // ⚠️ No Z
     }
 
+
+    function normalizeGoogleISOtoUK(isoString) {
+        if (!isoString) return null;
+        const utcDate = new Date(isoString);
+        // Remove the Z and reformat without timezone offset
+        const year = utcDate.getFullYear();
+        const month = String(utcDate.getMonth() + 1).padStart(2, '0');
+        const day = String(utcDate.getDate()).padStart(2, '0');
+        const hour = String(utcDate.getHours()).padStart(2, '0');
+        const minute = String(utcDate.getMinutes()).padStart(2, '0');
+        const second = String(utcDate.getSeconds()).padStart(2, '0');
+
+        // Output a string that FullCalendar interprets as local UK time
+        return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
+    }
+
     const transformedEvents = events.map(event => {
         if (!event.date) {
             console.error("Invalid event date:", event);
@@ -206,11 +222,14 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
         // Handle Google Calendar events directly
         if (event.eventType === 'google-calendar') {
-            const startRaw = event.date.includes('T') ? event.date : `${event.date}T${event.time || '00:00:00'}`;
-            const endRaw = event.end || startRaw;
+            const rawStart = event.date.includes('T')
+                ? event.date
+                : `${event.date}T${event.time || '00:00:00'}`;
 
-            const start = normalizeToLocalISOString(startRaw);
-            const end = normalizeToLocalISOString(endRaw);
+            const rawEnd = event.end || rawStart;
+
+            const start = normalizeGoogleISOtoUK(rawStart);
+            const end = normalizeGoogleISOtoUK(rawEnd);
 
             return {
                 id: event.id,
@@ -222,10 +241,11 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 borderColor: '#34a853',
                 textColor: '#fff',
                 extendedProps: {
-                    eventType: 'google-calendar'
+                    eventType: 'google-calendar',
                 }
             };
         }
+
         // if (event.eventType === 'google-calendar') {
         //     const start = event.date.includes('T') ? event.date : `${event.date}T${event.time || '00:00'}`;
         //     const end = event.end || start;

@@ -101,32 +101,44 @@ export default function BookingCalender() {
             }
 
             return response.data.events.map(event => {
-                const startDateTime = event.start?.includes("T") ? event.start : `${event.start}T00:00:00`;
-                const endDateTime = event.end?.includes("T") ? event.end : `${event.end}T23:59:59`;
+                const { id, title, start, end } = event;
 
-                let formattedDate = 'Unknown Date';
-                let formattedTime = 'All Day';
-                let formattedEnd = 'Unknown End Time';
+                const isAllDay = !start.includes("T");
+                let formattedDate = "Unknown Date";
+                let formattedTime = null;
+                let formattedEnd = null;
 
-                try {
-                    const startDateObj = new Date(startDateTime);
-                    formattedDate = startDateObj.toISOString().split("T")[0];
-                    formattedTime = startDateObj.toISOString().split("T")[1].split(".")[0];
+                if (isAllDay) {
+                    // All-day event
+                    formattedDate = start;
+                    formattedEnd = end;
+                } else {
+                    // Timed event — must respect UK timezone
+                    const startObj = new Date(start);
+                    const endObj = new Date(end);
 
-                    if (event.end) {
-                        const endDateObj = new Date(endDateTime);
-                        formattedEnd = endDateObj.toISOString();
-                    }
-                } catch (error) {
-                    console.error("Error parsing Google Calendar event dates:", error, event);
+                    // Use UK time zone
+                    formattedDate = startObj.toLocaleDateString("sv-SE", { timeZone: "Europe/London" });
+                    formattedTime = startObj.toLocaleTimeString("en-GB", {
+                        timeZone: "Europe/London",
+                        hour12: false,
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+
+                    formattedEnd = endObj.toLocaleString("sv-SE", {
+                        timeZone: "Europe/London"
+                    });
                 }
 
                 return {
-                    id: `calendar-${event.id}`,
-                    title: event.title ?? 'Google Calendar Event',
+                    id: `calendar-${id}`,
+                    title: title || 'Google Calendar Event',
                     date: formattedDate,
-                    time: formattedTime,
+                    time: formattedTime,  // UK time
                     end: formattedEnd,
+                    isAllDay,
                     eventType: 'google-calendar',
                 };
             });
@@ -135,6 +147,54 @@ export default function BookingCalender() {
             return [];
         }
     };
+
+    // const fetchAllCalendarEvents = async () => {
+    //     try {
+    //         const response = await axios.get(
+    //             '/wp-json/fpserver/v1/google-calendar-all-events',
+    //             { params: { partner_id } }
+    //         );
+    //
+    //         if (!response.data || !response.data.events) {
+    //             console.error("Google Calendar API returned unexpected response:", response.data);
+    //             return [];
+    //         }
+    //
+    //         return response.data.events.map(event => {
+    //             const startDateTime = event.start?.includes("T") ? event.start : `${event.start}T00:00:00`;
+    //             const endDateTime = event.end?.includes("T") ? event.end : `${event.end}T23:59:59`;
+    //
+    //             let formattedDate = 'Unknown Date';
+    //             let formattedTime = 'All Day';
+    //             let formattedEnd = 'Unknown End Time';
+    //
+    //             try {
+    //                 const startDateObj = new Date(startDateTime);
+    //                 formattedDate = startDateObj.toISOString().split("T")[0];
+    //                 formattedTime = startDateObj.toISOString().split("T")[1].split(".")[0];
+    //
+    //                 if (event.end) {
+    //                     const endDateObj = new Date(endDateTime);
+    //                     formattedEnd = endDateObj.toISOString();
+    //                 }
+    //             } catch (error) {
+    //                 console.error("Error parsing Google Calendar event dates:", error, event);
+    //             }
+    //
+    //             return {
+    //                 id: `calendar-${event.id}`,
+    //                 title: event.title ?? 'Google Calendar Event',
+    //                 date: formattedDate,
+    //                 time: formattedTime,
+    //                 end: formattedEnd,
+    //                 eventType: 'google-calendar',
+    //             };
+    //         });
+    //     } catch (error) {
+    //         console.error("Error fetching all Google Calendar events:", error);
+    //         return [];
+    //     }
+    // };
 
     // Fetch unavailable dates
     const fetchUnavailableDates = async () => {

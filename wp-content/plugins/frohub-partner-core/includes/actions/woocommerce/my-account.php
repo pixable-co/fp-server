@@ -11,6 +11,7 @@ class MyAccount {
         $self = new self();
 
         add_action('init', [$self, 'register_deactivated_role']);
+        add_action('init', [$self, 'handle_password_reset_submission']);
         add_action('wp_login', [$self, 'block_deactivated_login'], 10, 2);
 
         remove_action('woocommerce_account_navigation', 'woocommerce_account_navigation');
@@ -223,5 +224,45 @@ class MyAccount {
 
         $user->set_role('deactivated_user');
         wp_send_json_success(['message' => 'Your account has been deactivated.']);
+    }
+
+    public function handle_password_reset_submission() {
+        if (
+            isset($_POST['save_account_details']) &&
+            isset($_POST['save-account-details-nonce']) &&
+            wp_verify_nonce($_POST['save-account-details-nonce'], 'save_account_details')
+        ) {
+            $user = wp_get_current_user();
+            if (!$user || !($user instanceof \WP_User)) {
+                wc_add_notice(__('User not found.'), 'error');
+                return;
+            }
+
+            $current_password = $_POST['password_current'] ?? '';
+            $new_password     = $_POST['password_1'] ?? '';
+            $confirm_password = $_POST['password_2'] ?? '';
+
+            if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
+                wc_add_notice(__('Please fill in all password fields.'), 'error');
+                return;
+            }
+
+            if (!wp_check_password($current_password, $user->user_pass, $user->ID)) {
+                wc_add_notice(__('Your current password is incorrect.'), 'error');
+                return;
+            }
+
+            if ($new_password !== $confirm_password) {
+                wc_add_notice(__('New passwords do not match.'), 'error');
+                return;
+            }
+
+            wp_set_password($new_password, $user->ID);
+            wc_add_notice(__('Password successfully updated.'), 'success');
+
+            // Log user back in after password change
+            wp_set_auth_cookie($user->ID);
+            wp_set_current_user($user->ID);
+        }
     }
 }

@@ -10,13 +10,53 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
     const [currentDayOffset, setCurrentDayOffset] = useState(0);
 
+    // Helper function to parse dates without timezone conversion
+    const parseAsLocalDate = (dateString) => {
+        if (!dateString) return null;
+
+        // Handle different date formats
+        let cleanDateString = dateString;
+
+        // If it has 'Z' at the end, remove it to prevent UTC conversion
+        if (cleanDateString.endsWith('Z')) {
+            cleanDateString = cleanDateString.slice(0, -1);
+        }
+
+        // If it's just a date-time string without timezone info, parse it as local
+        // This prevents JavaScript from assuming UTC
+        const parts = cleanDateString.split('T');
+        if (parts.length === 2) {
+            const [datePart, timePart] = parts;
+            const [year, month, day] = datePart.split('-').map(Number);
+            const [hour, minute, second] = timePart.split(':').map(Number);
+
+            // Create date in local timezone
+            return new Date(year, month - 1, day, hour, minute, second || 0);
+        }
+
+        // Fallback to regular parsing
+        return new Date(cleanDateString);
+    };
+
+    // Helper to get date key in local timezone
+    const getLocalDateKey = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const groupedEvents = events.reduce((acc, event) => {
         if (!event || !event.start || !event.end) return acc;
-        const start = new Date(event.start);
-        const end = new Date(event.end);
 
+        const start = parseAsLocalDate(event.start);
+        const end = parseAsLocalDate(event.end);
+
+        if (!start || !end) return acc;
+
+        // Use local date for grouping
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-            const key = d.toISOString().split("T")[0];
+            const key = getLocalDateKey(d);
             if (!acc[key]) acc[key] = [];
             if (!acc[key].some(e => e.id === event.id)) {
                 acc[key].push(event);
@@ -25,7 +65,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         return acc;
     }, {});
 
-    // Month view logic (your existing code)
+    // Month view logic
     const allDatesInRange = () => {
         const dates = [];
         const today = new Date();
@@ -134,8 +174,11 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const renderEventCard = (event, dateKey) => {
         if (!event || !event.start || !event.end) return null;
 
-        const start = new Date(event.start);
-        const end = new Date(event.end);
+        const start = parseAsLocalDate(event.start);
+        const end = parseAsLocalDate(event.end);
+
+        if (!start || !end) return null;
+
         const isGoogle = event.extendedProps?.eventType === 'google-calendar';
         const isUnavailable = event.extendedProps?.eventType === 'unavailable';
         const isPlaceholder = event.extendedProps?.isPlaceholder;
@@ -167,7 +210,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         return (
             <div className="space-y-6">
                 {sortedDates.map(date => {
-                    const dateKey = date.toISOString().split("T")[0];
+                    const dateKey = getLocalDateKey(date);
                     const dayEvents = groupedEvents[dateKey] || [];
                     const weekday = date.toLocaleDateString("en-GB", { weekday: "short" });
                     const dayNum = date.getDate();
@@ -207,7 +250,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         return (
             <div className="space-y-4">
                 {weekDates.map(date => {
-                    const dateKey = date.toISOString().split("T")[0];
+                    const dateKey = getLocalDateKey(date);
                     const dayEvents = groupedEvents[dateKey] || [];
                     const weekday = date.toLocaleDateString("en-GB", { weekday: "long" });
                     const dayNum = date.getDate();
@@ -244,7 +287,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
 
     const renderDayView = () => {
         const dayDate = getDayDate()[0];
-        const dateKey = dayDate.toISOString().split("T")[0];
+        const dateKey = getLocalDateKey(dayDate);
         const dayEvents = groupedEvents[dateKey] || [];
         const isToday = dayDate.toDateString() === new Date().toDateString();
 
@@ -253,8 +296,10 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         dayEvents.forEach(event => {
             if (!event || !event.start || !event.end) return;
 
-            const eventStart = new Date(event.start);
-            const eventEnd = new Date(event.end);
+            const eventStart = parseAsLocalDate(event.start);
+            const eventEnd = parseAsLocalDate(event.end);
+
+            if (!eventStart || !eventEnd) return;
 
             // Ensure it's valid for this day
             if (eventStart.toDateString() !== dayDate.toDateString() && eventEnd.toDateString() !== dayDate.toDateString()) {
@@ -429,8 +474,8 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
             >
                 {selectedEvent && (
                     <div className="space-y-2 text-sm">
-                        <p><strong>Start:</strong> {new Date(selectedEvent.start).toLocaleString()}</p>
-                        <p><strong>End:</strong> {new Date(selectedEvent.end).toLocaleString()}</p>
+                        <p><strong>Start:</strong> {parseAsLocalDate(selectedEvent.start)?.toLocaleString()}</p>
+                        <p><strong>End:</strong> {parseAsLocalDate(selectedEvent.end)?.toLocaleString()}</p>
                         {selectedEvent.extendedProps?.eventType === 'unavailable' && (
                             <button
                                 onClick={handleDeleteEvent}

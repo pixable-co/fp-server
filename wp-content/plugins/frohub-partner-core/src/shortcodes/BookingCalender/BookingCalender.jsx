@@ -17,14 +17,6 @@ export default function BookingCalender() {
             ]);
 
             const merged = [...orderEvents, ...allCalendarEvents, ...unavailableDates];
-            console.log(merged);
-
-// ✅ Sanitize merged event list to prevent invalid dates
-            const sanitized = merged.filter(event => {
-                if (!event || !event.date || !event.time) return false;
-                const startDate = new Date(`${event.date}T${event.time || '00:00'}`);
-                return !isNaN(startDate.getTime());
-            });
 
             setEvents(merged);
 
@@ -147,54 +139,6 @@ export default function BookingCalender() {
             return [];
         }
     };
-
-    // const fetchAllCalendarEvents = async () => {
-    //     try {
-    //         const response = await axios.get(
-    //             '/wp-json/fpserver/v1/google-calendar-all-events',
-    //             { params: { partner_id } }
-    //         );
-    //
-    //         if (!response.data || !response.data.events) {
-    //             console.error("Google Calendar API returned unexpected response:", response.data);
-    //             return [];
-    //         }
-    //
-    //         return response.data.events.map(event => {
-    //             const startDateTime = event.start?.includes("T") ? event.start : `${event.start}T00:00:00`;
-    //             const endDateTime = event.end?.includes("T") ? event.end : `${event.end}T23:59:59`;
-    //
-    //             let formattedDate = 'Unknown Date';
-    //             let formattedTime = 'All Day';
-    //             let formattedEnd = 'Unknown End Time';
-    //
-    //             try {
-    //                 const startDateObj = new Date(startDateTime);
-    //                 formattedDate = startDateObj.toISOString().split("T")[0];
-    //                 formattedTime = startDateObj.toISOString().split("T")[1].split(".")[0];
-    //
-    //                 if (event.end) {
-    //                     const endDateObj = new Date(endDateTime);
-    //                     formattedEnd = endDateObj.toISOString();
-    //                 }
-    //             } catch (error) {
-    //                 console.error("Error parsing Google Calendar event dates:", error, event);
-    //             }
-    //
-    //             return {
-    //                 id: `calendar-${event.id}`,
-    //                 title: event.title ?? 'Google Calendar Event',
-    //                 date: formattedDate,
-    //                 time: formattedTime,
-    //                 end: formattedEnd,
-    //                 eventType: 'google-calendar',
-    //             };
-    //         });
-    //     } catch (error) {
-    //         console.error("Error fetching all Google Calendar events:", error);
-    //         return [];
-    //     }
-    // };
 
     // Fetch unavailable dates
     const fetchUnavailableDates = async () => {

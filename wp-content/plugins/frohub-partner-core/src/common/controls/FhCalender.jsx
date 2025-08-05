@@ -392,8 +392,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                         { partner_id: partner_id.toString(), event_index: eventIndex }
                     );
 
-                    console.log("✅ Delete API Response:", response.data);
-
                     if (response.data.success) {
                         await fetchData(); // Use await to ensure it compl
                         setTimeout(() => {
@@ -550,9 +548,6 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             return;
         }
 
-        console.log("Formatted Start Date (UK):", formattedStart);
-        console.log("Formatted End Date (UK):", formattedEnd);
-
         const payload = {
             partner_id: partner_id.toString(),
             event_title: eventTitle,
@@ -560,14 +555,11 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
             end_date: formattedEnd
         };
 
-        console.log("📤 Sending API Request:", payload);
-
         try {
             const response = await axios.post(
                 `${fpserver_settings.base_api_url}/wp-json/frohub/v1/custom-events/create`,
                 payload
             );
-            console.log("✅ API Response:", response.data);
 
             if (response.data.success) {
                 await fetchData();

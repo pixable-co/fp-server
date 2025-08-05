@@ -111,7 +111,7 @@ class MyAccount {
         echo '<div id="custom-deactivation-modal" class="custom-modal" style="display:none;">
             <div class="custom-modal-content">
                 <span class="custom-modal-close" onclick="document.getElementById(\'custom-deactivation-modal\').style.display=\'none\'">&times;</span>
-                ' . do_shortcode('[gravityform id="16" title="true"]') . '
+                ' . do_shortcode('[gravityform id="16" title="true" ajax="true"]') . '
             </div>
         </div>';
 

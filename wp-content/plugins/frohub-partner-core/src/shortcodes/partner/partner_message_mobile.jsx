@@ -281,7 +281,7 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
                                     ))
                                 }
                                 {!loading.conversations && conversations.length === 0 && (
-                                    <div className="p-4 text-center text-gray-500">No conversations found</div>
+                                    <div className="p-4 text-center text-gray-500">No messages yet</div>
                                 )}
                             </>
                         )}

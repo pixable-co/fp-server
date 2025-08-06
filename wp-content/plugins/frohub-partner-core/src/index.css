@@ -88,6 +88,10 @@ a:hover {
     border-color: #D9D9D9;
 }
 
+.fh__brand_button {
+    background-color: #E15748;
+}
+
 /*Subscriptions Styles*/
 
 .frohub-subscription-wrapper {

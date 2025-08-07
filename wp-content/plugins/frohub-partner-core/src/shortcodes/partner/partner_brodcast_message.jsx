@@ -104,7 +104,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
     // Handle opening modal
     const handleBroadcastClick = () => {
         if (selectedRowKeys.length === 0) {
-            swal('Warning', 'Please select at least one client.', 'warning');
+            swal('Oops', 'Please select at least one client.', 'warning');
             return;
         }
         setIsModalOpen(true);
@@ -153,7 +153,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
 
             sendNext();
         }).catch(() => {
-            swal('Warning', 'Please enter your message.', 'warning');
+            swal('Oops', 'Please enter your message.', 'warning');
         });
     };
 
@@ -184,7 +184,7 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                         }}
                         style={{  marginTop: 8, marginRight: 8  }}
                     >
-                        {selectedRowKeys.includes(client.client_id) ? 'Selected' : 'Select'}
+                        {selectedRowKeys.includes(client.client_id) ? 'Broadcast' : 'Broadcast'}
                     </Button>
 
                     <Button

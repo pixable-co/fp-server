@@ -268,13 +268,8 @@ const MobileService = () => {
             <button
                 onClick={saveLocationData}
                 disabled={saving}
+                className="w-btn us-btn-style_1"
                 style={{
-                    marginTop: "20px",
-                    padding: "8px 16px",
-                    borderRadius: "5px",
-                    background: "#007bff",
-                    color: "white",
-                    border: "none",
                     cursor: saving ? "not-allowed" : "pointer"
                 }}
             >

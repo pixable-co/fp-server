@@ -183,7 +183,7 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         const isUnavailable = event.extendedProps?.eventType === 'unavailable';
         const isPlaceholder = event.extendedProps?.isPlaceholder;
 
-        const bgColor = isGoogle ? 'bg-green-500' : isUnavailable ? 'bg-gray-500' : isPlaceholder ? 'bg-gray-300 animate-pulse' : 'bg-orange-400';
+        const bgColor = isGoogle ? 'bg-green-500' : isUnavailable ? 'bg-gray-500' : isPlaceholder ? 'bg-gray-300 animate-pulse' : 'fh__calendar_event';
 
         if (isPlaceholder) {
             return <div key={event.id} className="p-2"><Skeleton.Button active size="small" style={{ width: '100%', height: 48, borderRadius: 8 }} /></div>;
@@ -474,6 +474,9 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
             >
                 {selectedEvent && (
                     <div className="space-y-2 text-sm">
+                        <p><strong>Customer:</strong> {selectedEvent.extendedProps?.customer}</p>
+                        <p><strong>Phone:</strong> {selectedEvent.extendedProps.phone || 'N/A'}</p>
+                        <p><strong>Service Type:</strong> {selectedEvent.extendedProps.service || 'N/A'}</p>
                         <p><strong>Start:</strong> {parseAsLocalDate(selectedEvent.start)?.toLocaleString()}</p>
                         <p><strong>End:</strong> {parseAsLocalDate(selectedEvent.end)?.toLocaleString()}</p>
                         {selectedEvent.extendedProps?.eventType === 'unavailable' && (

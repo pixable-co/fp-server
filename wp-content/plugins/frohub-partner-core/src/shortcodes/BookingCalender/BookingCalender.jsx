@@ -185,7 +185,16 @@ export default function BookingCalender() {
 
     return (
         <div>
-            <NotificationBar message={"Need to block out availability? Click anywhere on the calendar to add an event, or drag to select multiple days."} />
+            {/* Desktop only (≥768px) */}
+            <div className="fh__tip_message">
+                <NotificationBar message="Need to block out availability? Click anywhere on the calendar to add an event, or drag to select multiple days." />
+            </div>
+
+            {/* Mobile only (<768px) */}
+            <div className="fh__tip_message_mobile">
+                <NotificationBar message="Need to block out availability? Tap the + button on mobile, or click anywhere on the calendar on desktop to add an event." />
+            </div>
+
             <FhCalender
                 type="day"
                 events={events}

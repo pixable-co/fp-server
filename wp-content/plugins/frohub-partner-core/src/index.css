@@ -92,6 +92,31 @@ a:hover {
     background-color: #E15748;
 }
 
+.fh__calendar_event {
+    background-color: #e0816d;
+}
+
+.fh__tip_message {
+    display: block;
+}
+
+@media only screen and (max-width: 600px) {
+    .fh__tip_message {
+        display: none;
+    }
+}
+
+.fh__tip_message_mobile {
+    display: none;
+}
+
+@media only screen and (max-width: 600px) {
+    .fh__tip_message_mobile {
+        display: block;
+    }
+}
+
+
 /*Subscriptions Styles*/
 
 .frohub-subscription-wrapper {

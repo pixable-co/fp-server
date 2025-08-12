@@ -11,6 +11,64 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const [currentDayOffset, setCurrentDayOffset] = useState(0);
 
     // Helper function to parse dates without timezone conversion
+    // Robust local parser for mobile too
+    const parseAsLocalDate = (input) => {
+        if (!input) return null;
+        if (input instanceof Date) return isNaN(input) ? null : input;
+
+        let s = String(input).trim();
+
+        // Treat explicit timezones as local by stripping them (avoid UTC shift)
+        // e.g. "2025-08-12T09:00:00Z" or "2025-08-12T09:00:00+01:00"
+        s = s.replace(/Z$/i, '').replace(/[+\-]\d{2}:\d{2}$/, '');
+
+        // Allow space or 'T' between date and time
+        s = s.replace(' ', 'T');
+
+        // 1) ISO-ish: YYYY-MM-DD or YYYY/MM/DD with optional time
+        let m = s.match(
+            /^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(?:T(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
+        );
+        if (m) {
+            const [, y, mo, d, hh = '0', mi = '0', ss = '0'] = m;
+            return new Date(
+                Number(y),
+                Number(mo) - 1,
+                Number(d),
+                Number(hh),
+                Number(mi),
+                Number(ss)
+            );
+        }
+
+        // 2) DMY: DD-MM-YYYY or DD/MM/YYYY with optional time
+        m = s.match(
+            /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
+        );
+        if (m) {
+            const [, d, mo, y, hh = '0', mi = '0', ss = '0'] = m;
+            return new Date(
+                Number(y),
+                Number(mo) - 1,
+                Number(d),
+                Number(hh),
+                Number(mi),
+                Number(ss)
+            );
+        }
+
+        // 3) Timestamp number strings
+        if (/^\d+$/.test(s)) {
+            const n = Number(s);
+            const bySec = s.length <= 10; // seconds vs ms
+            return new Date(bySec ? n * 1000 : n);
+        }
+
+        // Final fallback: try native — but guard Invalid Date
+        const d = new Date(s);
+        return isNaN(d) ? null : d;
+    };
+
     // const parseAsLocalDate = (dateString) => {
     //     if (!dateString) return null;
     //
@@ -37,50 +95,6 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     //     // Fallback to regular parsing
     //     return new Date(cleanDateString);
     // };
-
-    const parseAsLocalDate = (dateString) => {
-        if (dateString instanceof Date) {
-            return isNaN(dateString.getTime()) ? null : dateString;
-        }
-        if (!dateString || typeof dateString !== 'string') return null;
-
-        // Trim and normalize
-        const str = dateString.trim();
-
-        // Case 1: UK Format — dd/mm/yyyy h:mm aa
-        const ukMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s*([ap]m)$/i);
-        if (ukMatch) {
-            const [, day, month, year, hourStr, minute, ampm] = ukMatch;
-            let hour = parseInt(hourStr, 10);
-            if (ampm.toLowerCase() === 'pm' && hour < 12) hour += 12;
-            if (ampm.toLowerCase() === 'am' && hour === 12) hour = 0;
-
-            return new Date(+year, +month - 1, +day, +hour, +minute);
-        }
-
-        // Case 2: ISO Format with 'Z' → UTC time, but we want to interpret as LOCAL
-        // Example: 2025-08-23T06:00:00.000Z
-        if (str.endsWith('Z') || str.includes('T') && str.includes(':')) {
-            const parsed = new Date(str);
-            if (!isNaN(parsed.getTime())) {
-                // Convert UTC time to local floating time
-                // i.e. if it's 06:00 UTC, treat it as 06:00 *local*
-                const utcAsLocal = new Date(parsed.getTime() - parsed.getTimezoneOffset() * 60000);
-                return utcAsLocal;
-            }
-        }
-
-        // Case 3: ISO-like but without 'Z' — treat as local
-        // Example: 2025-08-23T06:00:00
-        const isoLocalMatch = str.match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
-        if (isoLocalMatch) {
-            const [, year, month, day, hour, minute] = isoLocalMatch;
-            return new Date(+year, +month - 1, +day, +hour, +minute);
-        }
-
-        console.warn("Invalid date format:", dateString);
-        return null;
-    };
 
     // Helper to get date key in local timezone
     const getLocalDateKey = (date) => {

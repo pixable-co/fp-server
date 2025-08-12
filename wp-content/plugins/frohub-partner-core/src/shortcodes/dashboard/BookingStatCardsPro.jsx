@@ -97,13 +97,11 @@ const BookingStatCardsPro = ({ orders, loading }) => {
             <div className="bg-white p-4 rounded shadow">
                 <div className="text-sm text-gray-500">Total value of bookings</div>
                 <div className="text-2xl font-semibold text-gray-800">£{totalValue.toFixed(2)}</div>
-                <div className="text-xs text-gray-400 mt-1">Goal: £3000.00</div>
-                <div className="text-sm text-yellow-600 mt-2">▼ 10% <span className="text-gray-500">Nearly there!</span></div>
             </div>
 
             {/* New vs Returning Clients */}
             <div className="bg-white p-4 rounded shadow">
-                <div className="text-sm text-gray-500">New vs Repeating Clients</div>
+                <div className="text-sm text-gray-500">New vs Returning Clients</div>
                 <div className="flex justify-between mt-2 text-sm">
                     <span>New</span><span className="font-semibold">£{newClientsValue.toFixed(2)}</span>
                 </div>

@@ -396,22 +396,163 @@ class NavMenu {
         .mobile-overlay.active {
             display: block;
         }
+
+        /* ===== MOBILE SUBMENU TOGGLE ===== */
+        @media (max-width: 768px) {
+          /* The row that holds the label becomes the positioning context */
+          .fp-nav-sidebar .menu-item-has-children > a {
+            position: relative;
+            display: flex;
+            align-items: center;    /* keeps icons/text vertically centered */
+            padding-right: 44px;    /* room for the chevron */
+            min-height: 44px;       /* stable tap target height */
+          }
+
+          /* Chevron toggle button */
+          .submenu-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;             /* ensure above link */
+            pointer-events: auto;   /* ensure button receives clicks */
+          }
+
+          /* Hide submenus by default on mobile */
+          .fp-nav-list li.menu-item-has-children > .sub-menu {
+            display: none !important;
+          }
+
+          /* Show submenu when .open class is set on LI */
+          .fp-nav-list li.menu-item-has-children.open > .sub-menu {
+            display: block !important;
+          }
+
+          /* Rotate chevron when open */
+          .submenu-toggle i {
+            transition: transform 0.2s ease;
+          }
+          .menu-item-has-children.open > a > .submenu-toggle i {
+            transform: rotate(180deg);
+          }
+
+          /* Disable hover-open on mobile so only the button controls it */
+          .fp-nav-sidebar .menu-item-has-children:hover > .sub-menu {
+            display: none !important;
+          }
+
+          /* Hide ONLY the original chevron inside the <a>, not inside the button */
+          .fp-nav-sidebar .menu-item-has-children > a > i.fa-chevron-down {
+            display: none !important;
+          }
+        }
         </style>
 
         <div class="mobile-overlay"></div>
 
         <script>
+//         document.addEventListener('DOMContentLoaded', function () {
+//             const sidebar = document.querySelector('.fp-nav-sidebar');
+//             const toggleBtn = document.querySelector('.fp-nav-toggle');
+//             const mobileToggle = document.querySelector('.mobile-menu-toggle');
+//             const overlay = document.querySelector('.mobile-overlay');
+//             const isMobile = window.innerWidth <= 768;
+//
+//             // Initialize sidebar state based on screen size
+//             if (isMobile) {
+//                 sidebar.classList.remove('collapsed');
+//                 // Don't add mobile-expanded initially on mobile
+//             } else {
+//                 sidebar.classList.remove('collapsed');
+//             }
+//
+//             // Toggle sidebar when the internal button is clicked (desktop)
+//             if (toggleBtn) {
+//                 toggleBtn.addEventListener('click', () => {
+//                     sidebar.classList.toggle('collapsed');
+//                     toggleBtn.innerHTML = sidebar.classList.contains('collapsed') ?
+//                         '<i class="far fa-chevron-right"></i>' :
+//                         '<i class="far fa-chevron-left"></i>';
+//                 });
+//             }
+//
+//             // Toggle sidebar when the mobile button is clicked
+//             if (mobileToggle) {
+//                 mobileToggle.addEventListener('click', () => {
+//                     sidebar.classList.toggle('mobile-expanded');
+//                     overlay.classList.toggle('active');
+//                 });
+//             }
+//
+//             // Close sidebar when clicking on overlay
+//             if (overlay) {
+//                 overlay.addEventListener('click', () => {
+//                     sidebar.classList.remove('mobile-expanded');
+//                     overlay.classList.remove('active');
+//                 });
+//             }
+//
+//             // Close sidebar on link click for mobile
+//             document.querySelectorAll('.fp-nav-list a').forEach(link => {
+//                 link.addEventListener('click', () => {
+//                     if (window.innerWidth <= 768) {
+//                         sidebar.classList.remove('mobile-expanded');
+//                         overlay.classList.remove('active');
+//                     }
+//                 });
+//             });
+//
+//             // User dropdown toggle
+//             const userToggle = document.getElementById('fpUserToggle');
+//             const dropdownMenu = document.getElementById('fpDropdownMenu');
+//
+//             if (userToggle && dropdownMenu) {
+//                 userToggle.addEventListener('click', function (e) {
+//                     dropdownMenu.style.display = (dropdownMenu.style.display === 'block') ? 'none' : 'block';
+//                     e.stopPropagation();
+//                 });
+//
+//                 // Close on outside click
+//                 document.addEventListener('click', function () {
+//                     dropdownMenu.style.display = 'none';
+//                 });
+//             }
+//
+//             // Handle window resize
+//             window.addEventListener('resize', function() {
+//                 const currentIsMobile = window.innerWidth <= 768;
+//
+//                 // Update layout when switching between mobile and desktop
+//                 if (currentIsMobile !== isMobile) {
+//                     if (currentIsMobile) {
+//                         sidebar.classList.remove('mobile-expanded');
+//                         overlay.classList.remove('active');
+//                     } else {
+//                         sidebar.classList.remove('collapsed');
+//                     }
+//                 }
+//             });
+//
+//         });
+
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.querySelector('.fp-nav-sidebar');
             const toggleBtn = document.querySelector('.fp-nav-toggle');
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             const overlay = document.querySelector('.mobile-overlay');
-            const isMobile = window.innerWidth <= 768;
+            let isMobile = window.innerWidth <= 768;
 
             // Initialize sidebar state based on screen size
             if (isMobile) {
                 sidebar.classList.remove('collapsed');
-                // Don't add mobile-expanded initially on mobile
             } else {
                 sidebar.classList.remove('collapsed');
             }
@@ -420,9 +561,9 @@ class NavMenu {
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', () => {
                     sidebar.classList.toggle('collapsed');
-                    toggleBtn.innerHTML = sidebar.classList.contains('collapsed') ?
-                        '<i class="far fa-chevron-right"></i>' :
-                        '<i class="far fa-chevron-left"></i>';
+                    toggleBtn.innerHTML = sidebar.classList.contains('collapsed')
+                        ? '<i class="far fa-chevron-right"></i>'
+                        : '<i class="far fa-chevron-left"></i>';
                 });
             }
 
@@ -468,19 +609,69 @@ class NavMenu {
                 });
             }
 
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                const currentIsMobile = window.innerWidth <= 768;
+            // ===== MOBILE SUBMENU TOGGLE (in same DOMContentLoaded) =====
+            const menuRoot = document.querySelector('.fp-nav-list');
+            let submenuDelegationBound = false;
 
-                // Update layout when switching between mobile and desktop
-                if (currentIsMobile !== isMobile) {
-                    if (currentIsMobile) {
-                        sidebar.classList.remove('mobile-expanded');
-                        overlay.classList.remove('active');
-                    } else {
-                        sidebar.classList.remove('collapsed');
-                    }
+            function setupMobileSubmenus() {
+                if (!menuRoot) return;
+
+                // Create toggle button inside each parent link (only if missing)
+                menuRoot.querySelectorAll('li.menu-item-has-children').forEach(li => {
+                    const link = li.querySelector(':scope > a');
+                    if (!link) return;
+
+                    // If a toggle already exists, skip
+                    if (link.querySelector('.submenu-toggle')) return;
+
+                    // Add a dedicated button (do NOT remove existing chevron icon)
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'submenu-toggle';
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.setAttribute('aria-label', 'Toggle submenu');
+                    btn.innerHTML = '<i class="far fa-chevron-down"></i>';
+
+                    link.appendChild(btn);
+                });
+
+                // Delegate click events to the root once (so links keep working)
+                if (!submenuDelegationBound) {
+                    submenuDelegationBound = true;
+
+                    menuRoot.addEventListener('click', function (e) {
+                        const btn = e.target.closest('.submenu-toggle');
+                        if (!btn) return; // ignore non-toggle clicks
+
+                        e.preventDefault();   // stop link navigation
+                        e.stopPropagation();  // keep it self-contained
+
+                        const li = btn.closest('li.menu-item-has-children');
+                        if (!li) return;
+
+                        const isOpen = li.classList.toggle('open');
+                        btn.setAttribute('aria-expanded', String(isOpen));
+                    }, true); // capture to beat link default
                 }
+            }
+
+            // Initial setup on mobile only
+            if (isMobile) {
+                setupMobileSubmenus();
+            }
+
+            // Handle window resize (re-init when crossing to mobile)
+            window.addEventListener('resize', function () {
+                const nowMobile = window.innerWidth <= 768;
+
+                // If crossing from desktop -> mobile, set up toggles
+                if (nowMobile && !isMobile) {
+                    setupMobileSubmenus();
+                }
+
+                // If crossing from mobile -> desktop, just update states
+                // (No DOM changes so desktop stays identical to original)
+                isMobile = nowMobile;
             });
         });
 

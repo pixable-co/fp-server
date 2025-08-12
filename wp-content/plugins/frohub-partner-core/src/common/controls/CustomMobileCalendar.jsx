@@ -11,31 +11,75 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const [currentDayOffset, setCurrentDayOffset] = useState(0);
 
     // Helper function to parse dates without timezone conversion
+    // const parseAsLocalDate = (dateString) => {
+    //     if (!dateString) return null;
+    //
+    //     // Handle different date formats
+    //     let cleanDateString = dateString;
+    //
+    //     // If it has 'Z' at the end, remove it to prevent UTC conversion
+    //     if (cleanDateString.endsWith('Z')) {
+    //         cleanDateString = cleanDateString.slice(0, -1);
+    //     }
+    //
+    //     // If it's just a date-time string without timezone info, parse it as local
+    //     // This prevents JavaScript from assuming UTC
+    //     const parts = cleanDateString.split('T');
+    //     if (parts.length === 2) {
+    //         const [datePart, timePart] = parts;
+    //         const [year, month, day] = datePart.split('-').map(Number);
+    //         const [hour, minute, second] = timePart.split(':').map(Number);
+    //
+    //         // Create date in local timezone
+    //         return new Date(year, month - 1, day, hour, minute, second || 0);
+    //     }
+    //
+    //     // Fallback to regular parsing
+    //     return new Date(cleanDateString);
+    // };
+
     const parseAsLocalDate = (dateString) => {
-        if (!dateString) return null;
+        if (dateString instanceof Date) {
+            return isNaN(dateString.getTime()) ? null : dateString;
+        }
+        if (!dateString || typeof dateString !== 'string') return null;
 
-        // Handle different date formats
-        let cleanDateString = dateString;
+        // Trim and normalize
+        const str = dateString.trim();
 
-        // If it has 'Z' at the end, remove it to prevent UTC conversion
-        if (cleanDateString.endsWith('Z')) {
-            cleanDateString = cleanDateString.slice(0, -1);
+        // Case 1: UK Format — dd/mm/yyyy h:mm aa
+        const ukMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s*([ap]m)$/i);
+        if (ukMatch) {
+            const [, day, month, year, hourStr, minute, ampm] = ukMatch;
+            let hour = parseInt(hourStr, 10);
+            if (ampm.toLowerCase() === 'pm' && hour < 12) hour += 12;
+            if (ampm.toLowerCase() === 'am' && hour === 12) hour = 0;
+
+            return new Date(+year, +month - 1, +day, +hour, +minute);
         }
 
-        // If it's just a date-time string without timezone info, parse it as local
-        // This prevents JavaScript from assuming UTC
-        const parts = cleanDateString.split('T');
-        if (parts.length === 2) {
-            const [datePart, timePart] = parts;
-            const [year, month, day] = datePart.split('-').map(Number);
-            const [hour, minute, second] = timePart.split(':').map(Number);
-
-            // Create date in local timezone
-            return new Date(year, month - 1, day, hour, minute, second || 0);
+        // Case 2: ISO Format with 'Z' → UTC time, but we want to interpret as LOCAL
+        // Example: 2025-08-23T06:00:00.000Z
+        if (str.endsWith('Z') || str.includes('T') && str.includes(':')) {
+            const parsed = new Date(str);
+            if (!isNaN(parsed.getTime())) {
+                // Convert UTC time to local floating time
+                // i.e. if it's 06:00 UTC, treat it as 06:00 *local*
+                const utcAsLocal = new Date(parsed.getTime() - parsed.getTimezoneOffset() * 60000);
+                return utcAsLocal;
+            }
         }
 
-        // Fallback to regular parsing
-        return new Date(cleanDateString);
+        // Case 3: ISO-like but without 'Z' — treat as local
+        // Example: 2025-08-23T06:00:00
+        const isoLocalMatch = str.match(/(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+        if (isoLocalMatch) {
+            const [, year, month, day, hour, minute] = isoLocalMatch;
+            return new Date(+year, +month - 1, +day, +hour, +minute);
+        }
+
+        console.warn("Invalid date format:", dateString);
+        return null;
     };
 
     // Helper to get date key in local timezone

@@ -281,7 +281,13 @@ const PartnerMessageMobile = ({ dataKey, currentUserPartnerPostId, initialConver
                                     ))
                                 }
                                 {!loading.conversations && conversations.length === 0 && (
-                                    <div className="p-4 text-center text-gray-500">No messages yet</div>
+                                    // <div className="p-4 text-center text-gray-500">No messages yet</div>
+                                    <div className="flex-1 flex items-start justify-center text-gray-500">
+                                        <div className="text-center mt-4">
+                                            <h3 className="text-2xl font-bold mb-3 text-gray-800">👋🏾 Welcome to your inbox!</h3>
+                                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">When a client books or sends an enquiry, their messages will appear here for you to respond to. Need to share anything ahead of the appointment? Send them a quick message here.</p>
+                                        </div>
+                                    </div>
                                 )}
                             </>
                         )}

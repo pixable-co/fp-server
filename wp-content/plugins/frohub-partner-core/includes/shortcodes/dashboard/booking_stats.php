@@ -144,7 +144,7 @@ class BookingStats {
 
             <!-- New vs Repeating Clients -->
             <div class="booking-card">
-                <div class="booking-card-header">New vs Repeating Clients</div>
+                <div class="booking-card-header">New vs Returning Clients</div>
                 <div class="booking-split">
                     <div class="booking-split-item"><span>New</span><strong>£<?php echo number_format($new_clients_value, 2); ?></strong></div>
                     <div class="booking-split-item"><span>Repeating</span><strong>£<?php echo number_format($returning_clients_value, 2); ?></strong></div>

@@ -214,6 +214,12 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
     }
 
+    const cleanDateStr = (str) => {
+        if (!str) return null;
+        // remove stray "T..." fragments like "T23:59:59"
+        return str.replace(/T.*$/, "").trim();
+    };
+
     const transformedEvents = events.map(event => {
         if (!event.date) {
             console.error("Invalid event date:", event);
@@ -267,27 +273,33 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
         // Unavailable event logic stays the same
         if (event.eventType === 'unavailable') {
-            const startISO = parseDateString(event.date);
-            const endISO = event.end ? parseDateString(event.end) : null;
+            const rawStart = event.start_date ?? event.date;
+            const rawEnd   = event.end_date   ?? event.end;
+
+            const startISO = parseDateString(cleanDateStr(rawStart));
+            const endISO   = rawEnd ? parseDateString(cleanDateStr(rawEnd)) : null;
 
             if (!startISO) {
                 console.error("❌ Invalid start date:", event);
                 return null;
             }
 
-            let finalEnd = endISO;
-            if (!endISO || startISO.split("T")[0] === endISO.split("T")[0]) {
-                const startDateObj = new Date(startISO);
-                const endDateObj = new Date(startDateObj);
-                endDateObj.setHours(startDateObj.getHours() + 1);
-                finalEnd = endDateObj.toISOString();
+            const startLocal = normalizeToLocalISOString(startISO);
+            let endLocal;
+
+            if (endISO) {
+                endLocal = normalizeToLocalISOString(endISO);
+            } else {
+                const s = new Date(startLocal);
+                s.setHours(s.getHours() + 1);
+                endLocal = normalizeToLocalISOString(s.toISOString());
             }
 
             return {
                 id: event.id,
                 title: event.title,
-                start: startISO,
-                end: finalEnd,
+                start: startLocal,
+                end: endLocal,
                 allDay: false,
                 backgroundColor: '#7D8793',
                 borderColor: '#7D8793',
@@ -303,6 +315,50 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 }
             };
         }
+        // if (event.eventType === 'unavailable') {
+        //     const rawStart = event.start_date ?? event.date;
+        //     const rawEnd   = event.end_date   ?? event.end;
+        //     console.log(rawEnd)
+        //
+        //     const startISO = parseDateString(cleanDateStr(rawStart));
+        //     const endISO   = rawEnd ? parseDateString(cleanDateStr(rawEnd)) : null;
+        //     console.log(endISO)
+        //     // const startISO = parseDateString(event.date);
+        //     // const endISO = event.end ? parseDateString(event.end) : null;
+        //
+        //     if (!startISO) {
+        //         console.error("❌ Invalid start date:", event);
+        //         return null;
+        //     }
+        //
+        //     let finalEnd = endISO;
+        //     if (!endISO || startISO.split("T")[0] === endISO.split("T")[0]) {
+        //         const startDateObj = new Date(startISO);
+        //         const endDateObj = new Date(startDateObj);
+        //         endDateObj.setHours(startDateObj.getHours() + 1);
+        //         finalEnd = endDateObj.toISOString();
+        //     }
+        //
+        //     return {
+        //         id: event.id,
+        //         title: event.title,
+        //         start: startISO,
+        //         end: finalEnd,
+        //         allDay: false,
+        //         backgroundColor: '#7D8793',
+        //         borderColor: '#7D8793',
+        //         textColor: '#fff',
+        //         extendedProps: {
+        //             eventType: event.eventType,
+        //             booking_time: event.time,
+        //             customer: event.customer,
+        //             email: event.email,
+        //             phone: event.phone,
+        //             service: event.service,
+        //             eventIndex: event.event_index,
+        //         }
+        //     };
+        // }
 
         // Regular "order" events
         const formattedStart = parseDateString(event.date, event.time || "00:00");

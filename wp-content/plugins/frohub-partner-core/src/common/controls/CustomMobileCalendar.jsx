@@ -559,11 +559,18 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
             >
                 {selectedEvent && (
                     <div className="space-y-2 text-sm">
-                        <p><strong>Customer:</strong> {selectedEvent.extendedProps?.customer}</p>
-                        <p><strong>Phone:</strong> {selectedEvent.extendedProps.phone || 'N/A'}</p>
-                        <p><strong>Service Type:</strong> {selectedEvent.extendedProps.service || 'N/A'}</p>
+                        {/* Only show these if NOT unavailable */}
+                        {selectedEvent.extendedProps?.eventType !== 'unavailable' && (
+                            <>
+                                <p><strong>Customer:</strong> {selectedEvent.extendedProps?.customer}</p>
+                                <p><strong>Phone:</strong> {selectedEvent.extendedProps.phone || 'N/A'}</p>
+                                <p><strong>Service Type:</strong> {selectedEvent.extendedProps.service || 'N/A'}</p>
+                            </>
+                        )}
+
                         <p><strong>Start:</strong> {parseAsLocalDate(selectedEvent.start)?.toLocaleString()}</p>
                         <p><strong>End:</strong> {parseAsLocalDate(selectedEvent.end)?.toLocaleString()}</p>
+
                         {selectedEvent.extendedProps?.eventType === 'unavailable' && (
                             <button
                                 onClick={handleDeleteEvent}

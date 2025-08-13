@@ -212,6 +212,8 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
         <div>
             {loadingClients ? (
                 <Skeleton active paragraph={{ rows: 8 }} />
+            ) : clients.length === 0 ? (
+                <p>No clients yet. Share your booking link to start building your client list.</p>
             ) : (
                 <>
                     {isMobile ? (
@@ -229,17 +231,17 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                             bordered
                         />
                     )}
+
+                    <Button
+                        type="primary"
+                        danger
+                        style={{ marginTop: 20 }}
+                        onClick={handleBroadcastClick}
+                    >
+                        Broadcast Message
+                    </Button>
                 </>
             )}
-
-            <Button
-                type="primary"
-                danger
-                style={{ marginTop: 20 }}
-                onClick={handleBroadcastClick}
-            >
-                Broadcast Message
-            </Button>
 
             <Modal
                 title="Broadcast Message"
@@ -266,12 +268,6 @@ const PartnerBroadcastMessage = ({ currentUserPartnerPostId }) => {
                     <Progress percent={progress} size="small" style={{ marginTop: 10 }} />
                 )}
             </Modal>
-
-            {/* <FhProUpgrade
-                visible={showUpgradeModal}
-                onClose={() => setShowUpgradeModal(false)}
-                onUpgrade={() => console.log('Redirect to upgrade page')}
-            /> */}
         </div>
     );
 };

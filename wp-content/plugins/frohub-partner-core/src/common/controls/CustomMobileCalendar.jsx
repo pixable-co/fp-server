@@ -11,31 +11,74 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const [currentDayOffset, setCurrentDayOffset] = useState(0);
 
     // Helper function to parse dates without timezone conversion
-    const parseAsLocalDate = (dateString) => {
-        if (!dateString) return null;
+    // Helper function to parse dates without timezone conversion
+    const parseAsLocalDate = (dateLike) => {
+        if (!dateLike) return null;
+        if (dateLike instanceof Date) return isNaN(dateLike) ? null : dateLike;
 
-        // Handle Zulu time (UTC) by converting to local equivalent
-        if (typeof dateString === 'string' && dateString.endsWith('Z')) {
-            const utc = new Date(dateString);
-            return new Date(utc.getTime() - utc.getTimezoneOffset() * 60000);
+        const s = String(dateLike).trim();
+
+        // Match: 29/08/2025 10:15 am  OR  29/08/2025 2:00 pm
+        const m1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})\s*([ap]m)$/i);
+        if (m1) {
+            let [, dd, MM, yyyy, hh, mm, ap] = m1.map(String);
+            dd = parseInt(dd, 10); MM = parseInt(MM, 10); yyyy = parseInt(yyyy, 10);
+            hh = parseInt(hh, 10); mm = parseInt(mm, 10);
+            const isPM = /pm/i.test(ap);
+            if (isPM && hh !== 12) hh += 12;
+            if (!isPM && hh === 12) hh = 0;
+            return new Date(yyyy, MM - 1, dd, hh, mm, 0);
         }
 
-        // If it's an ISO string with offset (e.g., 2025-04-05T09:00:00+05:00), let JS handle it
-        if (/\+|-/.test(dateString.slice(-6))) {
-            return new Date(dateString);
+        // Zulu UTC → convert to local clock
+        if (s.endsWith('Z')) {
+            const utc = new Date(s);
+            return isNaN(utc) ? null : new Date(utc.getTime() - utc.getTimezoneOffset() * 60000);
         }
 
-        // For strings like "2025-04-05T09:00:00" with NO timezone, assume they are LOCAL
-        const [datePart, timePart] = dateString.split('T');
-        const [year, month, day] = datePart.split('-').map(Number);
-        const time = timePart?.split(':') || ['00', '00', '00'];
-        const hour = parseInt(time[0], 10);
-        const minute = parseInt(time[1], 10);
-        const second = parseInt(time[2]?.replace(/\.\d+Z?$/, '') || 0, 10);
+        // ISO with explicit offset (…+05:00 / …-03:00)
+        if (/\+|-/.test(s.slice(-6))) {
+            const d = new Date(s);
+            return isNaN(d) ? null : d;
+        }
 
-        // Construct in local timezone directly
-        return new Date(year, month - 1, day, hour, minute, second);
+        // ISO without timezone: 2025-08-29T14:00:00
+        if (s.includes('T') && /^\d{4}-\d{2}-\d{2}/.test(s)) {
+            const [datePart, timePart = '00:00:00'] = s.split('T');
+            const [y, m, d] = datePart.split('-').map(Number);
+            const [H = 0, M = 0, S = 0] = timePart.split(':').map(v => parseInt(v.replace(/\D+$/,''), 10));
+            return new Date(y, m - 1, d, H, M, isNaN(S) ? 0 : S);
+        }
+
+        // Fallback
+        const d = new Date(s);
+        return isNaN(d) ? null : d;
     };
+    // const parseAsLocalDate = (dateString) => {
+    //     if (!dateString) return null;
+    //
+    //     // Handle Zulu time (UTC) by converting to local equivalent
+    //     if (typeof dateString === 'string' && dateString.endsWith('Z')) {
+    //         const utc = new Date(dateString);
+    //         return new Date(utc.getTime() - utc.getTimezoneOffset() * 60000);
+    //     }
+    //
+    //     // If it's an ISO string with offset (e.g., 2025-04-05T09:00:00+05:00), let JS handle it
+    //     if (/\+|-/.test(dateString.slice(-6))) {
+    //         return new Date(dateString);
+    //     }
+    //
+    //     // For strings like "2025-04-05T09:00:00" with NO timezone, assume they are LOCAL
+    //     const [datePart, timePart] = dateString.split('T');
+    //     const [year, month, day] = datePart.split('-').map(Number);
+    //     const time = timePart?.split(':') || ['00', '00', '00'];
+    //     const hour = parseInt(time[0], 10);
+    //     const minute = parseInt(time[1], 10);
+    //     const second = parseInt(time[2]?.replace(/\.\d+Z?$/, '') || 0, 10);
+    //
+    //     // Construct in local timezone directly
+    //     return new Date(year, month - 1, day, hour, minute, second);
+    // };
     // const parseAsLocalDate = (dateString) => {
     //     if (!dateString) return null;
     //
@@ -74,8 +117,19 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const groupedEvents = events.reduce((acc, event) => {
         if (!event || !event.start || !event.end) return acc;
 
-        const start = parseAsLocalDate(event.start);
-        const end = parseAsLocalDate(event.end);
+        // const start = parseAsLocalDate(event.start);
+        // const end = parseAsLocalDate(event.end);
+
+        const start = parseAsLocalDate(
+            event.extendedProps?.start_date ??
+            event.extendedProps?.startDate ??
+            event.start
+        );
+        const end = parseAsLocalDate(
+            event.extendedProps?.end_date ??
+            event.extendedProps?.endDate ??
+            event.end
+        );
 
         if (!start || !end) return acc;
 
@@ -211,8 +265,19 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const renderEventCard = (event, dateKey) => {
         if (!event || !event.start || !event.end) return null;
 
-        const start = parseAsLocalDate(event.start);
-        const end = parseAsLocalDate(event.end);
+        // const start = parseAsLocalDate(event.start);
+        // const end = parseAsLocalDate(event.end);
+
+        const start = parseAsLocalDate(
+            event.extendedProps?.start_date ??
+            event.extendedProps?.startDate ??
+            event.start
+        );
+        const end = parseAsLocalDate(
+            event.extendedProps?.end_date ??
+            event.extendedProps?.endDate ??
+            event.end
+        );
 
         if (!start || !end) return null;
 

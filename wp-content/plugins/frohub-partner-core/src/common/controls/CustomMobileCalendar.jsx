@@ -117,19 +117,8 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const groupedEvents = events.reduce((acc, event) => {
         if (!event || !event.start || !event.end) return acc;
 
-        // const start = parseAsLocalDate(event.start);
-        // const end = parseAsLocalDate(event.end);
-
-        const start = parseAsLocalDate(
-            event.extendedProps?.start_date ??
-            event.extendedProps?.startDate ??
-            event.start
-        );
-        const end = parseAsLocalDate(
-            event.extendedProps?.end_date ??
-            event.extendedProps?.endDate ??
-            event.end
-        );
+        const start = parseAsLocalDate(event.start);
+        const end = parseAsLocalDate(event.end);
 
         if (!start || !end) return acc;
 
@@ -265,19 +254,8 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
     const renderEventCard = (event, dateKey) => {
         if (!event || !event.start || !event.end) return null;
 
-        // const start = parseAsLocalDate(event.start);
-        // const end = parseAsLocalDate(event.end);
-
-        const start = parseAsLocalDate(
-            event.extendedProps?.start_date ??
-            event.extendedProps?.startDate ??
-            event.start
-        );
-        const end = parseAsLocalDate(
-            event.extendedProps?.end_date ??
-            event.extendedProps?.endDate ??
-            event.end
-        );
+        const start = parseAsLocalDate(event.start);
+        const end = parseAsLocalDate(event.end);
 
         if (!start || !end) return null;
 

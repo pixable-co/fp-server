@@ -196,6 +196,18 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
         }
     };
 
+    // 12-hour formatter with explicit AM/PM
+    const formatTime12 = (d) => {
+        if (!(d instanceof Date) || isNaN(d)) return '';
+        const h = d.getHours();
+        const m = d.getMinutes();
+        const hh = h % 12 === 0 ? 12 : h % 12;
+        const mm = String(m).padStart(2, '0');
+        const period = h >= 12 ? 'PM' : 'AM';
+        return `${hh}:${mm} ${period}`;
+    };
+
+
     const renderEventCard = (event, dateKey) => {
         if (!event || !event.start || !event.end) return null;
 
@@ -221,10 +233,15 @@ const MobileCalendarGrid = ({ events = [], loading, select, fetchData, partner_i
                 onClick={() => handleEventClick(event)}
             >
                 <div className="text-sm font-medium">{event.title || 'Untitled Event'}</div>
+                {/*<div className="text-xs text-blue-100 mt-0.5">*/}
+                {/*    {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })} – {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}*/}
+                {/*    {start.toDateString() !== end.toDateString() ? ' (Multi-day)' : ''}*/}
+                {/*</div>*/}
                 <div className="text-xs text-blue-100 mt-0.5">
-                    {start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })} – {end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    {formatTime12(start)} – {formatTime12(end)}
                     {start.toDateString() !== end.toDateString() ? ' (Multi-day)' : ''}
                 </div>
+
             </div>
         );
     };

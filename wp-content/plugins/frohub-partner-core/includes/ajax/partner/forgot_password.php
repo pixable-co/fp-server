@@ -11,8 +11,9 @@ class ForgotPassword {
         $self = new self();
 
         // Register AJAX handler
-        add_action('wp_ajax_fpserver/forgot_password', array($self, 'handle'));
-        add_action('wp_ajax_nopriv_fpserver/forgot_password', array($self, 'handle'));
+        add_action('wp_ajax_fpserver_forgot_password', [ $self, 'handle' ]);
+        add_action('wp_ajax_nopriv_fpserver_forgot_password', [ $self, 'handle' ]);
+
     }
 
     public function handle() {

@@ -47,7 +47,7 @@ class ForgotPasswordForm {
                 const nonce = form.find('[name="fp_nonce"]').val();
 
                 $.post('<?php echo esc_url($ajax_url); ?>', {
-                    action: 'fpserver/forgot_password',
+                    action: 'fpserver_forgot_password',
                     _ajax_nonce: nonce,
                     user_login: user_login
                 }, function (response) {

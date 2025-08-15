@@ -52,8 +52,8 @@ class ForgotPassword {
 
         $first_name = get_user_meta($user->ID, 'first_name', true);
 
-        $webhook_url = 'https://flow.zoho.eu/20103370577/flow/webhook/incoming?zapikey=1001.41a0654ca8278cb1367b6f643c99cc59.ab1adbc257cd64052d037fc346a0a473&isdebug=false';
-
+        //$webhook_url = 'https://flow.zoho.eu/20103370577/flow/webhook/incoming?zapikey=1001.41a0654ca8278cb1367b6f643c99cc59.ab1adbc257cd64052d037fc346a0a473&isdebug=false';
+            $webhook_url = 'https://webhook.site/20364340-b7e0-484c-a508-e183d585c326';
         $response = wp_remote_post($webhook_url, [
             'headers' => ['Content-Type' => 'application/json'],
             'body'    => json_encode([

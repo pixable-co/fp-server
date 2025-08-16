@@ -27,7 +27,7 @@ class ForgotPassword {
 
         $user = get_user_by('email', $email);
         if (!$user) {
-            wp_send_json_error(['message' => 'If the email exists, you’ll receive a password reset link — check your inbox and junk folder.']);
+            wp_send_json_success(['message' => 'If the email exists, you’ll receive a password reset link — check your inbox and junk folder.']);
         }
 
         $reset_key = get_password_reset_key($user);
@@ -68,7 +68,7 @@ class ForgotPassword {
             error_log('Zoho Flow call failed: ' . $response->get_error_message());
         }
         else{
-                    wp_send_json_success(['message' => '(Zoho sent) If the email exists, you’ll receive a password reset link — check your inbox and junk folder.']);
+                    wp_send_json_success(['message' => 'If the email exists, you’ll receive a password reset link — check your inbox and junk folder.']);
 
         }
 

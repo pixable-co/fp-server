@@ -19,8 +19,9 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
     const [autoReplySent, setAutoReplySent] = useState(false);
     const [unreadConversation, setUnreadConversation] = useState(0);
 
-    const urlCustomerId = typeof window !== 'undefined'
-        ? new URLSearchParams(window.location.search).get('customer_id')
+
+    const urlCustomerEmail = typeof window !== 'undefined'
+        ? decodeURIComponent(new URLSearchParams(window.location.search).get('customer_email') || '')
         : null;
 
     const conversationIntervalRef = useRef(null);
@@ -84,8 +85,11 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                 if (data.length > 0) {
                     let selected = null;
 
-                    if (urlCustomerId) {
-                        selected = data.find(c => String(c.customer_id) === String(urlCustomerId));
+                    if (urlCustomerEmail) {
+                        selected = data.find(c =>
+                            c.customer_email &&
+                            String(c.customer_email).toLowerCase() === String(urlCustomerEmail).toLowerCase()
+                        );
                     }
 
                     if (!selected && !activeConversation) {

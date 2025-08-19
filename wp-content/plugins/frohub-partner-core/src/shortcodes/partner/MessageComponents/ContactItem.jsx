@@ -43,7 +43,7 @@ const ContactItem = ({ conversation, unreadConversation, customerImage, isActive
             </div>
 
             <div className="flex flex-col items-end text-xs text-gray-500">
-                <span>{formatTimestamp(conversation.last_activity)}</span>
+                <span>{formatTimestamp(conversation.last_message_date)}</span>
             </div>
 
             <input type="hidden" value={conversation.conversation_id} />

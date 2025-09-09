@@ -260,21 +260,24 @@ const PartnerMessage = ({ dataKey, currentUserPartnerPostId, initialConversation
                             </div>
                         </div>
                     ) : (
-                        conversations.map(conversation => (
-                            <ContactItem
-                                key={conversation.client_id}
-                                conversation={conversation}
-                                // unreadConversation={unreadConversation}
-                                unreadConversation={conversation.unread_count_partner}
-                                customerImage={conversation.customer_image}
-                                isActive={activeConversation?.client_id === conversation.client_id}
-                                onClick={handleConversationSelect}
-                            />
-                        ))
+                        [...conversations]
+                            .sort((a, b) => new Date(b.last_message_date) - new Date(a.last_message_date))
+                            .map(conversation => (
+                                <ContactItem
+                                    key={conversation.client_id}
+                                    conversation={conversation}
+                                    unreadConversation={conversation.unread_count_partner}
+                                    customerImage={conversation.customer_image}
+                                    isActive={activeConversation?.client_id === conversation.client_id}
+                                    onClick={handleConversationSelect}
+                                />
+                            ))
                     )}
                     {!loading.conversations && conversations.length === 0 && (
                         <div className="flex justify-center items-center p-24">
-                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">No messages yet</p>
+                            <p className="text-gray-600 text-base text-center max-w-xl mx-auto">
+                                No messages yet
+                            </p>
                         </div>
                     )}
                 </div>

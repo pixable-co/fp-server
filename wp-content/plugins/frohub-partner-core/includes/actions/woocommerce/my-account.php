@@ -379,13 +379,11 @@ class MyAccount
 
             // 🔔 Send API request to webhook.site
             $payload = [
-                'user_id' => $user->ID,
-                'user_email' => $user->user_email,
-                'event' => 'password_reset',
-                'timestamp' => current_time('mysql'),
+                'first_name' => get_user_meta($user->ID, 'first_name', true),
+                'email' => $user->user_email,
             ];
 
-            $response = wp_remote_post('https://webhook.site/1eb58aaf-7dcc-40ed-bcc8-081b18f52dc2', [
+            $response = wp_remote_post('https://flow.zoho.eu/20103370577/flow/webhook/incoming?zapikey=1001.ae77fc329d49eba81472778ce3e29149.7481072d786c9d6c69dd04f21ad58086&isdebug=false', [
                 'method' => 'POST',
                 'timeout' => 15,
                 'redirection' => 5,

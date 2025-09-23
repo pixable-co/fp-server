@@ -5,9 +5,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class MyAccount {
+class MyAccount
+{
 
-    public static function init() {
+    public static function init()
+    {
         $self = new self();
 
         add_action('init', [$self, 'register_deactivated_role']);
@@ -28,32 +30,36 @@ class MyAccount {
         add_action('wp_ajax_fp_deactivate_account', [$self, 'handle_deactivation']);
     }
 
-    public function register_deactivated_role() {
+    public function register_deactivated_role()
+    {
         if (!get_role('deactivated_user')) {
             add_role('deactivated_user', 'Deactivated User', []);
         }
     }
 
-    public function block_deactivated_login($user_login, $user) {
+    public function block_deactivated_login($user_login, $user)
+    {
         if (in_array('deactivated_user', (array) $user->roles)) {
             wp_logout();
             wp_die('Your account has been deactivated.', 'Account Disabled');
         }
     }
 
-    public function rename_edit_account_tab($items) {
+    public function rename_edit_account_tab($items)
+    {
         if (isset($items['edit-account'])) {
             $items['edit-account'] = 'Login & Security';
         }
         return $items;
     }
 
-    public function inject_custom_tab_nav() {
+    public function inject_custom_tab_nav()
+    {
         $tabs = [
-            'dashboard'        => 'Personal Info',
-            'subscriptions'    => 'My Subscription',
-            'payment-methods'  => 'Payment Methods',
-            'edit-account'     => 'Login & Security',
+            'dashboard' => 'Personal Info',
+            'subscriptions' => 'My Subscription',
+            'payment-methods' => 'Payment Methods',
+            'edit-account' => 'Login & Security',
         ];
 
         echo '<div class="fp-tab-wrapper">';
@@ -65,7 +71,8 @@ class MyAccount {
         echo '</div>';
     }
 
-    public function render_reset_password_section() {
+    public function render_reset_password_section()
+    {
         echo '<div class="fp-security-wrapper">';
         echo '<h3 class="fp-title">Reset Password</h3>';
 
@@ -73,24 +80,24 @@ class MyAccount {
         do_action('woocommerce_edit_account_form_start');
 
         woocommerce_form_field('password_current', [
-            'type'        => 'password',
-            'label'       => 'Your current Password',
-            'required'    => true,
+            'type' => 'password',
+            'label' => 'Your current Password',
+            'required' => true,
             'input_class' => ['fp-input'],
         ], '');
 
         echo '<div class="fp-row">';
         woocommerce_form_field('password_1', [
-            'type'        => 'password',
-            'label'       => 'New Password',
-            'required'    => true,
+            'type' => 'password',
+            'label' => 'New Password',
+            'required' => true,
             'input_class' => ['fp-input'],
         ], '');
 
         woocommerce_form_field('password_2', [
-            'type'        => 'password',
-            'label'       => 'Re-enter New Password',
-            'required'    => true,
+            'type' => 'password',
+            'label' => 'Re-enter New Password',
+            'required' => true,
             'input_class' => ['fp-input'],
         ], '');
         echo '</div>';
@@ -119,8 +126,10 @@ class MyAccount {
         echo '</div>';
     }
 
-    public function inject_custom_js() {
-        if (!is_account_page() || !is_wc_endpoint_url('edit-account')) return;
+    public function inject_custom_js()
+    {
+        if (!is_account_page() || !is_wc_endpoint_url('edit-account'))
+            return;
         ?>
         <script>
             function deactivateAccount() {
@@ -131,7 +140,7 @@ class MyAccount {
             }
 
             // Listen for Gravity Form submission
-            document.addEventListener('gform_confirmation_loaded', function(event) {
+            document.addEventListener('gform_confirmation_loaded', function (event) {
                 const formId = 16;
                 if (event.detail.formId === formId) {
                     // Hide the modal
@@ -161,52 +170,154 @@ class MyAccount {
         <?php
     }
 
-    public function inject_custom_styles() {
-        if (!is_account_page()) return;
+    public function inject_custom_styles()
+    {
+        if (!is_account_page())
+            return;
         ?>
         <style>
             .fp-tab-wrapper {
-                display: flex; justify-content: flex-start; gap: 30px;
-                border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 40px;
-                overflow-x: auto; /* Allow horizontal scroll on small screens */
+                display: flex;
+                justify-content: flex-start;
+                gap: 30px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 15px;
+                margin-bottom: 40px;
+                overflow-x: auto;
+                /* Allow horizontal scroll on small screens */
             }
+
             .fp-tab-wrapper::-webkit-scrollbar {
-                display: none; /* Hide scrollbar on mobile */
+                display: none;
+                /* Hide scrollbar on mobile */
             }
+
             .fp-tab {
-                text-decoration: none; color: #333; font-weight: 500;
-                padding: 6px 12px; border-bottom: 2px solid transparent;
-                flex-shrink: 0; /* Prevent tabs from shrinking */
-                white-space: nowrap; /* Prevent tab text from wrapping */
+                text-decoration: none;
+                color: #333;
+                font-weight: 500;
+                padding: 6px 12px;
+                border-bottom: 2px solid transparent;
+                flex-shrink: 0;
+                /* Prevent tabs from shrinking */
+                white-space: nowrap;
+                /* Prevent tab text from wrapping */
             }
-            .fp-tab.active { border-bottom: 2px solid #000; font-weight: 600; }
+
+            .fp-tab.active {
+                border-bottom: 2px solid #000;
+                font-weight: 600;
+            }
 
             /* Optional: Stack tabs vertically on very narrow screens */
             @media (max-width: 480px) {
                 .fp-tab-wrapper {
-                    flex-direction: column; gap: 10px; align-items: flex-start;
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: flex-start;
                 }
             }
 
-            .fp-security-wrapper { max-width: 640px; margin: 0 auto; padding: 10px; }
-            .fp-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
-            .fp-row { display: flex; gap: 20px; flex-wrap: wrap; }
-            .fp-input { width: 100% !important; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 20px; box-sizing: border-box; }
-            .fp-save-btn { background: #999; color: #fff; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-            .fp-save-btn:hover { background: #666; }
-            .fp-divider { margin: 50px 0 20px; border-top: 1px solid #ccc; }
-            .fp-deactivate-section { text-align: left; }
-            .fp-deactivate-button { color: #000; text-decoration: none; font-weight: 500; font-size: 15px; display: inline-flex; align-items: center; }
-            .fp-deactivate-button:hover { text-decoration: underline; }
-            .fp-trash { font-size: 16px; margin-right: 8px; }
-            .custom-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); }
-            .custom-modal-content { background-color: #fff; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 600px; }
-            .custom-modal-close { float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+            .fp-security-wrapper {
+                max-width: 640px;
+                margin: 0 auto;
+                padding: 10px;
+            }
+
+            .fp-title {
+                font-size: 20px;
+                font-weight: 600;
+                margin-bottom: 20px;
+            }
+
+            .fp-row {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .fp-input {
+                width: 100% !important;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                margin-bottom: 20px;
+                box-sizing: border-box;
+            }
+
+            .fp-save-btn {
+                background: #999;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            .fp-save-btn:hover {
+                background: #666;
+            }
+
+            .fp-divider {
+                margin: 50px 0 20px;
+                border-top: 1px solid #ccc;
+            }
+
+            .fp-deactivate-section {
+                text-align: left;
+            }
+
+            .fp-deactivate-button {
+                color: #000;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 15px;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .fp-deactivate-button:hover {
+                text-decoration: underline;
+            }
+
+            .fp-trash {
+                font-size: 16px;
+                margin-right: 8px;
+            }
+
+            .custom-modal {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.4);
+            }
+
+            .custom-modal-content {
+                background-color: #fff;
+                margin: 10% auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                max-width: 600px;
+            }
+
+            .custom-modal-close {
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
         </style>
         <?php
     }
 
-    public function handle_deactivation() {
+    public function handle_deactivation()
+    {
         if (!is_user_logged_in()) {
             wp_send_json_error(['message' => 'You must be logged in.'], 401);
         }
@@ -226,7 +337,8 @@ class MyAccount {
         wp_send_json_success(['message' => 'Your account has been deactivated.']);
     }
 
-    public function handle_password_reset_submission() {
+    public function handle_password_reset_submission()
+    {
         if (
             isset($_POST['save_account_details']) &&
             isset($_POST['save-account-details-nonce']) &&
@@ -239,7 +351,7 @@ class MyAccount {
             }
 
             $current_password = $_POST['password_current'] ?? '';
-            $new_password     = $_POST['password_1'] ?? '';
+            $new_password = $_POST['password_1'] ?? '';
             $confirm_password = $_POST['password_2'] ?? '';
 
             if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
@@ -257,12 +369,37 @@ class MyAccount {
                 return;
             }
 
+            // ✅ Update the password
             wp_set_password($new_password, $user->ID);
             wc_add_notice(__('Password successfully updated.'), 'success');
 
             // Log user back in after password change
             wp_set_auth_cookie($user->ID);
             wp_set_current_user($user->ID);
+
+            // 🔔 Send API request to webhook.site
+            $payload = [
+                'user_id' => $user->ID,
+                'user_email' => $user->user_email,
+                'event' => 'password_reset',
+                'timestamp' => current_time('mysql'),
+            ];
+
+            $response = wp_remote_post('https://webhook.site/1eb58aaf-7dcc-40ed-bcc8-081b18f52dc2', [
+                'method' => 'POST',
+                'timeout' => 15,
+                'redirection' => 5,
+                'blocking' => true,
+                'headers' => [
+                    'Content-Type' => 'application/json; charset=utf-8',
+                ],
+                'body' => wp_json_encode($payload),
+            ]);
+
+            if (is_wp_error($response)) {
+                error_log('Webhook failed: ' . $response->get_error_message());
+            }
         }
     }
+
 }

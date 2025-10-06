@@ -257,7 +257,7 @@ class PartnerConversations {
 
         // Get data from AJAX request
         $post_id     = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
-        $partner_id  = isset($_POST['partner_id']) ? intval($_POST['partner_id']) : 0;
+        $partner_id = intval(get_field('partner_post_id', 'user_' . get_current_user_id()) ?: 0);
         $comment     = isset($_POST['comment']) ? sanitize_text_field($_POST['comment']) : '';
         $author_name = isset($_POST['author_name']) ? sanitize_text_field($_POST['author_name']) : '';
         $email       = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';

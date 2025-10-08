@@ -222,8 +222,15 @@ class ConnectCalender {
         $client->setAccessToken($token);
 
         if ($client->isAccessTokenExpired()) {
-            wp_send_json_error(['message' => 'Access token expired. Please reconnect.']);
+            $user_id = get_current_user_id();
+            $new_token = self::refreshAccessToken($user_id);
+            if ($new_token) {
+                $client->setAccessToken($new_token);
+            } else {
+                wp_send_json_error(['message' => 'Access token expired. Please reconnect your Google account.']);
+            }
         }
+
 
         $service = new \Google_Service_Calendar($client);
         $calendarList = $service->calendarList->listCalendarList();

@@ -1,13 +1,16 @@
 <?php
+
 namespace FPServer;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-class ConnectCalender {
+class ConnectCalender
+{
 
-    public static function init() {
+    public static function init()
+    {
         require_once FPSERVER_ROOT_DIR_PATH . '/library/vendor/autoload.php';
         $self = new self();
 
@@ -22,7 +25,8 @@ class ConnectCalender {
         add_action('wp_ajax_fpserver/save_user_calendar', array($self, 'save_user_calendar'));
     }
 
-    public static function ajax_refresh_google_token() {
+    public static function ajax_refresh_google_token()
+    {
         check_ajax_referer('fpserver_nonce');
 
         $user_id = get_current_user_id();
@@ -38,7 +42,8 @@ class ConnectCalender {
         wp_send_json_success(['message' => 'Token refreshed successfully.']);
     }
 
-    public static function getClient() {
+    public static function getClient()
+    {
         $client = new \Google_Client();
         $client->setAuthConfig(__DIR__ . '/credentials.json'); // Google OAuth Credentials
         $client->setRedirectUri(admin_url('admin-ajax.php?action=fpserver/google_oauth_callback'));
@@ -52,7 +57,8 @@ class ConnectCalender {
         return $client;
     }
 
-    public function disconnect_google_calendar() {
+    public function disconnect_google_calendar()
+    {
         check_ajax_referer('fpserver_nonce');
 
         $user_id = get_current_user_id();
@@ -67,7 +73,8 @@ class ConnectCalender {
         wp_send_json_success(['message' => 'Disconnected from Google Calendar.']);
     }
 
-    public function get_google_auth_url() {
+    public function get_google_auth_url()
+    {
         check_ajax_referer('fpserver_nonce');
 
         $client = self::getClient();
@@ -86,7 +93,8 @@ class ConnectCalender {
         wp_send_json_success(['auth_url' => $auth_url]);
     }
 
-    public static function check_google_auth_status() {
+    public static function check_google_auth_status()
+    {
         $user_id = get_current_user_id();
         if (!$user_id) {
             wp_send_json_error(['message' => 'User not logged in.']);
@@ -110,7 +118,8 @@ class ConnectCalender {
         wp_send_json_success(['authenticated' => true, 'expired' => false]);
     }
 
-    public function handle_oauth_callback() {
+    public function handle_oauth_callback()
+    {
         if (!isset($_GET['code'])) {
             wp_send_json_error(['message' => 'Authorization code missing']);
         }
@@ -158,7 +167,8 @@ class ConnectCalender {
         }
     }
 
-    public static function getAccessToken() {
+    public static function getAccessToken()
+    {
         $user_id = get_current_user_id();
         $token = json_decode(get_user_meta($user_id, 'google_calendar_access_token', true), true);
 
@@ -181,26 +191,35 @@ class ConnectCalender {
         return $token;
     }
 
-    public static function refreshAccessToken($user_id) {
+    public static function refreshAccessToken($user_id)
+    {
         $refresh_token = get_user_meta($user_id, 'google_calendar_refresh_token', true);
-
         if (!$refresh_token) {
-            return false; // No refresh token found, user must reauthenticate
+            error_log("No refresh token found for user {$user_id}");
+            return false;
         }
 
         $client = self::getClient();
-        $client->fetchAccessTokenWithRefreshToken($refresh_token);
-        $new_token = $client->getAccessToken();
+        $new_token = $client->fetchAccessTokenWithRefreshToken($refresh_token);
 
         if (isset($new_token['error'])) {
-            return false; // Token refresh failed
+            error_log("Failed to refresh token for user {$user_id}: " . $new_token['error']);
+            return false;
+        }
+
+        // Ensure refresh token persists
+        if (empty($new_token['refresh_token'])) {
+            $new_token['refresh_token'] = $refresh_token;
         }
 
         update_user_meta($user_id, 'google_calendar_access_token', json_encode($new_token));
+
         return $new_token;
     }
 
-    public function get_google_calendars() {
+
+    public function get_google_calendars()
+    {
         check_ajax_referer('fpserver_nonce');
 
         $user_id = get_current_user_id();
@@ -231,7 +250,6 @@ class ConnectCalender {
             }
         }
 
-
         $service = new \Google_Service_Calendar($client);
         $calendarList = $service->calendarList->listCalendarList();
         $calendars = [];
@@ -246,14 +264,15 @@ class ConnectCalender {
         $saved_calendar_id = get_user_meta($user_id, 'google_calendar_id', true);
 
         wp_send_json_success([
-                'calendars' => $calendars,
-                'saved_calendar_id' => $saved_calendar_id,
+            'calendars' => $calendars,
+            'saved_calendar_id' => $saved_calendar_id,
         ]);
 
-//         wp_send_json_success(['calendars' => $calendars]);
+        //         wp_send_json_success(['calendars' => $calendars]);
     }
 
-    public function save_user_calendar() {
+    public function save_user_calendar()
+    {
         check_ajax_referer('fpserver_nonce');
 
         if (!isset($_POST['calendar_id']) || empty($_POST['calendar_id'])) {
@@ -271,7 +290,8 @@ class ConnectCalender {
         wp_send_json_success(['message' => 'Calendar saved successfully.']);
     }
 
-    public static function get_user_calendar_events($partner_id, $date) {
+    public static function get_user_calendar_events($partner_id, $date)
+    {
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
             wp_send_json_error(['message' => 'Invalid date format. Use YYYY-MM-DD.']);
         }
@@ -304,8 +324,13 @@ class ConnectCalender {
         $client->setAccessToken($token);
 
         if ($client->isAccessTokenExpired()) {
-            wp_send_json_error(['message' => 'Access token expired. Please reconnect.']);
+            $new_token = self::refreshAccessToken($user_id);
+            if (!$new_token) {
+                wp_send_json_error(['message' => 'Access token expired. Please reconnect your Google account.']);
+            }
+            $client->setAccessToken($new_token);
         }
+
 
         $timeMin = $date . 'T00:00:00Z';
         $timeMax = $date . 'T23:59:59Z';
@@ -332,7 +357,8 @@ class ConnectCalender {
         return $event_list;
     }
 
-    public static function get_user_all_calendar_events($partner_id) {
+    public static function get_user_all_calendar_events($partner_id)
+    {
         $user_query = new \WP_User_Query([
             'meta_key'   => 'partner_post_id',
             'meta_value' => $partner_id,
@@ -414,5 +440,4 @@ class ConnectCalender {
 
         return $event_list;
     }
-
 }

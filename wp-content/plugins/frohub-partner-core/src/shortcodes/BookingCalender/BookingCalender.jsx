@@ -97,20 +97,24 @@ export default function BookingCalender() {
                 const isAllDay = !start.includes("T");
 
                 if (isAllDay) {
-                    // ✅ Correct handling for all-day events
-                    // Google returns end date exclusive, but FullCalendar expects inclusive.
-                    // We'll just mark it as allDay and omit end, so it shows correctly on one day.
+                    // Google all-day events: end.date is exclusive — keep it that way.
+                    const startStr = start; // "2025-10-28"
+                    const endStr = end;     // "2025-10-29" for 1-day, "2025-10-31" for 3-day
+
                     return {
                         id: `calendar-${id}`,
                         title: title || 'Google Calendar Event',
-                        start,              // e.g. "2025-10-21"
-                        allDay: true,       // critical flag
+                        start: startStr,
+                        end: endStr,           // ✅ no subtraction
+                        allDay: true,
                         eventType: 'google-calendar',
                         backgroundColor: '#34a853',
                         borderColor: '#34a853',
                         textColor: '#fff',
                     };
                 }
+
+
 
                 // ⏰ Handle timed events normally
                 const startObj = new Date(start);

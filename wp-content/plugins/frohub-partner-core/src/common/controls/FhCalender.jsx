@@ -234,7 +234,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 return {
                     id: event.id,
                     title: event.title || 'Google Calendar Event',
-                    start: event.start,       // "YYYY-MM-DD"
+                    start: event.start,   // e.g. "2025-10-10"
+                    end: event.end,       // ✅ pass inclusive end date from BookingCalender
                     allDay: true,
                     backgroundColor: '#34a853',
                     borderColor: '#34a853',
@@ -244,6 +245,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                     }
                 };
             }
+
 
             // ✅ 2. Handle timed events
             const startISO = event.start

@@ -104,8 +104,8 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
 
     const padZero = (n) => String(n).padStart(2, "0");
     const getMonthIndex = (monthText) => {
-        const months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
-        return months.findIndex(m => m === monthText.toLowerCase().slice(0,3)) + 1;
+        const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+        return months.findIndex(m => m === monthText.toLowerCase().slice(0, 3)) + 1;
     };
 
     // const parseDateString = (dateStr, timeStr = "00:00") => {
@@ -221,27 +221,44 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     };
 
     const transformedEvents = events.map(event => {
-        if (!event.date) {
-            console.error("Invalid event date:", event);
+        // 🩵 Accept events that have either .date OR .start
+        if (!event.date && !event.start) {
+            console.warn("Skipping event with no date or start:", event);
             return null;
         }
 
-        // Handle Google Calendar events directly
+        // 🟢 GOOGLE CALENDAR EVENTS
         if (event.eventType === 'google-calendar') {
-            const rawStart = event.date.includes('T')
-                ? event.date
+            // ✅ 1. Handle all-day events (no time component)
+            if (event.allDay) {
+                return {
+                    id: event.id,
+                    title: event.title || 'Google Calendar Event',
+                    start: event.start,       // "YYYY-MM-DD"
+                    allDay: true,
+                    backgroundColor: '#34a853',
+                    borderColor: '#34a853',
+                    textColor: '#fff',
+                    extendedProps: {
+                        eventType: 'google-calendar',
+                    }
+                };
+            }
+
+            // ✅ 2. Handle timed events
+            const startISO = event.start
+                ? normalizeGoogleISOtoUK(event.start)
                 : `${event.date}T${event.time || '00:00:00'}`;
 
-            const rawEnd = event.end || rawStart;
-
-            const start = normalizeGoogleISOtoUK(rawStart);
-            const end = normalizeGoogleISOtoUK(rawEnd);
+            const endISO = event.end
+                ? normalizeGoogleISOtoUK(event.end)
+                : startISO;
 
             return {
                 id: event.id,
-                title: event.title,
-                start,
-                end,
+                title: event.title || 'Google Calendar Event',
+                start: startISO,
+                end: endISO,
                 allDay: false,
                 backgroundColor: '#34a853',
                 borderColor: '#34a853',
@@ -251,6 +268,7 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
                 }
             };
         }
+
 
         // if (event.eventType === 'google-calendar') {
         //     const start = event.date.includes('T') ? event.date : `${event.date}T${event.time || '00:00'}`;
@@ -274,10 +292,10 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
         // Unavailable event logic stays the same
         if (event.eventType === 'unavailable') {
             const rawStart = event.start_date ?? event.date;
-            const rawEnd   = event.end_date   ?? event.end;
+            const rawEnd = event.end_date ?? event.end;
 
             const startISO = parseDateString(cleanDateStr(rawStart));
-            const endISO   = rawEnd ? parseDateString(cleanDateStr(rawEnd)) : null;
+            const endISO = rawEnd ? parseDateString(cleanDateStr(rawEnd)) : null;
 
             if (!startISO) {
                 console.error("❌ Invalid start date:", event);
@@ -755,127 +773,127 @@ const FhCalender = ({ type, events, setEvents, fetchData }) => {
     const displayEvents = loading
         ? generatePlaceholderEvents()
         : [...transformedEvents,
-            ...events.filter(event =>
-                event.extendedProps?.isPlaceholder ||
-                modifyingEventIds.includes(event.id)
-            )];
+        ...events.filter(event =>
+            event.extendedProps?.isPlaceholder ||
+            modifyingEventIds.includes(event.id)
+        )];
 
-  return (
-      <div>
-          {isMobile ? (
-              <MobileCalendarGrid
-                  events={displayEvents}
-                  loading={loading}
-                  select={handleSelect} // ✅ Ensure this is passed!
-                  fetchData={fetchData}
-                  partner_id={partner_id}
-              />
-          ) : (
-              <FullCalendar
-                  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                  initialView={isDayView ? 'dayGridMonth' : 'timeGridWeek'}
-                  headerToolbar={{
-                      left: 'prev,next today',
-                      center: 'title',
-                      right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                  }}
-                  locale={enGbLocale}
-                  weekends={true}
-                  events={displayEvents}
-                  selectable={!loading}
-                  selectMirror={!loading}
-                  select={handleSelect}
-                  eventClick={loading ? undefined : handleEventClick}
-                  selectLongPressDelay={100}
-                  eventContent={renderEventContent}
-                  eventTimeFormat={{
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      meridiem: false
-                  }}
-                  height="auto"
-              />
-          )}
+    return (
+        <div>
+            {isMobile ? (
+                <MobileCalendarGrid
+                    events={displayEvents}
+                    loading={loading}
+                    select={handleSelect} // ✅ Ensure this is passed!
+                    fetchData={fetchData}
+                    partner_id={partner_id}
+                />
+            ) : (
+                <FullCalendar
+                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                    initialView={isDayView ? 'dayGridMonth' : 'timeGridWeek'}
+                    headerToolbar={{
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    }}
+                    locale={enGbLocale}
+                    weekends={true}
+                    events={displayEvents}
+                    selectable={!loading}
+                    selectMirror={!loading}
+                    select={handleSelect}
+                    eventClick={loading ? undefined : handleEventClick}
+                    selectLongPressDelay={100}
+                    eventContent={renderEventContent}
+                    eventTimeFormat={{
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        meridiem: false
+                    }}
+                    height="auto"
+                />
+            )}
 
-          {/* ✅ Universal Modal (shared across both views) */}
-          <FhModal
-              actionType="create"
-              name="Event"
-              isOpen={isModalOpen}
-              isClose={handleModalClose}
-              width={500}
-          >
-              <div className="p-4">
-                  <h2 className="text-lg font-semibold mb-2">Block Out Time</h2>
-                  <p className="text-gray-500 text-sm mb-4">Clients won't be able to book during this time.</p>
+            {/* ✅ Universal Modal (shared across both views) */}
+            <FhModal
+                actionType="create"
+                name="Event"
+                isOpen={isModalOpen}
+                isClose={handleModalClose}
+                width={500}
+            >
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold mb-2">Block Out Time</h2>
+                    <p className="text-gray-500 text-sm mb-4">Clients won't be able to book during this time.</p>
 
-                  {/* Event Title Input */}
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
-                  <input
-                      type="text"
-                      className="w-full border-gray-300 rounded-md p-2 mb-4"
-                      placeholder="(e.g. personal appointment, vacation, etc.)"
-                      value={eventTitle}
-                      onChange={(e) => setEventTitle(e.target.value)}
-                  />
+                    {/* Event Title Input */}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
+                    <input
+                        type="text"
+                        className="w-full border-gray-300 rounded-md p-2 mb-4"
+                        placeholder="(e.g. personal appointment, vacation, etc.)"
+                        value={eventTitle}
+                        onChange={(e) => setEventTitle(e.target.value)}
+                    />
 
-                  {/* Start Date & Time Selection */}
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
-                  <div className="flex items-center gap-3 mb-4">
-                      <input
-                          type="date"
-                          className="border-gray-300 rounded-md p-2 w-full"
-                          value={selectedSlot?.start?.split("T")[0] || ""}
-                          min={new Date().toISOString().split("T")[0]}
-                          onChange={(e) => setSelectedSlot({ ...selectedSlot, start: e.target.value })}
-                      />
-                      <select
-                          className="border-gray-300 rounded-md p-2 w-full"
-                          value={selectedSlot?.startTime || "00:00"}
-                          onChange={(e) => setSelectedSlot({ ...selectedSlot, startTime: e.target.value })}
-                      >
-                          {generateTimeOptions().map((time, index) => (
-                              <option key={index} value={time}>
-                                  {time}
-                              </option>
-                          ))}
-                      </select>
-                  </div>
+                    {/* Start Date & Time Selection */}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Date & Time</label>
+                    <div className="flex items-center gap-3 mb-4">
+                        <input
+                            type="date"
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.start?.split("T")[0] || ""}
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, start: e.target.value })}
+                        />
+                        <select
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.startTime || "00:00"}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, startTime: e.target.value })}
+                        >
+                            {generateTimeOptions().map((time, index) => (
+                                <option key={index} value={time}>
+                                    {time}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                  {/* End Date & Time Selection */}
-                  <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
-                  <div className="flex items-center gap-3 mb-4">
-                      <input
-                          type="date"
-                          className="border-gray-300 rounded-md p-2 w-full"
-                          value={selectedSlot?.end?.split("T")[0] || ""}
-                          onChange={(e) => setSelectedSlot({ ...selectedSlot, end: e.target.value })}
-                      />
-                      <select
-                          className="border-gray-300 rounded-md p-2 w-full"
-                          value={selectedSlot?.endTime || "23:59"}
-                          onChange={(e) => setSelectedSlot({ ...selectedSlot, endTime: e.target.value })}
-                      >
-                          {generateTimeOptions().map((time, index) => (
-                              <option key={index} value={time}>
-                                  {time}
-                              </option>
-                          ))}
-                      </select>
-                  </div>
+                    {/* End Date & Time Selection */}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">End Date & Time</label>
+                    <div className="flex items-center gap-3 mb-4">
+                        <input
+                            type="date"
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.end?.split("T")[0] || ""}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, end: e.target.value })}
+                        />
+                        <select
+                            className="border-gray-300 rounded-md p-2 w-full"
+                            value={selectedSlot?.endTime || "23:59"}
+                            onChange={(e) => setSelectedSlot({ ...selectedSlot, endTime: e.target.value })}
+                        >
+                            {generateTimeOptions().map((time, index) => (
+                                <option key={index} value={time}>
+                                    {time}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                  {/* Save Button */}
-                  <button
-                      className="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600"
-                      onClick={handleSaveEvent}
-                  >
-                      Save
-                  </button>
-              </div>
-          </FhModal>
-      </div>
+                    {/* Save Button */}
+                    <button
+                        className="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-gray-600"
+                        onClick={handleSaveEvent}
+                    >
+                        Save
+                    </button>
+                </div>
+            </FhModal>
+        </div>
 
-  );
+    );
 };
 
 export default FhCalender;

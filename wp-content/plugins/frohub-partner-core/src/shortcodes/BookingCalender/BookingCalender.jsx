@@ -91,49 +91,54 @@ export default function BookingCalender() {
                 console.error("Google Calendar API returned unexpected response:", response.data);
                 return [];
             }
-
             return response.data.events.map(event => {
                 const { id, title, start, end } = event;
 
                 const isAllDay = !start.includes("T");
-                let formattedDate = "Unknown Date";
-                let formattedTime = null;
-                let formattedEnd = null;
 
                 if (isAllDay) {
-                    // All-day event
-                    formattedDate = start;
-                    formattedEnd = end;
-                } else {
-                    // Timed event — must respect UK timezone
-                    const startObj = new Date(start);
-                    const endObj = new Date(end);
-
-                    // Use UK time zone
-                    formattedDate = startObj.toLocaleDateString("sv-SE", { timeZone: "Europe/London" });
-                    formattedTime = startObj.toLocaleTimeString("en-GB", {
-                        timeZone: "Europe/London",
-                        hour12: false,
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-
-                    formattedEnd = endObj.toLocaleString("sv-SE", {
-                        timeZone: "Europe/London"
-                    });
+                    // ✅ Correct handling for all-day events
+                    // Google returns end date exclusive, but FullCalendar expects inclusive.
+                    // We'll just mark it as allDay and omit end, so it shows correctly on one day.
+                    return {
+                        id: `calendar-${id}`,
+                        title: title || 'Google Calendar Event',
+                        start,              // e.g. "2025-10-21"
+                        allDay: true,       // critical flag
+                        eventType: 'google-calendar',
+                        backgroundColor: '#34a853',
+                        borderColor: '#34a853',
+                        textColor: '#fff',
+                    };
                 }
+
+                // ⏰ Handle timed events normally
+                const startObj = new Date(start);
+                const endObj = new Date(end);
+
+                const formattedDate = startObj.toLocaleDateString("sv-SE", { timeZone: "Europe/London" });
+                const formattedTime = startObj.toLocaleTimeString("en-GB", {
+                    timeZone: "Europe/London",
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                const formattedEnd = endObj.toLocaleString("sv-SE", { timeZone: "Europe/London" });
 
                 return {
                     id: `calendar-${id}`,
                     title: title || 'Google Calendar Event',
                     date: formattedDate,
-                    time: formattedTime,  // UK time
+                    time: formattedTime,
                     end: formattedEnd,
-                    isAllDay,
+                    isAllDay: false,
                     eventType: 'google-calendar',
                 };
             });
+
+
         } catch (error) {
             console.error("Error fetching all Google Calendar events:", error);
             return [];
